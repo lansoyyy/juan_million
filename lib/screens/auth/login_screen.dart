@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:juan_million/screens/auth/signup_screen.dart';
+import 'package:juan_million/screens/home_screen.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/button_widget.dart';
 import 'package:juan_million/widgets/text_widget.dart';
@@ -72,7 +73,10 @@ class _LoginScreenState extends State<LoginScreen> {
             ButtonWidget(
               width: 350,
               label: 'Log in',
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const HomeScreen()));
+              },
             ),
             const SizedBox(
               height: 10,
