@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:juan_million/screens/pages/inventory_page.dart';
+import 'package:juan_million/screens/pages/points_page.dart';
+import 'package:juan_million/screens/pages/wallet_page.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 
@@ -73,12 +77,18 @@ class HomeScreen extends StatelessWidget {
                           const SizedBox(
                             width: 10,
                           ),
-                          Container(
-                            decoration: const BoxDecoration(
-                                color: Colors.white, shape: BoxShape.circle),
-                            child: Icon(
-                              Icons.add,
-                              color: primary,
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => const InventoryPage()));
+                            },
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                  color: Colors.white, shape: BoxShape.circle),
+                              child: Icon(
+                                Icons.add,
+                                color: primary,
+                              ),
                             ),
                           ),
                         ],
