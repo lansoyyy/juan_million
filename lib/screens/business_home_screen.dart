@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:juan_million/screens/pages/inventory_page.dart';
-import 'package:juan_million/screens/pages/points_page.dart';
-import 'package:juan_million/screens/pages/settings_page.dart';
-import 'package:juan_million/screens/pages/wallet_page.dart';
+import 'package:juan_million/screens/pages/business/inventory_page.dart';
+import 'package:juan_million/screens/pages/business/points_page.dart';
+import 'package:juan_million/screens/pages/business/settings_page.dart';
+import 'package:juan_million/screens/pages/business/wallet_page.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class BusinessHomeScreen extends StatelessWidget {
+  const BusinessHomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

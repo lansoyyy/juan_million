@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:juan_million/screens/auth/signup_screen.dart';
-import 'package:juan_million/screens/home_screen.dart';
+import 'package:juan_million/screens/business_home_screen.dart';
+import 'package:juan_million/screens/customer_home_screen.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/button_widget.dart';
 import 'package:juan_million/widgets/text_widget.dart';
@@ -75,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
               label: 'Log in',
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const HomeScreen()));
+                    builder: (context) => const CustomerHomeScreen()));
               },
             ),
             const SizedBox(

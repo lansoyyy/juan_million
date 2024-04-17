@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:juan_million/screens/pages/profile_page.dart';
+import 'package:juan_million/screens/pages/business/profile_page.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/button_widget.dart';
 import 'package:juan_million/widgets/text_widget.dart';
