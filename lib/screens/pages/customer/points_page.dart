@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 
-class PointsPage extends StatelessWidget {
-  const PointsPage({super.key});
+class CustomerPointsPage extends StatelessWidget {
+  const CustomerPointsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +50,7 @@ class PointsPage extends StatelessWidget {
                 GestureDetector(
                   onTap: () {
                     Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const PointsPage()));
+                        builder: (context) => const CustomerPointsPage()));
                   },
                   child: Container(
                     decoration: const BoxDecoration(

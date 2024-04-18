@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 
-class WalletPage extends StatelessWidget {
-  const WalletPage({super.key});
+class CustomerWalletPage extends StatelessWidget {
+  const CustomerWalletPage({super.key});
 
   @override
   Widget build(BuildContext context) {

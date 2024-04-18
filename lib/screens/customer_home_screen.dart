@@ -4,6 +4,8 @@ import 'package:juan_million/screens/pages/business/inventory_page.dart';
 import 'package:juan_million/screens/pages/business/points_page.dart';
 import 'package:juan_million/screens/pages/business/settings_page.dart';
 import 'package:juan_million/screens/pages/business/wallet_page.dart';
+import 'package:juan_million/screens/pages/customer/notif_page.dart';
+import 'package:juan_million/screens/pages/customer/settings_page.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 
@@ -42,19 +44,24 @@ class CustomerHomeScreen extends StatelessWidget {
                             child: SizedBox(),
                           ),
                           IconButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) =>
+                                      const CustomerNotifPage()));
+                            },
                             icon: const Icon(
-                              Icons.qr_code,
+                              Icons.notifications,
                               color: Colors.white,
                             ),
                           ),
                           IconButton(
                             onPressed: () {
                               Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => const SettingsPage()));
+                                  builder: (context) =>
+                                      const CustomerSettingsPage()));
                             },
                             icon: const Icon(
-                              Icons.settings,
+                              Icons.account_circle,
                               color: Colors.white,
                             ),
                           ),
@@ -121,7 +128,7 @@ class CustomerHomeScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     TextWidget(
-                      text: 'Store',
+                      text: 'Recent Activity',
                       fontSize: 18,
                       fontFamily: 'Bold',
                     ),
@@ -155,11 +162,13 @@ class CustomerHomeScreen extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  TextWidget(
-                                    text: 'P200',
-                                    fontSize: 14,
-                                    fontFamily: 'Medium',
-                                    color: blue,
+                                  Center(
+                                    child: TextWidget(
+                                      text: 'Groovy Grocers',
+                                      fontSize: 14,
+                                      fontFamily: 'Medium',
+                                      color: blue,
+                                    ),
                                   ),
                                   const SizedBox(
                                     height: 15,
@@ -199,10 +208,10 @@ class CustomerHomeScreen extends StatelessWidget {
                                         width: 5,
                                       ),
                                       TextWidget(
-                                        text: 'Limited offer',
+                                        text: '150 pts yesterday',
                                         fontSize: 10,
                                         fontFamily: 'Bold',
-                                        color: Colors.black,
+                                        color: Colors.grey,
                                       ),
                                     ],
                                   ),

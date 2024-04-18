@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 
-class InventoryPage extends StatefulWidget {
-  const InventoryPage({super.key});
+class CustomerInventoryPage extends StatefulWidget {
+  const CustomerInventoryPage({super.key});
 
   @override
-  State<InventoryPage> createState() => _InventoryPageState();
+  State<CustomerInventoryPage> createState() => _CustomerInventoryPageState();
 }
 
-class _InventoryPageState extends State<InventoryPage> {
+class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
   final searchController = TextEditingController();
   String nameSearched = '';
   @override
