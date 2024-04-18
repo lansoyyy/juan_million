@@ -6,6 +6,7 @@ import 'package:juan_million/screens/pages/business/settings_page.dart';
 import 'package:juan_million/screens/pages/business/wallet_page.dart';
 import 'package:juan_million/screens/pages/customer/notif_page.dart';
 import 'package:juan_million/screens/pages/customer/settings_page.dart';
+import 'package:juan_million/screens/pages/store_page.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 
@@ -151,71 +152,79 @@ class CustomerHomeScreen extends StatelessWidget {
                     itemBuilder: (context, index) {
                       return Padding(
                         padding: const EdgeInsets.only(left: 5, right: 5),
-                        child: Card(
-                          elevation: 5,
-                          color: Colors.white,
-                          child: SizedBox(
-                            height: 150,
-                            width: 150,
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Center(
-                                    child: TextWidget(
-                                      text: 'Groovy Grocers',
-                                      fontSize: 14,
-                                      fontFamily: 'Medium',
-                                      color: blue,
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => const StorePage()));
+                          },
+                          child: Card(
+                            elevation: 5,
+                            color: Colors.white,
+                            child: SizedBox(
+                              height: 150,
+                              width: 150,
+                              child: Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Center(
+                                      child: TextWidget(
+                                        text: 'Groovy Grocers',
+                                        fontSize: 14,
+                                        fontFamily: 'Medium',
+                                        color: blue,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(
-                                    height: 15,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      TextWidget(
-                                        text: '250',
-                                        fontSize: 38,
-                                        fontFamily: 'Bold',
-                                        color: blue,
-                                      ),
-                                      const SizedBox(
-                                        width: 5,
-                                      ),
-                                      TextWidget(
-                                        text: 'pts',
-                                        fontSize: 12,
-                                        fontFamily: 'Bold',
-                                        color: blue,
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 15,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.circle,
-                                        color: secondary,
-                                        size: 15,
-                                      ),
-                                      const SizedBox(
-                                        width: 5,
-                                      ),
-                                      TextWidget(
-                                        text: '150 pts yesterday',
-                                        fontSize: 10,
-                                        fontFamily: 'Bold',
-                                        color: Colors.grey,
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                    const SizedBox(
+                                      height: 15,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        TextWidget(
+                                          text: '250',
+                                          fontSize: 38,
+                                          fontFamily: 'Bold',
+                                          color: blue,
+                                        ),
+                                        const SizedBox(
+                                          width: 5,
+                                        ),
+                                        TextWidget(
+                                          text: 'pts',
+                                          fontSize: 12,
+                                          fontFamily: 'Bold',
+                                          color: blue,
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(
+                                      height: 15,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.circle,
+                                          color: secondary,
+                                          size: 15,
+                                        ),
+                                        const SizedBox(
+                                          width: 5,
+                                        ),
+                                        TextWidget(
+                                          text: '150 pts yesterday',
+                                          fontSize: 10,
+                                          fontFamily: 'Bold',
+                                          color: Colors.grey,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
