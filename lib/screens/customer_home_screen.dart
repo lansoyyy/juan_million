@@ -4,6 +4,7 @@ import 'package:juan_million/screens/pages/business/inventory_page.dart';
 import 'package:juan_million/screens/pages/business/points_page.dart';
 import 'package:juan_million/screens/pages/business/settings_page.dart';
 import 'package:juan_million/screens/pages/business/wallet_page.dart';
+import 'package:juan_million/screens/pages/customer/inventory_page.dart';
 import 'package:juan_million/screens/pages/customer/notif_page.dart';
 import 'package:juan_million/screens/pages/customer/settings_page.dart';
 import 'package:juan_million/screens/pages/store_page.dart';
@@ -92,7 +93,8 @@ class CustomerHomeScreen extends StatelessWidget {
                           GestureDetector(
                             onTap: () {
                               Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => const InventoryPage()));
+                                  builder: (context) =>
+                                      const CustomerInventoryPage()));
                             },
                             child: Container(
                               decoration: const BoxDecoration(
