@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "863618395212",
+    "project_id": "juan-million",
+    "storage_bucket": "juan-million.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:863618395212:android:383fbc62cf7fa7e59fd8e9",
+        "android_client_info": {
+          "package_name": "com.example.juan_million"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBoHNTsLBqy-mfh6FldX1LQAFjkqAeefP8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
