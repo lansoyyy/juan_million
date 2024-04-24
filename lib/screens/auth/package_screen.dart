@@ -6,7 +6,15 @@ import 'package:juan_million/widgets/text_widget.dart';
 import 'package:juan_million/widgets/textfield_widget.dart';
 
 class PackageScreen extends StatefulWidget {
-  const PackageScreen({super.key});
+  String email;
+  String name;
+  String password;
+
+  PackageScreen(
+      {super.key,
+      required this.email,
+      required this.name,
+      required this.password});
 
   @override
   State<PackageScreen> createState() => _PackageScreenState();
@@ -17,6 +25,8 @@ class _PackageScreenState extends State<PackageScreen> {
   final email = TextEditingController();
 
   final password = TextEditingController();
+
+  int selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,71 +75,79 @@ class _PackageScreenState extends State<PackageScreen> {
                       itemBuilder: (context, index) {
                         return Padding(
                           padding: const EdgeInsets.only(left: 5, right: 5),
-                          child: Card(
-                            elevation: 5,
-                            color: Colors.white,
-                            child: SizedBox(
-                              height: 150,
-                              width: 150,
-                              child: Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    TextWidget(
-                                      text: 'P200',
-                                      fontSize: 14,
-                                      fontFamily: 'Medium',
-                                      color: blue,
-                                    ),
-                                    const SizedBox(
-                                      height: 15,
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        TextWidget(
-                                          text: '250',
-                                          fontSize: 38,
-                                          fontFamily: 'Bold',
-                                          color: blue,
-                                        ),
-                                        const SizedBox(
-                                          width: 5,
-                                        ),
-                                        TextWidget(
-                                          text: 'pts',
-                                          fontSize: 12,
-                                          fontFamily: 'Bold',
-                                          color: blue,
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(
-                                      height: 15,
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.circle,
-                                          color: secondary,
-                                          size: 15,
-                                        ),
-                                        const SizedBox(
-                                          width: 5,
-                                        ),
-                                        TextWidget(
-                                          text: 'Limited offer',
-                                          fontSize: 10,
-                                          fontFamily: 'Bold',
-                                          color: Colors.black,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedIndex = index;
+                              });
+                            },
+                            child: Card(
+                              elevation: selectedIndex == index ? 5 : 0.5,
+                              color: Colors.white,
+                              child: SizedBox(
+                                height: 150,
+                                width: 150,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      TextWidget(
+                                        text: 'P200',
+                                        fontSize: 14,
+                                        fontFamily: 'Medium',
+                                        color: blue,
+                                      ),
+                                      const SizedBox(
+                                        height: 15,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          TextWidget(
+                                            text: '250',
+                                            fontSize: 38,
+                                            fontFamily: 'Bold',
+                                            color: blue,
+                                          ),
+                                          const SizedBox(
+                                            width: 5,
+                                          ),
+                                          TextWidget(
+                                            text: 'pts',
+                                            fontSize: 12,
+                                            fontFamily: 'Bold',
+                                            color: blue,
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 15,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.circle,
+                                            color: secondary,
+                                            size: 15,
+                                          ),
+                                          const SizedBox(
+                                            width: 5,
+                                          ),
+                                          TextWidget(
+                                            text: 'Limited offer',
+                                            fontSize: 10,
+                                            fontFamily: 'Bold',
+                                            color: Colors.black,
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -165,71 +183,79 @@ class _PackageScreenState extends State<PackageScreen> {
                       itemBuilder: (context, index) {
                         return Padding(
                           padding: const EdgeInsets.only(left: 5, right: 5),
-                          child: Card(
-                            elevation: 5,
-                            color: Colors.white,
-                            child: SizedBox(
-                              height: 150,
-                              width: 150,
-                              child: Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    TextWidget(
-                                      text: 'P200',
-                                      fontSize: 14,
-                                      fontFamily: 'Medium',
-                                      color: blue,
-                                    ),
-                                    const SizedBox(
-                                      height: 15,
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        TextWidget(
-                                          text: '250',
-                                          fontSize: 38,
-                                          fontFamily: 'Bold',
-                                          color: blue,
-                                        ),
-                                        const SizedBox(
-                                          width: 5,
-                                        ),
-                                        TextWidget(
-                                          text: 'pts',
-                                          fontSize: 12,
-                                          fontFamily: 'Bold',
-                                          color: blue,
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(
-                                      height: 15,
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.circle,
-                                          color: secondary,
-                                          size: 15,
-                                        ),
-                                        const SizedBox(
-                                          width: 5,
-                                        ),
-                                        TextWidget(
-                                          text: 'Limited offer',
-                                          fontSize: 10,
-                                          fontFamily: 'Bold',
-                                          color: Colors.black,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedIndex = index;
+                              });
+                            },
+                            child: Card(
+                              elevation: selectedIndex == index ? 5 : 0.5,
+                              color: Colors.white,
+                              child: SizedBox(
+                                height: 150,
+                                width: 150,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      TextWidget(
+                                        text: 'P200',
+                                        fontSize: 14,
+                                        fontFamily: 'Medium',
+                                        color: blue,
+                                      ),
+                                      const SizedBox(
+                                        height: 15,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          TextWidget(
+                                            text: '250',
+                                            fontSize: 38,
+                                            fontFamily: 'Bold',
+                                            color: blue,
+                                          ),
+                                          const SizedBox(
+                                            width: 5,
+                                          ),
+                                          TextWidget(
+                                            text: 'pts',
+                                            fontSize: 12,
+                                            fontFamily: 'Bold',
+                                            color: blue,
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 15,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.circle,
+                                            color: secondary,
+                                            size: 15,
+                                          ),
+                                          const SizedBox(
+                                            width: 5,
+                                          ),
+                                          TextWidget(
+                                            text: 'Limited offer',
+                                            fontSize: 10,
+                                            fontFamily: 'Bold',
+                                            color: Colors.black,
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -247,10 +273,17 @@ class _PackageScreenState extends State<PackageScreen> {
             Center(
               child: ButtonWidget(
                 width: 325,
+                color: selectedIndex == 0 ? Colors.grey : blue,
                 label: 'Next',
                 onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const PaymentScreen()));
+                  if (selectedIndex != 0) {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => PaymentScreen(
+                              email: widget.email,
+                              name: widget.name,
+                              password: widget.password,
+                            )));
+                  }
                 },
               ),
             ),

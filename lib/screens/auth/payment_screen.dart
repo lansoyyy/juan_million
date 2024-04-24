@@ -1,22 +1,30 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:juan_million/screens/auth/login_screen.dart';
+import 'package:juan_million/screens/business_home_screen.dart';
+import 'package:juan_million/services/add_business.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/button_widget.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:juan_million/widgets/textfield_widget.dart';
+import 'package:juan_million/widgets/toast_widget.dart';
 
 class PaymentScreen extends StatefulWidget {
-  const PaymentScreen({super.key});
+  String email;
+  String name;
+  String password;
+
+  PaymentScreen(
+      {super.key,
+      required this.email,
+      required this.name,
+      required this.password});
 
   @override
   State<PaymentScreen> createState() => _PaymentScreenState();
 }
 
 class _PaymentScreenState extends State<PaymentScreen> {
-  final name = TextEditingController();
-  final email = TextEditingController();
-
-  final password = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,7 +56,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
               padding: const EdgeInsets.only(
                   left: 30, right: 30, top: 10, bottom: 10),
               child: GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  showToast('Paypal is currently unavailable');
+                },
                 child: Container(
                   width: double.infinity,
                   height: 65,
@@ -78,7 +88,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         ),
                       ),
                       const Icon(
-                        Icons.radio_button_checked_rounded,
+                        Icons.radio_button_off_rounded,
                       ),
                       const SizedBox(
                         width: 30,
@@ -125,7 +135,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         ),
                       ),
                       const Icon(
-                        Icons.radio_button_off_outlined,
+                        Icons.radio_button_checked_rounded,
                       ),
                       const SizedBox(
                         width: 30,
@@ -139,7 +149,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
               padding: const EdgeInsets.only(
                   left: 30, right: 30, top: 10, bottom: 10),
               child: GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  showToast('Apple Pay is currently unavailable');
+                },
                 child: Container(
                   width: double.infinity,
                   height: 65,
@@ -207,5 +219,30 @@ class _PaymentScreenState extends State<PaymentScreen> {
         ),
       ),
     );
+  }
+
+  register(context) async {
+    try {
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: widget.email, password: widget.password);
+
+      addBusiness(widget.name, widget.email);
+
+      showToast('Account created succesfully!');
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const BusinessHomeScreen()));
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        showToast('The password provided is too weak.');
+      } else if (e.code == 'email-already-in-use') {
+        showToast('The account already exists for that email.');
+      } else if (e.code == 'invalid-email') {
+        showToast('The email address is not valid.');
+      } else {
+        showToast(e.toString());
+      }
+    } on Exception catch (e) {
+      showToast("An error occurred: $e");
+    }
   }
 }

@@ -88,7 +88,11 @@ class _SignupScreenState extends State<SignupScreen> {
               label: 'Next',
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const PackageScreen()));
+                    builder: (context) => PackageScreen(
+                          email: email.text,
+                          name: name.text,
+                          password: password.text,
+                        )));
               },
             ),
             const SizedBox(
