@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:juan_million/screens/auth/login_screen.dart';
 import 'package:juan_million/screens/pages/business/profile_page.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/button_widget.dart';
@@ -244,6 +245,59 @@ class _CustomerSettingsPageState extends State<CustomerSettingsPage> {
                           Card(
                             elevation: 3,
                             child: ListTile(
+                              onTap: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                          title: const Text(
+                                            'Logout Confirmation',
+                                            style: TextStyle(
+                                                fontFamily: 'QBold',
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          content: const Text(
+                                            'Are you sure you want to Logout?',
+                                            style: TextStyle(
+                                                fontFamily: 'QRegular'),
+                                          ),
+                                          actions: <Widget>[
+                                            MaterialButton(
+                                              onPressed: () =>
+                                                  Navigator.of(context)
+                                                      .pop(true),
+                                              child: const Text(
+                                                'Close',
+                                                style: TextStyle(
+                                                    fontFamily: 'QRegular',
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ),
+                                            MaterialButton(
+                                              onPressed: () async {
+                                                await FirebaseAuth.instance
+                                                    .signOut();
+                                                Navigator.of(context)
+                                                    .pushReplacement(
+                                                        MaterialPageRoute(
+                                                            builder:
+                                                                (context) =>
+                                                                    LoginScreen(
+                                                                      inCustomer:
+                                                                          true,
+                                                                    )));
+                                              },
+                                              child: const Text(
+                                                'Continue',
+                                                style: TextStyle(
+                                                    fontFamily: 'QRegular',
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ),
+                                          ],
+                                        ));
+                              },
                               tileColor: Colors.white,
                               leading: Container(
                                 decoration: BoxDecoration(
