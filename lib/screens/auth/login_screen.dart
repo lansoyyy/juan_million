@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:juan_million/screens/auth/customer_signup_screen.dart';
 import 'package:juan_million/screens/auth/signup_screen.dart';
 import 'package:juan_million/screens/business_home_screen.dart';
 import 'package:juan_million/screens/customer_home_screen.dart';
@@ -8,7 +9,9 @@ import 'package:juan_million/widgets/text_widget.dart';
 import 'package:juan_million/widgets/textfield_widget.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  bool inCustomer;
+
+  LoginScreen({super.key, required this.inCustomer});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -92,8 +95,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pushReplacement(MaterialPageRoute(
-                        builder: (context) => const SignupScreen()));
+                    if (widget.inCustomer) {
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(
+                          builder: (context) => const CustomerSignupScreen()));
+                    } else {
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(
+                          builder: (context) => const SignupScreen()));
+                    }
                   },
                   child: TextWidget(
                     text: 'Create account',

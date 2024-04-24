@@ -191,7 +191,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 label: 'Next',
                 onPressed: () {
                   Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      builder: (context) => const LoginScreen()));
+                      builder: (context) => LoginScreen(
+                            inCustomer: false,
+                          )));
                 },
               ),
             ),

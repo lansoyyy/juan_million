@@ -32,7 +32,9 @@ class LandingScreen extends StatelessWidget {
                   GestureDetector(
                     onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const LoginScreen()));
+                          builder: (context) => LoginScreen(
+                                inCustomer: true,
+                              )));
                     },
                     child: Align(
                       alignment: Alignment.topCenter,
@@ -71,7 +73,9 @@ class LandingScreen extends StatelessWidget {
                   GestureDetector(
                     onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const SignupScreen()));
+                          builder: (context) => LoginScreen(
+                                inCustomer: false,
+                              )));
                     },
                     child: Container(
                       height: 300,
