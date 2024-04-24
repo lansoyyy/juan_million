@@ -1,9 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:juan_million/screens/auth/package_screen.dart';
+import 'package:juan_million/screens/customer_home_screen.dart';
+import 'package:juan_million/services/add_user.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/button_widget.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:juan_million/widgets/textfield_widget.dart';
+import 'package:juan_million/widgets/toast_widget.dart';
 
 class CustomerSignupScreen extends StatefulWidget {
   const CustomerSignupScreen({super.key});
@@ -31,7 +35,7 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
               height: 200,
             ),
             TextWidget(
-              text: 'Sign up as business',
+              text: 'Register as Customer',
               fontSize: 32,
               fontFamily: 'Bold',
               color: primary,
@@ -85,10 +89,9 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
             ),
             ButtonWidget(
               width: 350,
-              label: 'Next',
+              label: 'Signup',
               onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const PackageScreen()));
+                register(context);
               },
             ),
             const SizedBox(
@@ -184,5 +187,30 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
         ),
       ),
     );
+  }
+
+  register(context) async {
+    try {
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: email.text, password: password.text);
+
+      addUser(name.text, email.text);
+
+      showToast('Account created succesfully!');
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const CustomerHomeScreen()));
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        showToast('The password provided is too weak.');
+      } else if (e.code == 'email-already-in-use') {
+        showToast('The account already exists for that email.');
+      } else if (e.code == 'invalid-email') {
+        showToast('The email address is not valid.');
+      } else {
+        showToast(e.toString());
+      }
+    } on Exception catch (e) {
+      showToast("An error occurred: $e");
+    }
   }
 }
