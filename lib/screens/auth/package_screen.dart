@@ -273,17 +273,15 @@ class _PackageScreenState extends State<PackageScreen> {
             Center(
               child: ButtonWidget(
                 width: 325,
-                color: selectedIndex == 0 ? Colors.grey : blue,
+                color: blue,
                 label: 'Next',
                 onPressed: () {
-                  if (selectedIndex != 0) {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => PaymentScreen(
-                              email: widget.email,
-                              name: widget.name,
-                              password: widget.password,
-                            )));
-                  }
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => PaymentScreen(
+                            email: widget.email,
+                            name: widget.name,
+                            password: widget.password,
+                          )));
                 },
               ),
             ),
