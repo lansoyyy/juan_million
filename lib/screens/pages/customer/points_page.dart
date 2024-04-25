@@ -48,10 +48,7 @@ class CustomerPointsPage extends StatelessWidget {
                   width: 10,
                 ),
                 GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const CustomerPointsPage()));
-                  },
+                  onTap: () {},
                   child: Container(
                     decoration: const BoxDecoration(
                         color: Colors.white, shape: BoxShape.circle),

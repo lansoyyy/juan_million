@@ -1,9 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:juan_million/screens/auth/package_screen.dart';
+import 'package:juan_million/screens/business_home_screen.dart';
+import 'package:juan_million/services/add_business.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/button_widget.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:juan_million/widgets/textfield_widget.dart';
+import 'package:juan_million/widgets/toast_widget.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
