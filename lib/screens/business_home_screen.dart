@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:juan_million/screens/pages/business/inventory_page.dart';
 import 'package:juan_million/screens/pages/business/points_page.dart';
+import 'package:juan_million/screens/pages/business/qr_page.dart';
 import 'package:juan_million/screens/pages/business/settings_page.dart';
 import 'package:juan_million/screens/pages/business/wallet_page.dart';
 import 'package:juan_million/utlis/colors.dart';
@@ -42,7 +43,10 @@ class BusinessHomeScreen extends StatelessWidget {
                             child: SizedBox(),
                           ),
                           IconButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => const QRPage()));
+                            },
                             icon: const Icon(
                               Icons.qr_code,
                               color: Colors.white,
