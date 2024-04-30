@@ -89,14 +89,9 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
             ButtonWidget(
               width: 350,
-              label: 'Next',
+              label: 'Signup',
               onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => PackageScreen(
-                          email: email.text,
-                          name: name.text,
-                          password: password.text,
-                        )));
+                register(context);
               },
             ),
             const SizedBox(
@@ -192,5 +187,31 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
       ),
     );
+  }
+
+  register(context) async {
+    try {
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: email.text, password: password.text);
+
+      // addUser(name.text, email.text);
+      addBusiness(name.text, email.text);
+
+      showToast('Account created succesfully!');
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const BusinessHomeScreen()));
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        showToast('The password provided is too weak.');
+      } else if (e.code == 'email-already-in-use') {
+        showToast('The account already exists for that email.');
+      } else if (e.code == 'invalid-email') {
+        showToast('The email address is not valid.');
+      } else {
+        showToast(e.toString());
+      }
+    } on Exception catch (e) {
+      showToast("An error occurred: $e");
+    }
   }
 }

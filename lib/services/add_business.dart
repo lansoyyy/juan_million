@@ -14,7 +14,9 @@ Future addBusiness(name, email) async {
     'inventory': 0,
     'phone': '',
     'ptsConversion': 0,
-    'uid': FirebaseAuth.instance.currentUser!.uid
+    'uid': FirebaseAuth.instance.currentUser!.uid,
+    'ptsreceive': 0,
+    'ptsconversion': 0,
   };
 
   await docUser.set(json);

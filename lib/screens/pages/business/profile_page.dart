@@ -3,7 +3,9 @@ import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 
 class ProfikePage extends StatelessWidget {
-  const ProfikePage({super.key});
+  dynamic data;
+
+  ProfikePage({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +29,7 @@ class ProfikePage extends StatelessWidget {
                       )),
                 ),
                 TextWidget(
-                  text: 'Customer Info',
+                  text: 'Business Info',
                   fontSize: 18,
                 ),
                 const SizedBox(
@@ -44,7 +46,7 @@ class ProfikePage extends StatelessWidget {
               size: 125,
             ),
             TextWidget(
-              text: 'Lance Olana',
+              text: data['name'],
               fontSize: 18,
               color: Colors.black,
             ),
@@ -68,7 +70,7 @@ class ProfikePage extends StatelessWidget {
                     fontFamily: 'Medium',
                   ),
                   trailing: TextWidget(
-                    text: ' 1,000 points',
+                    text: ' ${data['pts']} points',
                     fontSize: 16,
                     color: primary,
                     fontFamily: 'Bold',
@@ -96,7 +98,7 @@ class ProfikePage extends StatelessWidget {
                     fontFamily: 'Medium',
                   ),
                   trailing: TextWidget(
-                    text: ' 1,500 points',
+                    text: ' ${data['ptsreceive']} points',
                     fontSize: 16,
                     color: primary,
                     fontFamily: 'Bold',
