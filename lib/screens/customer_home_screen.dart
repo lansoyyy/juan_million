@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:juan_million/screens/pages/business/inventory_page.dart';
@@ -157,6 +158,18 @@ class CustomerHomeScreen extends StatelessWidget {
                             fontSize: 18,
                             fontFamily: 'Bold',
                           ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => const StorePage()));
+                            },
+                            child: TextWidget(
+                              text: 'See all',
+                              color: blue,
+                              fontSize: 14,
+                              fontFamily: 'Bold',
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(
@@ -171,10 +184,6 @@ class CustomerHomeScreen extends StatelessWidget {
                             return Padding(
                               padding: const EdgeInsets.only(left: 5, right: 5),
                               child: GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => const StorePage()));
-                                },
                                 child: Card(
                                   elevation: 5,
                                   color: Colors.white,

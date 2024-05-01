@@ -153,12 +153,6 @@ class BusinessHomeScreen extends StatelessWidget {
                             fontSize: 18,
                             fontFamily: 'Bold',
                           ),
-                          TextWidget(
-                            text: 'See all',
-                            color: blue,
-                            fontSize: 14,
-                            fontFamily: 'Bold',
-                          ),
                         ],
                       ),
                       const SizedBox(
@@ -291,12 +285,6 @@ class BusinessHomeScreen extends StatelessWidget {
                           TextWidget(
                             text: 'Promo & Deals',
                             fontSize: 18,
-                            fontFamily: 'Bold',
-                          ),
-                          TextWidget(
-                            text: 'See more',
-                            color: blue,
-                            fontSize: 14,
                             fontFamily: 'Bold',
                           ),
                         ],
