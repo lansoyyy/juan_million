@@ -7,6 +7,7 @@ import 'package:juan_million/screens/pages/business/points_page.dart';
 import 'package:juan_million/screens/pages/business/qr_page.dart';
 import 'package:juan_million/screens/pages/business/settings_page.dart';
 import 'package:juan_million/screens/pages/business/wallet_page.dart';
+import 'package:juan_million/screens/pages/store_page.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 
@@ -152,6 +153,18 @@ class BusinessHomeScreen extends StatelessWidget {
                             text: 'Store',
                             fontSize: 18,
                             fontFamily: 'Bold',
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => const StorePage()));
+                            },
+                            child: TextWidget(
+                              text: 'See all',
+                              color: blue,
+                              fontSize: 14,
+                              fontFamily: 'Bold',
+                            ),
                           ),
                         ],
                       ),
