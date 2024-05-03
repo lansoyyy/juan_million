@@ -82,12 +82,12 @@ class CustomerWalletPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const Icon(
-                          Icons.sync_alt,
+                          Icons.wallet,
                           color: Colors.white,
                           size: 30,
                         ),
                         TextWidget(
-                          text: 'Transfer',
+                          text: 'Top up',
                           fontSize: 12,
                           color: Colors.white,
                         ),
