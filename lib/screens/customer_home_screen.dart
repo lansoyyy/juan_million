@@ -64,10 +64,22 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           .get()
           .then((DocumentSnapshot documentSnapshot) async {
         if (documentSnapshot.exists) {
+          await FirebaseFirestore.instance
+              .collection('Users')
+              .doc(FirebaseAuth.instance.currentUser!.uid)
+              .update({
+            'pts': FieldValue.increment(documentSnapshot['pts']),
+          });
+          await FirebaseFirestore.instance
+              .collection('Business')
+              .doc(documentSnapshot['uid'])
+              .update({
+            'pts': FieldValue.increment(-documentSnapshot['pts']),
+          });
           // Update my points
           // Update business points
         }
-
+      }).whenComplete(() {
         Navigator.pop(context);
         Navigator.pop(context);
       });
