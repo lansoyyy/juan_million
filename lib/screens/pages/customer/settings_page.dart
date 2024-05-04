@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:juan_million/screens/auth/login_screen.dart';
+import 'package:juan_million/screens/landing_screen.dart';
 import 'package:juan_million/screens/pages/business/profile_page.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/button_widget.dart';
@@ -280,12 +281,8 @@ class _CustomerSettingsPageState extends State<CustomerSettingsPage> {
                                                 Navigator.of(context)
                                                     .pushReplacement(
                                                         MaterialPageRoute(
-                                                            builder:
-                                                                (context) =>
-                                                                    LoginScreen(
-                                                                      inCustomer:
-                                                                          true,
-                                                                    )));
+                                                            builder: (context) =>
+                                                                const LandingScreen()));
                                               },
                                               child: const Text(
                                                 'Continue',
