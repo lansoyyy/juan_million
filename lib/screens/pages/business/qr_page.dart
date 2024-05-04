@@ -6,7 +6,9 @@ import 'package:juan_million/widgets/text_widget.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class QRPage extends StatelessWidget {
-  const QRPage({super.key});
+  String id;
+
+  QRPage({super.key, required this.id});
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +80,7 @@ class QRPage extends StatelessWidget {
                             ),
                             child: Padding(
                               padding: const EdgeInsets.all(10.0),
-                              child: QrImageView(data: mydata.id),
+                              child: QrImageView(data: id),
                             ),
                           ),
                         ),

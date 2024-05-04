@@ -8,12 +8,19 @@ import 'package:juan_million/screens/pages/business/qr_page.dart';
 import 'package:juan_million/screens/pages/business/settings_page.dart';
 import 'package:juan_million/screens/pages/business/wallet_page.dart';
 import 'package:juan_million/screens/pages/store_page.dart';
+import 'package:juan_million/services/add_points.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
+import 'package:juan_million/widgets/toast_widget.dart';
 
-class BusinessHomeScreen extends StatelessWidget {
+class BusinessHomeScreen extends StatefulWidget {
   const BusinessHomeScreen({super.key});
 
+  @override
+  State<BusinessHomeScreen> createState() => _BusinessHomeScreenState();
+}
+
+class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
   @override
   Widget build(BuildContext context) {
     final Stream<DocumentSnapshot> userData = FirebaseFirestore.instance
@@ -87,10 +94,160 @@ class BusinessHomeScreen extends StatelessWidget {
                                         ),
                                         IconButton(
                                           onPressed: () {
-                                            Navigator.of(context).push(
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const QRPage()));
+                                            if (mydata['pts'] > 1) {
+                                              int qty = 1;
+
+                                              showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return AlertDialog(
+                                                    content: StatefulBuilder(
+                                                        builder: (context,
+                                                            setState) {
+                                                      int total = mydata[
+                                                              'ptsconversion'] *
+                                                          qty;
+                                                      return Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          TextWidget(
+                                                            text:
+                                                                'Input quantity',
+                                                            fontSize: 12,
+                                                            fontFamily:
+                                                                'Regular',
+                                                            color: Colors.grey,
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              IconButton(
+                                                                onPressed: () {
+                                                                  if (qty > 1) {
+                                                                    setState(
+                                                                        () {
+                                                                      qty--;
+                                                                    });
+                                                                  }
+                                                                },
+                                                                icon:
+                                                                    const Icon(
+                                                                  Icons.remove,
+                                                                  size: 50,
+                                                                ),
+                                                              ),
+                                                              const SizedBox(
+                                                                width: 10,
+                                                              ),
+                                                              TextWidget(
+                                                                text: qty
+                                                                    .toString(),
+                                                                fontSize: 48,
+                                                                fontFamily:
+                                                                    'Bold',
+                                                                color: blue,
+                                                              ),
+                                                              const SizedBox(
+                                                                width: 10,
+                                                              ),
+                                                              IconButton(
+                                                                onPressed: () {
+                                                                  if (mydata[
+                                                                          'pts'] >
+                                                                      total) {
+                                                                    setState(
+                                                                        () {
+                                                                      qty++;
+                                                                    });
+                                                                  } else {
+                                                                    showToast(
+                                                                        'Points not enough!');
+                                                                  }
+                                                                },
+                                                                icon:
+                                                                    const Icon(
+                                                                  Icons.add,
+                                                                  size: 50,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .end,
+                                                            children: [
+                                                              MaterialButton(
+                                                                onPressed: () =>
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop(
+                                                                            true),
+                                                                child:
+                                                                    const Text(
+                                                                  'Close',
+                                                                  style: TextStyle(
+                                                                      color: Colors
+                                                                          .grey,
+                                                                      fontFamily:
+                                                                          'Medium',
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold),
+                                                                ),
+                                                              ),
+                                                              MaterialButton(
+                                                                onPressed:
+                                                                    () async {
+                                                                  addPoints(
+                                                                          total,
+                                                                          qty)
+                                                                      .then(
+                                                                          (value) {
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop(
+                                                                            true);
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .push(MaterialPageRoute(
+                                                                            builder: (context) => QRPage(
+                                                                                  id: value,
+                                                                                )));
+                                                                  });
+                                                                },
+                                                                child:
+                                                                    const Text(
+                                                                  'Continue',
+                                                                  style: TextStyle(
+                                                                      fontFamily:
+                                                                          'Bold',
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      );
+                                                    }),
+                                                  );
+                                                },
+                                              );
+                                            } else {
+                                              showToast(
+                                                  "You don't have enough points.");
+                                            }
                                           },
                                           icon: const Icon(
                                             Icons.qr_code,
