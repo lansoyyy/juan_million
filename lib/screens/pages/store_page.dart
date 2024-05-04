@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:juan_million/screens/auth/payment_screen.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/button_widget.dart';
 import 'package:juan_million/widgets/text_widget.dart';
@@ -87,79 +88,86 @@ class StorePage extends StatelessWidget {
                             itemBuilder: (context, index) {
                               return Padding(
                                 padding: const EdgeInsets.all(5.0),
-                                child: Card(
-                                  elevation: 5,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(
-                                        15,
+                                child: GestureDetector(
+                                  child: Card(
+                                    elevation: 5,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(
+                                          15,
+                                        ),
                                       ),
-                                    ),
-                                    width: double.infinity,
-                                    height: 150,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 10, right: 10),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Container(
-                                            width: 150,
-                                            height: 120,
-                                            decoration: BoxDecoration(
-                                              color: Colors.grey[200],
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                10,
+                                      width: double.infinity,
+                                      height: 150,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 10, right: 10),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Container(
+                                              width: 150,
+                                              height: 120,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey[200],
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                  10,
+                                                ),
+                                              ),
+                                              child: Center(
+                                                child: Image.asset(
+                                                  'assets/images/Juan4All 2.png',
+                                                ),
                                               ),
                                             ),
-                                            child: Center(
-                                              child: Image.asset(
-                                                'assets/images/Juan4All 2.png',
-                                              ),
+                                            const SizedBox(
+                                              width: 20,
                                             ),
-                                          ),
-                                          const SizedBox(
-                                            width: 20,
-                                          ),
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              TextWidget(
-                                                text:
-                                                    '${finaldata[index]['slots'] * 150} pts',
-                                                fontSize: 24,
-                                                color: blue,
-                                                fontFamily: 'Bold',
-                                              ),
-                                              TextWidget(
-                                                text:
-                                                    'P${finaldata[index]['price']}',
-                                                fontSize: 14,
-                                                color: grey,
-                                                fontFamily: 'Medium',
-                                              ),
-                                              const SizedBox(
-                                                height: 5,
-                                              ),
-                                              ButtonWidget(
-                                                radius: 100,
-                                                height: 30,
-                                                width: 75,
-                                                fontSize: 12,
-                                                label: 'Buy',
-                                                onPressed: () {},
-                                              ),
-                                            ],
-                                          ),
-                                        ],
+                                            Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                TextWidget(
+                                                  text:
+                                                      '${finaldata[index]['slots'] * 150} pts',
+                                                  fontSize: 24,
+                                                  color: blue,
+                                                  fontFamily: 'Bold',
+                                                ),
+                                                TextWidget(
+                                                  text:
+                                                      'P${finaldata[index]['price']}',
+                                                  fontSize: 14,
+                                                  color: grey,
+                                                  fontFamily: 'Medium',
+                                                ),
+                                                const SizedBox(
+                                                  height: 5,
+                                                ),
+                                                ButtonWidget(
+                                                  radius: 100,
+                                                  height: 30,
+                                                  width: 75,
+                                                  fontSize: 12,
+                                                  label: 'Buy',
+                                                  onPressed: () {
+                                                    Navigator.of(context).push(
+                                                        MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                const PaymentScreen()));
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -232,74 +240,82 @@ class StorePage extends StatelessWidget {
                               return Padding(
                                 padding:
                                     const EdgeInsets.only(left: 5, right: 5),
-                                child: Card(
-                                  elevation: 5,
-                                  color: Colors.white,
-                                  child: SizedBox(
-                                    height: 150,
-                                    width: 150,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(10.0),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          TextWidget(
-                                            text:
-                                                'P${data.docs[index]['price']}',
-                                            fontSize: 14,
-                                            fontFamily: 'Medium',
-                                            color: blue,
-                                          ),
-                                          const SizedBox(
-                                            height: 15,
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              TextWidget(
-                                                text:
-                                                    '${data.docs[index]['slots'] * 150}',
-                                                fontSize: 38,
-                                                fontFamily: 'Bold',
-                                                color: blue,
-                                              ),
-                                              const SizedBox(
-                                                width: 5,
-                                              ),
-                                              TextWidget(
-                                                text: 'pts',
-                                                fontSize: 12,
-                                                fontFamily: 'Bold',
-                                                color: blue,
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(
-                                            height: 15,
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Icon(
-                                                Icons.circle,
-                                                color: secondary,
-                                                size: 15,
-                                              ),
-                                              const SizedBox(
-                                                width: 5,
-                                              ),
-                                              TextWidget(
-                                                text: 'Limited offer',
-                                                fontSize: 10,
-                                                fontFamily: 'Bold',
-                                                color: Colors.black,
-                                              ),
-                                            ],
-                                          ),
-                                        ],
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const PaymentScreen()));
+                                  },
+                                  child: Card(
+                                    elevation: 5,
+                                    color: Colors.white,
+                                    child: SizedBox(
+                                      height: 150,
+                                      width: 150,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            TextWidget(
+                                              text:
+                                                  'P${data.docs[index]['price']}',
+                                              fontSize: 14,
+                                              fontFamily: 'Medium',
+                                              color: blue,
+                                            ),
+                                            const SizedBox(
+                                              height: 15,
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                TextWidget(
+                                                  text:
+                                                      '${data.docs[index]['slots'] * 150}',
+                                                  fontSize: 38,
+                                                  fontFamily: 'Bold',
+                                                  color: blue,
+                                                ),
+                                                const SizedBox(
+                                                  width: 5,
+                                                ),
+                                                TextWidget(
+                                                  text: 'pts',
+                                                  fontSize: 12,
+                                                  fontFamily: 'Bold',
+                                                  color: blue,
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              height: 15,
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  Icons.circle,
+                                                  color: secondary,
+                                                  size: 15,
+                                                ),
+                                                const SizedBox(
+                                                  width: 5,
+                                                ),
+                                                TextWidget(
+                                                  text: 'Limited offer',
+                                                  fontSize: 10,
+                                                  fontFamily: 'Bold',
+                                                  color: Colors.black,
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),

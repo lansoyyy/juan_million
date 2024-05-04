@@ -276,12 +276,12 @@ class _PackageScreenState extends State<PackageScreen> {
                 color: blue,
                 label: 'Next',
                 onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => PaymentScreen(
-                            email: widget.email,
-                            name: widget.name,
-                            password: widget.password,
-                          )));
+                  // Navigator.of(context).push(MaterialPageRoute(
+                  //     builder: (context) => PaymentScreen(
+                  //           email: widget.email,
+                  //           name: widget.name,
+                  //           password: widget.password,
+                  //         )));
                 },
               ),
             ),
