@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:intl/intl.dart';
 import 'package:juan_million/screens/pages/business/inventory_page.dart';
 import 'package:juan_million/screens/pages/business/points_page.dart';
 import 'package:juan_million/screens/pages/business/settings_page.dart';
@@ -222,7 +223,11 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                           CrossAxisAlignment.center,
                                       children: [
                                         TextWidget(
-                                          text: '${data['pts']}',
+                                          text: index == 0
+                                              ? '${data['pts']}'
+                                              : index == 1
+                                                  ? '0'
+                                                  : '0',
                                           fontFamily: 'Bold',
                                           fontSize: 50,
                                           color: Colors.white,
@@ -265,126 +270,194 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                 const SizedBox(
                   height: 10,
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 20, right: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          TextWidget(
-                            text: 'Recent Activity',
-                            fontSize: 18,
-                            fontFamily: 'Bold',
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
+                StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('Points')
+                        .where('scannedId',
+                            isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                        .snapshots(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.hasError) {
+                        print(snapshot.error);
+                        return const Center(child: Text('Error'));
+                      }
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Padding(
+                          padding: EdgeInsets.only(top: 50),
+                          child: Center(
+                              child: CircularProgressIndicator(
+                            color: Colors.black,
+                          )),
+                        );
+                      }
 
-                      Center(
-                        child: TextWidget(
-                          text: 'No Recent Activity',
-                          fontSize: 14,
-                          fontFamily: 'Regular',
-                          color: Colors.grey,
+                      final data = snapshot.requireData;
+                      return Padding(
+                        padding: const EdgeInsets.only(left: 20, right: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                TextWidget(
+                                  text: 'Recent Activity',
+                                  fontSize: 18,
+                                  fontFamily: 'Bold',
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            data.docs.isEmpty
+                                ? Center(
+                                    child: TextWidget(
+                                      text: 'No Recent Activity',
+                                      fontSize: 14,
+                                      fontFamily: 'Regular',
+                                      color: Colors.grey,
+                                    ),
+                                  )
+                                : SizedBox(
+                                    height: 150,
+                                    width: 500,
+                                    child: ListView.builder(
+                                      itemCount: data.docs.length,
+                                      scrollDirection: Axis.horizontal,
+                                      itemBuilder: (context, index) {
+                                        return StreamBuilder<DocumentSnapshot>(
+                                            stream: FirebaseFirestore.instance
+                                                .collection('Business')
+                                                .doc(data.docs[index]['uid'])
+                                                .snapshots(),
+                                            builder: (context,
+                                                AsyncSnapshot<DocumentSnapshot>
+                                                    snapshot) {
+                                              if (!snapshot.hasData) {
+                                                return const Center(
+                                                    child: Text('Loading'));
+                                              } else if (snapshot.hasError) {
+                                                return const Center(
+                                                    child: Text(
+                                                        'Something went wrong'));
+                                              } else if (snapshot
+                                                      .connectionState ==
+                                                  ConnectionState.waiting) {
+                                                return const Center(
+                                                    child:
+                                                        CircularProgressIndicator());
+                                              }
+                                              dynamic businessdata =
+                                                  snapshot.data;
+                                              return Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 5, right: 5),
+                                                child: GestureDetector(
+                                                  child: Card(
+                                                    elevation: 5,
+                                                    color: Colors.white,
+                                                    child: SizedBox(
+                                                      height: 150,
+                                                      width: 150,
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(10.0),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Center(
+                                                              child: TextWidget(
+                                                                text:
+                                                                    businessdata[
+                                                                        'name'],
+                                                                fontSize: 12,
+                                                                fontFamily:
+                                                                    'Medium',
+                                                                color: blue,
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                              height: 15,
+                                                            ),
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                TextWidget(
+                                                                  text: data
+                                                                      .docs[
+                                                                          index]
+                                                                          [
+                                                                          'pts']
+                                                                      .toString(),
+                                                                  fontSize: 38,
+                                                                  fontFamily:
+                                                                      'Bold',
+                                                                  color: blue,
+                                                                ),
+                                                                const SizedBox(
+                                                                  width: 5,
+                                                                ),
+                                                                TextWidget(
+                                                                  text: 'pts',
+                                                                  fontSize: 12,
+                                                                  fontFamily:
+                                                                      'Bold',
+                                                                  color: blue,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            const SizedBox(
+                                                              height: 15,
+                                                            ),
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                TextWidget(
+                                                                  text: DateFormat
+                                                                          .yMMMd()
+                                                                      .add_jm()
+                                                                      .format(data
+                                                                          .docs[
+                                                                              index]
+                                                                              [
+                                                                              'dateTime']
+                                                                          .toDate()),
+                                                                  fontSize: 10,
+                                                                  fontFamily:
+                                                                      'Bold',
+                                                                  color: Colors
+                                                                      .grey,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            });
+                                      },
+                                    ),
+                                  ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      // SizedBox(
-                      //   height: 150,
-                      //   width: 500,
-                      //   child: ListView.builder(
-                      //     scrollDirection: Axis.horizontal,
-                      //     itemBuilder: (context, index) {
-                      //       return Padding(
-                      //         padding: const EdgeInsets.only(left: 5, right: 5),
-                      //         child: GestureDetector(
-                      //           child: Card(
-                      //             elevation: 5,
-                      //             color: Colors.white,
-                      //             child: SizedBox(
-                      //               height: 150,
-                      //               width: 150,
-                      //               child: Padding(
-                      //                 padding: const EdgeInsets.all(10.0),
-                      //                 child: Column(
-                      //                   crossAxisAlignment:
-                      //                       CrossAxisAlignment.start,
-                      //                   children: [
-                      //                     Center(
-                      //                       child: TextWidget(
-                      //                         text: 'Groovy Grocers',
-                      //                         fontSize: 14,
-                      //                         fontFamily: 'Medium',
-                      //                         color: blue,
-                      //                       ),
-                      //                     ),
-                      //                     const SizedBox(
-                      //                       height: 15,
-                      //                     ),
-                      //                     Row(
-                      //                       mainAxisAlignment:
-                      //                           MainAxisAlignment.center,
-                      //                       children: [
-                      //                         TextWidget(
-                      //                           text: '250',
-                      //                           fontSize: 38,
-                      //                           fontFamily: 'Bold',
-                      //                           color: blue,
-                      //                         ),
-                      //                         const SizedBox(
-                      //                           width: 5,
-                      //                         ),
-                      //                         TextWidget(
-                      //                           text: 'pts',
-                      //                           fontSize: 12,
-                      //                           fontFamily: 'Bold',
-                      //                           color: blue,
-                      //                         ),
-                      //                       ],
-                      //                     ),
-                      //                     const SizedBox(
-                      //                       height: 15,
-                      //                     ),
-                      //                     Row(
-                      //                       mainAxisAlignment:
-                      //                           MainAxisAlignment.center,
-                      //                       children: [
-                      //                         Icon(
-                      //                           Icons.circle,
-                      //                           color: secondary,
-                      //                           size: 15,
-                      //                         ),
-                      //                         const SizedBox(
-                      //                           width: 5,
-                      //                         ),
-                      //                         TextWidget(
-                      //                           text: '150 pts yesterday',
-                      //                           fontSize: 10,
-                      //                           fontFamily: 'Bold',
-                      //                           color: Colors.grey,
-                      //                         ),
-                      //                       ],
-                      //                     ),
-                      //                   ],
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //           ),
-                      //         ),
-                      //       );
-                      //     },
-                      //   ),
-                      // )
-                    ],
-                  ),
-                ),
+                      );
+                    }),
                 const SizedBox(
                   height: 10,
                 ),

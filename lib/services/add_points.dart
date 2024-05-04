@@ -11,6 +11,7 @@ Future<String> addPoints(pts, qty) async {
     'id': docUser.id,
     'scanned': false,
     'scannedId': '',
+    'dateTime': DateTime.now(),
   };
 
   await docUser.set(json);
