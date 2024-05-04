@@ -8,7 +8,9 @@ Future<String> addPoints(pts, qty) async {
     'pts': pts,
     'qty': qty,
     'uid': FirebaseAuth.instance.currentUser!.uid,
-    'id': docUser.id
+    'id': docUser.id,
+    'scanned': false,
+    'scannedId': '',
   };
 
   await docUser.set(json);

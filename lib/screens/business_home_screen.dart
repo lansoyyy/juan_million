@@ -280,36 +280,73 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                       fontSize: 14,
                                       color: Colors.white,
                                     ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        TextWidget(
-                                          text: '${mydata['pts']}',
-                                          fontFamily: 'Bold',
-                                          fontSize: 50,
-                                          color: Colors.white,
-                                        ),
-                                        const SizedBox(
-                                          width: 10,
-                                        ),
-                                        index == 0
-                                            ? Container(
-                                                decoration: const BoxDecoration(
-                                                    color: Colors.white,
-                                                    shape: BoxShape.circle),
-                                                child: index == 0
-                                                    ? const Icon(
-                                                        Icons.add,
-                                                        color: Colors.black,
-                                                      )
-                                                    : const SizedBox(),
-                                              )
-                                            : const SizedBox(),
-                                      ],
-                                    ),
+                                    StreamBuilder<QuerySnapshot>(
+                                        stream: FirebaseFirestore.instance
+                                            .collection('Points')
+                                            .where('uid', isEqualTo: mydata.id)
+                                            .where('scanned', isEqualTo: true)
+                                            .snapshots(),
+                                        builder: (BuildContext context,
+                                            AsyncSnapshot<QuerySnapshot>
+                                                snapshot) {
+                                          if (snapshot.hasError) {
+                                            print(snapshot.error);
+                                            return const Center(
+                                                child: Text('Error'));
+                                          }
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return const Padding(
+                                              padding: EdgeInsets.only(top: 50),
+                                              child: Center(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                color: Colors.black,
+                                              )),
+                                            );
+                                          }
+
+                                          final data = snapshot.requireData;
+                                          return Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              TextWidget(
+                                                text: index == 0
+                                                    ? '${mydata['pts']}'
+                                                    : index == 1
+                                                        ? '0'
+                                                        : data.docs.length
+                                                            .toString(),
+                                                fontFamily: 'Bold',
+                                                fontSize: 50,
+                                                color: Colors.white,
+                                              ),
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                              index == 0
+                                                  ? Container(
+                                                      decoration:
+                                                          const BoxDecoration(
+                                                              color:
+                                                                  Colors.white,
+                                                              shape: BoxShape
+                                                                  .circle),
+                                                      child: index == 0
+                                                          ? const Icon(
+                                                              Icons.add,
+                                                              color:
+                                                                  Colors.black,
+                                                            )
+                                                          : const SizedBox(),
+                                                    )
+                                                  : const SizedBox(),
+                                            ],
+                                          );
+                                        }),
                                     index == 2
                                         ? TextWidget(
                                             text: '0 Slots',

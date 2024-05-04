@@ -76,11 +76,17 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               .update({
             'pts': FieldValue.increment(-documentSnapshot['pts']),
           });
+          await FirebaseFirestore.instance
+              .collection('Points')
+              .doc(documentSnapshot.id)
+              .update({
+            'scanned': true,
+            'scannedId': FirebaseAuth.instance.currentUser!.uid,
+          });
           // Update my points
           // Update business points
         }
       }).whenComplete(() {
-        Navigator.pop(context);
         Navigator.pop(context);
       });
     } on PlatformException {
@@ -163,7 +169,9 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                           child: SizedBox(),
                                         ),
                                         IconButton(
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            scanQRCode();
+                                          },
                                           icon: const Icon(
                                             Icons.qr_code,
                                             color: Colors.white,

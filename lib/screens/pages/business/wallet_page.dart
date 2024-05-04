@@ -36,7 +36,7 @@ class WalletPage extends StatelessWidget {
             ),
             Center(
               child: TextWidget(
-                text: '135',
+                text: '0',
                 fontFamily: 'Bold',
                 fontSize: 75,
                 color: Colors.white,
@@ -117,7 +117,7 @@ class WalletPage extends StatelessWidget {
                   SizedBox(
                     height: 300,
                     child: ListView.builder(
-                      itemCount: 4,
+                      itemCount: 0,
                       itemBuilder: (context, index) {
                         return Padding(
                           padding: const EdgeInsets.all(5.0),
