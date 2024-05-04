@@ -45,7 +45,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
               ),
               Center(
                 child: TextWidget(
-                  text: '100',
+                  text: '0',
                   fontFamily: 'Bold',
                   fontSize: 75,
                   color: Colors.white,
@@ -55,7 +55,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                 child: Column(
                   children: [
                     TextWidget(
-                      text: '2 slots',
+                      text: '0 slots',
                       fontSize: 18,
                       color: Colors.white,
                       fontFamily: 'Bold',
@@ -81,7 +81,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                           fontFamily: 'Bold',
                         ),
                         TextWidget(
-                          text: '2/10 per day',
+                          text: '0/10 per day',
                           fontSize: 14,
                           color: Colors.white,
                           fontFamily: 'Regular',
@@ -89,7 +89,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                       ],
                     ),
                     TextWidget(
-                      text: '85%',
+                      text: '0%',
                       fontSize: 12,
                       color: Colors.black,
                       fontFamily: 'Regular',
@@ -98,23 +98,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                       width: double.infinity,
                       height: 15,
                       decoration: BoxDecoration(
-                          color: Colors.green,
-                          borderRadius: BorderRadius.circular(100)),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    TextWidget(
-                      text: '25%',
-                      fontSize: 12,
-                      color: Colors.black,
-                      fontFamily: 'Regular',
-                    ),
-                    Container(
-                      width: double.infinity,
-                      height: 15,
-                      decoration: BoxDecoration(
-                          color: Colors.green,
+                          color: Colors.grey,
                           borderRadius: BorderRadius.circular(100)),
                     ),
                     const SizedBox(
@@ -129,71 +113,79 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                     const SizedBox(
                       height: 5,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        for (int i = 0; i < 3; i++)
-                          Stack(
-                            children: [
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  CircleAvatar(
-                                    maxRadius: 40,
-                                    minRadius: 40,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(top: 20),
-                                      child: Align(
-                                        alignment: Alignment.bottomCenter,
-                                        child: Container(
-                                          height: 25,
-                                          width: 25,
-                                          decoration: const BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Colors.white,
-                                          ),
-                                          child: Center(
-                                            child: TextWidget(
-                                              text: i == 0
-                                                  ? '2'
-                                                  : i == 1
-                                                      ? '1'
-                                                      : '3',
-                                              fontSize: 12,
-                                              fontFamily: 'Bold',
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 5,
-                                  ),
-                                  TextWidget(
-                                    text: 'John Doe',
-                                    fontSize: 18,
-                                    fontFamily: 'Bold',
-                                  ),
-                                  TextWidget(
-                                    text: '40 pts',
-                                    fontSize: 14,
-                                    fontFamily: 'Medium',
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                      ],
+                    Center(
+                      child: TextWidget(
+                        text: 'No Slots',
+                        fontSize: 14,
+                        fontFamily: 'Regular',
+                        color: Colors.grey,
+                      ),
                     ),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    //   children: [
+                    //     for (int i = 0; i < 3; i++)
+                    //       Stack(
+                    //         children: [
+                    //           Column(
+                    //             mainAxisAlignment: MainAxisAlignment.center,
+                    //             crossAxisAlignment: CrossAxisAlignment.center,
+                    //             children: [
+                    //               CircleAvatar(
+                    //                 maxRadius: 40,
+                    //                 minRadius: 40,
+                    //                 child: Padding(
+                    //                   padding: const EdgeInsets.only(top: 20),
+                    //                   child: Align(
+                    //                     alignment: Alignment.bottomCenter,
+                    //                     child: Container(
+                    //                       height: 25,
+                    //                       width: 25,
+                    //                       decoration: const BoxDecoration(
+                    //                         shape: BoxShape.circle,
+                    //                         color: Colors.white,
+                    //                       ),
+                    //                       child: Center(
+                    //                         child: TextWidget(
+                    //                           text: i == 0
+                    //                               ? '2'
+                    //                               : i == 1
+                    //                                   ? '1'
+                    //                                   : '3',
+                    //                           fontSize: 12,
+                    //                           fontFamily: 'Bold',
+                    //                         ),
+                    //                       ),
+                    //                     ),
+                    //                   ),
+                    //                 ),
+                    //               ),
+                    //               const SizedBox(
+                    //                 height: 5,
+                    //               ),
+                    //               TextWidget(
+                    //                 text: 'John Doe',
+                    //                 fontSize: 18,
+                    //                 fontFamily: 'Bold',
+                    //               ),
+                    //               TextWidget(
+                    //                 text: '40 pts',
+                    //                 fontSize: 14,
+                    //                 fontFamily: 'Medium',
+                    //               ),
+                    //             ],
+                    //           ),
+                    //         ],
+                    //       ),
+                    //   ],
+                    // ),
                     const SizedBox(
                       height: 20,
                     ),
                     SizedBox(
                       height: 300,
                       child: ListView.builder(
-                        itemCount: 4,
+                        itemCount: 0,
                         itemBuilder: (context, index) {
                           return Padding(
                             padding: const EdgeInsets.all(5.0),
