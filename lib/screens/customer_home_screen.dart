@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:juan_million/screens/pages/business/inventory_page.dart';
 import 'package:juan_million/screens/pages/business/points_page.dart';
 import 'package:juan_million/screens/pages/business/settings_page.dart';
@@ -16,8 +18,63 @@ import 'package:juan_million/screens/pages/store_page.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 
-class CustomerHomeScreen extends StatelessWidget {
+class CustomerHomeScreen extends StatefulWidget {
   const CustomerHomeScreen({super.key});
+
+  @override
+  State<CustomerHomeScreen> createState() => _CustomerHomeScreenState();
+}
+
+class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
+  String qrCode = 'Unknown';
+
+  Future<void> scanQRCode() async {
+    try {
+      final qrCode = await FlutterBarcodeScanner.scanBarcode(
+        '#ff6666',
+        'Cancel',
+        true,
+        ScanMode.QR,
+      );
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return const AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+              ],
+            ),
+          );
+        },
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        this.qrCode = qrCode;
+      });
+
+      await FirebaseFirestore.instance
+          .collection('Points')
+          .doc(qrCode)
+          .get()
+          .then((DocumentSnapshot documentSnapshot) async {
+        if (documentSnapshot.exists) {
+          // Update my points
+          // Update business points
+        }
+
+        Navigator.pop(context);
+        Navigator.pop(context);
+      });
+    } on PlatformException {
+      qrCode = 'Failed to get platform version.';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
