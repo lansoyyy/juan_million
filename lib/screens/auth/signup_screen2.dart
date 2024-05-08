@@ -28,16 +28,15 @@ class SignupScreen2 extends StatefulWidget {
 class _SignupScreen2State extends State<SignupScreen2> {
   final address = TextEditingController();
   final desc = TextEditingController();
+  final clarification = TextEditingController();
+
+  final rep = TextEditingController();
 
   late String fileName = '';
 
   late File imageFile;
 
   late String imageURL = '';
-
-  final clarification = TextEditingController();
-
-  final rep = TextEditingController();
 
   Future<void> uploadPicture(String inputSource) async {
     final picker = ImagePicker();

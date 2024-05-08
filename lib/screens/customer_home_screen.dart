@@ -14,6 +14,7 @@ import 'package:juan_million/screens/pages/business/wallet_page.dart';
 import 'package:juan_million/screens/pages/customer/inventory_page.dart';
 import 'package:juan_million/screens/pages/customer/notif_page.dart';
 import 'package:juan_million/screens/pages/customer/points_page.dart';
+import 'package:juan_million/screens/pages/customer/qr_scanned_page.dart';
 import 'package:juan_million/screens/pages/customer/settings_page.dart';
 import 'package:juan_million/screens/pages/customer/wallet_page.dart';
 import 'package:juan_million/screens/pages/store_page.dart';
@@ -29,6 +30,8 @@ class CustomerHomeScreen extends StatefulWidget {
 
 class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   String qrCode = 'Unknown';
+  String store = '';
+  String pts = '';
 
   Future<void> scanQRCode() async {
     try {
@@ -88,8 +91,16 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           // Update my points
           // Update business points
         }
+        setState(() {
+          pts = documentSnapshot['pts'].toString();
+          store = documentSnapshot['uid'];
+        });
       }).whenComplete(() {
-        Navigator.pop(context);
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => QRScannedPage(
+                  pts: pts,
+                  store: store,
+                )));
       });
     } on PlatformException {
       qrCode = 'Failed to get platform version.';

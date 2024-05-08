@@ -192,13 +192,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
             Center(
               child: ButtonWidget(
                 width: 325,
-                label: 'Next',
-                onPressed: () {
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      builder: (context) => LoginScreen(
-                            inCustomer: false,
-                          )));
-                },
+                label: 'Continue',
+                onPressed: () {},
               ),
             ),
             const SizedBox(
