@@ -93,10 +93,10 @@ class _CustomerSettingsPageState extends State<CustomerSettingsPage> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              const Icon(
-                                Icons.account_circle,
-                                size: 80,
-                                color: Colors.white,
+                              CircleAvatar(
+                                maxRadius: 40,
+                                minRadius: 40,
+                                backgroundImage: NetworkImage(data['pic']),
                               ),
                               const SizedBox(
                                 width: 10,
