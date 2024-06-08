@@ -239,7 +239,10 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                               ? '${data['pts']}'
                                               : index == 1
                                                   ? '0'
-                                                  : '0',
+                                                  : double.parse(
+                                                          (data['pts'] / 50)
+                                                              .toString())
+                                                      .toStringAsFixed(0),
                                           fontFamily: 'Bold',
                                           fontSize: 50,
                                           color: Colors.white,
@@ -264,7 +267,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                     ),
                                     index == 2
                                         ? TextWidget(
-                                            text: '0 Slots',
+                                            text:
+                                                '${double.parse((data['pts'] / 50).toString()).toStringAsFixed(0)} Slot/s',
                                             fontSize: 14,
                                             color: Colors.white,
                                           )
