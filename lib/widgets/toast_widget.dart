@@ -3,7 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 Future<bool?> showToast(msg) {
   return Fluttertoast.showToast(
-    backgroundColor: Colors.amber,
+    backgroundColor: Colors.red,
     toastLength: Toast.LENGTH_LONG,
     msg: msg,
   );

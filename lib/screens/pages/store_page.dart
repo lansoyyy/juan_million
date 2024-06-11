@@ -3,9 +3,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:juan_million/screens/auth/payment_screen.dart';
+import 'package:juan_million/screens/pages/payment_selection_screen.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/button_widget.dart';
 import 'package:juan_million/widgets/text_widget.dart';
+import 'package:paymongo_sdk/paymongo_sdk.dart';
 
 class StorePage extends StatelessWidget {
   const StorePage({super.key});
@@ -161,7 +163,11 @@ class StorePage extends StatelessWidget {
                                                     Navigator.of(context).push(
                                                         MaterialPageRoute(
                                                             builder: (context) =>
-                                                                const PaymentScreen()));
+                                                                PaymentSelectionScreen(
+                                                                  item:
+                                                                      finaldata[
+                                                                          index],
+                                                                )));
                                                   },
                                                 ),
                                               ],
@@ -195,12 +201,6 @@ class StorePage extends StatelessWidget {
                       TextWidget(
                         text: 'All Points',
                         fontSize: 18,
-                        fontFamily: 'Bold',
-                      ),
-                      TextWidget(
-                        text: 'See all',
-                        color: blue,
-                        fontSize: 14,
                         fontFamily: 'Bold',
                       ),
                     ],
@@ -245,7 +245,9 @@ class StorePage extends StatelessWidget {
                                     Navigator.of(context).push(
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                const PaymentScreen()));
+                                                PaymentSelectionScreen(
+                                                  item: data.docs[index],
+                                                )));
                                   },
                                   child: Card(
                                     elevation: 5,

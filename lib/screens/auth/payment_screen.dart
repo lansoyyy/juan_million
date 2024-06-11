@@ -193,7 +193,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
               child: ButtonWidget(
                 width: 325,
                 label: 'Continue',
-                onPressed: () {},
+                onPressed: () {
+                  showToast('Payment method not available!');
+                },
               ),
             ),
             const SizedBox(

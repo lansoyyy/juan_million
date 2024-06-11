@@ -17,6 +17,7 @@ import 'package:juan_million/screens/pages/customer/points_page.dart';
 import 'package:juan_million/screens/pages/customer/qr_scanned_page.dart';
 import 'package:juan_million/screens/pages/customer/settings_page.dart';
 import 'package:juan_million/screens/pages/customer/wallet_page.dart';
+import 'package:juan_million/screens/pages/payment_selection_screen.dart';
 import 'package:juan_million/screens/pages/store_page.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
@@ -238,7 +239,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                           text: index == 0
                                               ? '${data['pts']}'
                                               : index == 1
-                                                  ? '0'
+                                                  ? '${data['wallet']}'
                                                   : double.parse(
                                                           (data['pts'] / 50)
                                                               .toString())
@@ -545,7 +546,9 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                         Navigator.of(context).push(
                                             MaterialPageRoute(
                                                 builder: (context) =>
-                                                    const PaymentScreen()));
+                                                    PaymentSelectionScreen(
+                                                      item: data.docs[index],
+                                                    )));
                                       },
                                       child: Card(
                                         elevation: 5,
