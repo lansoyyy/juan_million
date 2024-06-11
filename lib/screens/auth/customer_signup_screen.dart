@@ -238,7 +238,6 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
 
       addUser(name.text, email.text, nickname.text, imageURL, address.text);
 
-      showToast('Account created succesfully!');
       Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const CustomerHomeScreen()));
     } on FirebaseAuthException catch (e) {

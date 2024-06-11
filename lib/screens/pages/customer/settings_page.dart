@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:juan_million/screens/auth/login_screen.dart';
 import 'package:juan_million/screens/landing_screen.dart';
 import 'package:juan_million/screens/pages/business/profile_page.dart';
+import 'package:juan_million/screens/pages/customer/myqr_page.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/button_widget.dart';
 import 'package:juan_million/widgets/text_widget.dart';
@@ -247,6 +248,37 @@ class _CustomerSettingsPageState extends State<CustomerSettingsPage> {
                             elevation: 3,
                             child: ListTile(
                               onTap: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => MyQRPage()));
+                              },
+                              tileColor: Colors.white,
+                              leading: Container(
+                                decoration: BoxDecoration(
+                                  color: blue.withOpacity(0.15),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Padding(
+                                  padding: EdgeInsets.all(10.0),
+                                  child: Icon(
+                                    Icons.qr_code,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+                              title: TextWidget(
+                                text: 'My QR Code',
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Card(
+                            elevation: 3,
+                            child: ListTile(
+                              onTap: () {
                                 showDialog(
                                     context: context,
                                     builder: (context) => AlertDialog(
@@ -315,6 +347,9 @@ class _CustomerSettingsPageState extends State<CustomerSettingsPage> {
                                 color: Colors.grey,
                               ),
                             ),
+                          ),
+                          const SizedBox(
+                            height: 20,
                           ),
                         ],
                       ),

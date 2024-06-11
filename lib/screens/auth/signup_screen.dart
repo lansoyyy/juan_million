@@ -115,7 +115,6 @@ class _SignupScreenState extends State<SignupScreen> {
       // addUser(name.text, email.text);
       addBusiness(name.text, email.text, '', '', '', '', '');
 
-      showToast('Account created succesfully!');
       Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (context) => SignupScreen2(
                 id: user.user!.uid,

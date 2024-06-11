@@ -126,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: username.text, password: password.text);
-      showToast('Logged in succesfully!');
+
       if (widget.inCustomer) {
         Navigator.of(context).pushReplacement(MaterialPageRoute(
             builder: (context) => const CustomerHomeScreen()));
