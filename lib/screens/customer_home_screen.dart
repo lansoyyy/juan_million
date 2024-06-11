@@ -495,7 +495,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                           GestureDetector(
                             onTap: () {
                               Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => const StorePage()));
+                                  builder: (context) => StorePage()));
                             },
                             child: TextWidget(
                               text: 'See all',

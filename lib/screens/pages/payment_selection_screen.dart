@@ -11,18 +11,26 @@ import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:juan_million/widgets/toast_widget.dart';
 
-class PaymentSelectionScreen extends StatelessWidget {
+class PaymentSelectionScreen extends StatefulWidget {
   dynamic item;
+
+  bool? inbusiness;
 
   PaymentSelectionScreen({
     super.key,
     required this.item,
+    this.inbusiness = false,
   });
 
   @override
+  State<PaymentSelectionScreen> createState() => _PaymentSelectionScreenState();
+}
+
+class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
+  @override
   Widget build(BuildContext context) {
     final Stream<DocumentSnapshot> userData = FirebaseFirestore.instance
-        .collection('Users')
+        .collection(widget.inbusiness! ? 'Business' : 'Users')
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .snapshots();
     return Scaffold(
@@ -103,20 +111,22 @@ class PaymentSelectionScreen extends StatelessWidget {
                   ),
                   GestureDetector(
                     onTap: () async {
-                      if (data['wallet'] > item['price']) {
-                        addPoints(item['slots'] * 150, 1);
+                      if (data['wallet'] > widget.item['price']) {
+                        addPoints(widget.item['slots'] * 150, 1);
                         Navigator.of(context).pop();
 
                         showToast('Succesfully purchased!');
 
                         // Check if business
                         await FirebaseFirestore.instance
-                            .collection('Users')
+                            .collection(
+                                widget.inbusiness! ? 'Business' : 'Users')
                             .doc(FirebaseAuth.instance.currentUser!.uid)
                             .update({
-                          'pts': FieldValue.increment(item['slots'] * 150),
-                          'wallet':
-                              FieldValue.increment(-(item['slots'] * 150)),
+                          'pts':
+                              FieldValue.increment(widget.item['slots'] * 150),
+                          'wallet': FieldValue.increment(
+                              -(widget.item['slots'] * 150)),
                         });
                       } else {
                         showToast('Not enough balance on wallet!');

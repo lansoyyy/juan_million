@@ -9,9 +9,18 @@ import 'package:juan_million/widgets/button_widget.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:paymongo_sdk/paymongo_sdk.dart';
 
-class StorePage extends StatelessWidget {
-  const StorePage({super.key});
+class StorePage extends StatefulWidget {
+  bool? inbusiness;
+  StorePage({
+    super.key,
+    this.inbusiness = false,
+  });
 
+  @override
+  State<StorePage> createState() => _StorePageState();
+}
+
+class _StorePageState extends State<StorePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -164,6 +173,8 @@ class StorePage extends StatelessWidget {
                                                         MaterialPageRoute(
                                                             builder: (context) =>
                                                                 PaymentSelectionScreen(
+                                                                  inbusiness: widget
+                                                                      .inbusiness,
                                                                   item:
                                                                       finaldata[
                                                                           index],
@@ -246,6 +257,7 @@ class StorePage extends StatelessWidget {
                                         MaterialPageRoute(
                                             builder: (context) =>
                                                 PaymentSelectionScreen(
+                                                  inbusiness: widget.inbusiness,
                                                   item: data.docs[index],
                                                 )));
                                   },

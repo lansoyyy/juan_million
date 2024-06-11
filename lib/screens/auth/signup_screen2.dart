@@ -201,7 +201,9 @@ class _SignupScreen2State extends State<SignupScreen2> {
                     'representative': rep.text,
                   }).whenComplete(() {
                     Navigator.of(context).pushReplacement(MaterialPageRoute(
-                        builder: (context) => const StorePage()));
+                        builder: (context) => StorePage(
+                              inbusiness: true,
+                            )));
                   });
                 },
               ),

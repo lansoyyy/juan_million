@@ -99,7 +99,7 @@ class CustomerWalletPage extends StatelessWidget {
                           GestureDetector(
                             onTap: () {
                               Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => const StorePage()));
+                                  builder: (context) => StorePage()));
                             },
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,

@@ -8,6 +8,7 @@ import 'package:juan_million/screens/pages/business/points_page.dart';
 import 'package:juan_million/screens/pages/business/qr_page.dart';
 import 'package:juan_million/screens/pages/business/settings_page.dart';
 import 'package:juan_million/screens/pages/business/wallet_page.dart';
+import 'package:juan_million/screens/pages/payment_selection_screen.dart';
 import 'package:juan_million/screens/pages/store_page.dart';
 import 'package:juan_million/services/add_points.dart';
 import 'package:juan_million/utlis/colors.dart';
@@ -318,7 +319,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                 text: index == 0
                                                     ? '${mydata['pts']}'
                                                     : index == 1
-                                                        ? '0'
+                                                        ? '${mydata['wallet']}'
                                                         : data.docs.length
                                                             .toString(),
                                                 fontFamily: 'Bold',
@@ -385,7 +386,9 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                           GestureDetector(
                             onTap: () {
                               Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => const StorePage()));
+                                  builder: (context) => StorePage(
+                                        inbusiness: true,
+                                      )));
                             },
                             child: TextWidget(
                               text: 'See all',
@@ -431,74 +434,85 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                   return Padding(
                                     padding: const EdgeInsets.only(
                                         left: 5, right: 5),
-                                    child: Card(
-                                      elevation: 5,
-                                      color: Colors.white,
-                                      child: SizedBox(
-                                        height: 150,
-                                        width: 150,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(10.0),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              TextWidget(
-                                                text:
-                                                    'P${data.docs[index]['price']}',
-                                                fontSize: 14,
-                                                fontFamily: 'Medium',
-                                                color: blue,
-                                              ),
-                                              const SizedBox(
-                                                height: 15,
-                                              ),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  TextWidget(
-                                                    text:
-                                                        '${data.docs[index]['slots'] * 150}',
-                                                    fontSize: 38,
-                                                    fontFamily: 'Bold',
-                                                    color: blue,
-                                                  ),
-                                                  const SizedBox(
-                                                    width: 5,
-                                                  ),
-                                                  TextWidget(
-                                                    text: 'pts',
-                                                    fontSize: 12,
-                                                    fontFamily: 'Bold',
-                                                    color: blue,
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(
-                                                height: 15,
-                                              ),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Icon(
-                                                    Icons.circle,
-                                                    color: secondary,
-                                                    size: 15,
-                                                  ),
-                                                  const SizedBox(
-                                                    width: 5,
-                                                  ),
-                                                  TextWidget(
-                                                    text: 'Limited offer',
-                                                    fontSize: 10,
-                                                    fontFamily: 'Bold',
-                                                    color: Colors.black,
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    PaymentSelectionScreen(
+                                                      inbusiness: true,
+                                                      item: data.docs[index],
+                                                    )));
+                                      },
+                                      child: Card(
+                                        elevation: 5,
+                                        color: Colors.white,
+                                        child: SizedBox(
+                                          height: 150,
+                                          width: 150,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(10.0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                TextWidget(
+                                                  text:
+                                                      'P${data.docs[index]['price']}',
+                                                  fontSize: 14,
+                                                  fontFamily: 'Medium',
+                                                  color: blue,
+                                                ),
+                                                const SizedBox(
+                                                  height: 15,
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    TextWidget(
+                                                      text:
+                                                          '${data.docs[index]['slots'] * 150}',
+                                                      fontSize: 38,
+                                                      fontFamily: 'Bold',
+                                                      color: blue,
+                                                    ),
+                                                    const SizedBox(
+                                                      width: 5,
+                                                    ),
+                                                    TextWidget(
+                                                      text: 'pts',
+                                                      fontSize: 12,
+                                                      fontFamily: 'Bold',
+                                                      color: blue,
+                                                    ),
+                                                  ],
+                                                ),
+                                                const SizedBox(
+                                                  height: 15,
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Icon(
+                                                      Icons.circle,
+                                                      color: secondary,
+                                                      size: 15,
+                                                    ),
+                                                    const SizedBox(
+                                                      width: 5,
+                                                    ),
+                                                    TextWidget(
+                                                      text: 'Limited offer',
+                                                      fontSize: 10,
+                                                      fontFamily: 'Bold',
+                                                      color: Colors.black,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -531,7 +545,9 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                           GestureDetector(
                             onTap: () {
                               Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => const StorePage()));
+                                  builder: (context) => StorePage(
+                                        inbusiness: true,
+                                      )));
                             },
                             child: TextWidget(
                               text: 'See all',
@@ -582,7 +598,10 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                         Navigator.of(context).push(
                                             MaterialPageRoute(
                                                 builder: (context) =>
-                                                    const PaymentScreen()));
+                                                    PaymentSelectionScreen(
+                                                      inbusiness: true,
+                                                      item: data.docs[index],
+                                                    )));
                                       },
                                       child: Card(
                                         elevation: 5,
