@@ -395,7 +395,7 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
       }).whenComplete(() {
         // Add transaction
 
-        addWallet(int.parse(pts.text));
+        addWallet(int.parse(pts.text), qrCode);
         Navigator.of(context).pop();
       });
     } on PlatformException {
