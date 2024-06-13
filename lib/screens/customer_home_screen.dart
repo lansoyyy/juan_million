@@ -128,8 +128,60 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             dynamic data = snapshot.data;
             return Column(
               children: [
+                Container(
+                  width: double.infinity,
+                  color: blue,
+                  child: SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 20, right: 20),
+                      child: Row(
+                        children: [
+                          TextWidget(
+                            text: 'Hello ka-Juan!',
+                            fontSize: 18,
+                            color: Colors.white,
+                          ),
+                          const Expanded(
+                            child: SizedBox(),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              scanQRCode();
+                            },
+                            icon: const Icon(
+                              Icons.qr_code,
+                              color: Colors.white,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) =>
+                                      const CustomerNotifPage()));
+                            },
+                            icon: const Icon(
+                              Icons.notifications,
+                              color: Colors.white,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) =>
+                                      const CustomerSettingsPage()));
+                            },
+                            icon: const Icon(
+                              Icons.account_circle,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
                 SizedBox(
-                  height: 250,
+                  height: 200,
                   width: 500,
                   child: ListView.builder(
                     itemCount: 3,
@@ -172,54 +224,6 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                     const EdgeInsets.fromLTRB(20, 10, 20, 5),
                                 child: Column(
                                   children: [
-                                    Row(
-                                      children: [
-                                        TextWidget(
-                                          text: 'Hello ka-Juan!',
-                                          fontSize: 18,
-                                          color: Colors.white,
-                                        ),
-                                        const Expanded(
-                                          child: SizedBox(),
-                                        ),
-                                        IconButton(
-                                          onPressed: () {
-                                            scanQRCode();
-                                          },
-                                          icon: const Icon(
-                                            Icons.qr_code,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        IconButton(
-                                          onPressed: () {
-                                            Navigator.of(context).push(
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const CustomerNotifPage()));
-                                          },
-                                          icon: const Icon(
-                                            Icons.notifications,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        IconButton(
-                                          onPressed: () {
-                                            Navigator.of(context).push(
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const CustomerSettingsPage()));
-                                          },
-                                          icon: const Icon(
-                                            Icons.account_circle,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(
-                                      height: 20,
-                                    ),
                                     TextWidget(
                                       text: index == 0
                                           ? 'Total Points'
@@ -229,42 +233,50 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                       fontSize: 14,
                                       color: Colors.white,
                                     ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        TextWidget(
-                                          text: index == 0
-                                              ? '${data['pts']}'
-                                              : index == 1
-                                                  ? '${data['wallet']}'
-                                                  : double.parse(
-                                                          (data['pts'] / 50)
-                                                              .toString())
-                                                      .toStringAsFixed(0),
-                                          fontFamily: 'Bold',
-                                          fontSize: 50,
-                                          color: Colors.white,
-                                        ),
-                                        const SizedBox(
-                                          width: 10,
-                                        ),
-                                        index == 0
-                                            ? Container(
-                                                decoration: const BoxDecoration(
-                                                    color: Colors.white,
-                                                    shape: BoxShape.circle),
-                                                child: index == 0
-                                                    ? const Icon(
-                                                        Icons.add,
-                                                        color: Colors.black,
-                                                      )
-                                                    : const SizedBox(),
-                                              )
-                                            : const SizedBox(),
-                                      ],
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 50, right: 50),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          index != 0
+                                              ? const Icon(
+                                                  Icons
+                                                      .keyboard_arrow_left_rounded,
+                                                  color: Colors.white60,
+                                                  size: 50,
+                                                )
+                                              : const SizedBox(
+                                                  width: 50,
+                                                ),
+                                          TextWidget(
+                                            text: index == 0
+                                                ? '${data['pts']}'
+                                                : index == 1
+                                                    ? '${data['wallet']}'
+                                                    : double.parse(
+                                                            (data['pts'] / 50)
+                                                                .toString())
+                                                        .toStringAsFixed(0),
+                                            fontFamily: 'Bold',
+                                            fontSize: 50,
+                                            color: Colors.white,
+                                          ),
+                                          index == 2
+                                              ? const SizedBox(
+                                                  width: 50,
+                                                )
+                                              : const Icon(
+                                                  Icons
+                                                      .keyboard_arrow_right_rounded,
+                                                  color: Colors.white60,
+                                                  size: 50,
+                                                ),
+                                        ],
+                                      ),
                                     ),
                                     index == 2
                                         ? TextWidget(
