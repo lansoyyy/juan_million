@@ -126,7 +126,7 @@ class ProfikePage extends StatelessWidget {
                   SizedBox(
                     height: 250,
                     child: ListView.builder(
-                      itemCount: 5,
+                      itemCount: 0,
                       itemBuilder: (context, index) {
                         return Padding(
                           padding: const EdgeInsets.all(5.0),
