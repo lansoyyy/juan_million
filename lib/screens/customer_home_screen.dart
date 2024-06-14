@@ -108,6 +108,24 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     }
   }
 
+  void checkPoints(int points, int limit) {
+    if (points > limit) {
+      int total = points - limit;
+      // Code to execute when points exceed the limit
+
+      FirebaseFirestore.instance
+          .collection('Users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .update({
+        'wallet': FieldValue.increment(total),
+        'pts': FieldValue.increment(-total),
+      });
+      // Add your code here
+    } else {
+      print('Points are within the limit.');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final Stream<DocumentSnapshot> userData = FirebaseFirestore.instance
@@ -126,6 +144,9 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               return const Center(child: CircularProgressIndicator());
             }
             dynamic data = snapshot.data;
+
+            checkPoints(data['pts'], 49);
+
             return Column(
               children: [
                 Container(
@@ -280,8 +301,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                     ),
                                     index == 2
                                         ? TextWidget(
-                                            text:
-                                                '${double.parse((data['pts'] / 50).toString()).toStringAsFixed(0)} Slot/s',
+                                            text: 'Your Overall Slot/s',
                                             fontSize: 14,
                                             color: Colors.white,
                                           )

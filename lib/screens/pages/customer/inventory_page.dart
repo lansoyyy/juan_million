@@ -17,6 +17,8 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
   String nameSearched = '';
 
   int position = 0;
+  int total = 0;
+
   @override
   Widget build(BuildContext context) {
     final Stream<DocumentSnapshot> userData = FirebaseFirestore.instance
@@ -36,6 +38,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
               return const Center(child: CircularProgressIndicator());
             }
             dynamic mydata = snapshot.data;
+
             return SafeArea(
               child: SingleChildScrollView(
                 child: Column(
@@ -74,7 +77,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                       child: Column(
                         children: [
                           TextWidget(
-                            text: 'Current Slot',
+                            text: 'Current Slot Position',
                             fontSize: 18,
                             color: Colors.white,
                             fontFamily: 'Bold',
@@ -100,8 +103,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                                 fontFamily: 'Bold',
                               ),
                               TextWidget(
-                                text:
-                                    '${double.parse((mydata['pts'] / 50).toString()).toStringAsFixed(0)}/10 per day',
+                                text: '10 slots per day',
                                 fontSize: 14,
                                 color: Colors.white,
                                 fontFamily: 'Regular',
@@ -110,7 +112,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                           ),
                           TextWidget(
                             text:
-                                '${(double.parse((mydata['pts'] / 50).toString()) * 10).toStringAsFixed(0)}%',
+                                '${(double.parse((total / position).toString()) * 100).toStringAsFixed(0)}%',
                             fontSize: 12,
                             color: Colors.black,
                             fontFamily: 'Regular',
@@ -119,8 +121,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                             minHeight: 12,
                             color: primary,
                             value:
-                                double.parse((mydata['pts'] / 50).toString()) *
-                                    0.1,
+                                double.parse((total / position).toString()) * 1,
                             backgroundColor: Colors.grey,
                           ),
 
@@ -231,7 +232,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                           StreamBuilder<QuerySnapshot>(
                               stream: FirebaseFirestore.instance
                                   .collection('Users')
-                                  .orderBy('pts')
+                                  .orderBy('pts', descending: true)
                                   .snapshots(),
                               builder: (BuildContext context,
                                   AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -264,6 +265,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                                           if (position == 0) {
                                             setState(() {});
                                           }
+                                          total = data.docs.length;
                                           position = index + 1;
                                         });
                                       }
