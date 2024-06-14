@@ -261,6 +261,9 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                                               .instance.currentUser!.uid) {
                                         WidgetsBinding.instance
                                             .addPostFrameCallback((timeStamp) {
+                                          if (position == 0) {
+                                            setState(() {});
+                                          }
                                           position = index + 1;
                                         });
                                       }
