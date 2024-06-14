@@ -250,7 +250,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                           ? 'Total Points'
                                           : index == 1
                                               ? 'Wallet'
-                                              : 'Bayanihan Fund',
+                                              : 'Community Fund',
                                       fontSize: 14,
                                       color: Colors.white,
                                     ),

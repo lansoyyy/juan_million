@@ -60,7 +60,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                     ),
                     Center(
                       child: TextWidget(
-                        text: 'Bayanihan Fund',
+                        text: 'Community Fund',
                         fontSize: 14,
                         color: Colors.white,
                       ),
