@@ -264,7 +264,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                           text: index == 0
                                               ? 'Total Points'
                                               : index == 1
-                                                  ? 'Wallet'
+                                                  ? 'Cash Wallet'
                                                   : 'Customers',
                                           fontSize: 14,
                                           color: Colors.white,

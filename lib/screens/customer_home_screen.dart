@@ -145,7 +145,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             }
             dynamic data = snapshot.data;
 
-            checkPoints(data['pts'], 49);
+            checkPoints(data['pts'], 149);
 
             return Column(
               children: [
@@ -249,8 +249,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                       text: index == 0
                                           ? 'Total Points'
                                           : index == 1
-                                              ? 'Wallet'
-                                              : 'Community Fund',
+                                              ? 'Cash Wallet'
+                                              : 'Bayanihan Fund',
                                       fontSize: 14,
                                       color: Colors.white,
                                     ),
