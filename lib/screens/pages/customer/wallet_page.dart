@@ -168,7 +168,9 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
                           GestureDetector(
                             onTap: () {
                               Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => StorePage()));
+                                  builder: (context) => StorePage(
+                                        inbusiness: false,
+                                      )));
                             },
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,

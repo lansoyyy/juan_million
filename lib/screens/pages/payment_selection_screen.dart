@@ -112,11 +112,6 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                   GestureDetector(
                     onTap: () async {
                       if (data['wallet'] > widget.item['price']) {
-                        addPoints(widget.item['slots'] * 150, 1);
-                        Navigator.of(context).pop();
-
-                        showToast('Succesfully purchased!');
-
                         // Check if business
                         await FirebaseFirestore.instance
                             .collection(
@@ -125,9 +120,14 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                             .update({
                           'pts':
                               FieldValue.increment(widget.item['slots'] * 150),
-                          'wallet': FieldValue.increment(
-                              -(widget.item['slots'] * 150)),
+                          'wallet':
+                              FieldValue.increment(-(widget.item['price'])),
                         });
+
+                        addPoints(widget.item['slots'] * 150, 1);
+                        Navigator.of(context).pop();
+
+                        showToast('Succesfully purchased!');
                       } else {
                         showToast('Not enough balance on wallet!');
                       }
