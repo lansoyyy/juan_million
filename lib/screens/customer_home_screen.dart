@@ -19,6 +19,7 @@ import 'package:juan_million/screens/pages/customer/settings_page.dart';
 import 'package:juan_million/screens/pages/customer/wallet_page.dart';
 import 'package:juan_million/screens/pages/payment_selection_screen.dart';
 import 'package:juan_million/screens/pages/store_page.dart';
+import 'package:juan_million/services/add_slots.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 
@@ -111,16 +112,31 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   void checkPoints(int points, int limit) {
     if (points > limit) {
       int total = points - limit;
-      // Code to execute when points exceed the limit
+
+      int slots = total ~/ limit;
+      print(slots);
 
       FirebaseFirestore.instance
           .collection('Users')
           .doc(FirebaseAuth.instance.currentUser!.uid)
           .update({
-        'wallet': FieldValue.increment(total),
+        // 'wallet': FieldValue.increment(total),
         'pts': FieldValue.increment(-total),
       });
-      // Add your code here
+
+      FirebaseFirestore.instance
+          .collection('Community Wallet')
+          .doc('wallet')
+          .update({
+        // 'wallet': FieldValue.increment(total),
+        'pts': FieldValue.increment(total),
+      });
+
+      // Add to Slot
+
+      for (int i = 0; i < slots; i++) {
+        addSlots();
+      }
     } else {
       print('Points are within the limit.');
     }
@@ -273,19 +289,51 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                               : const SizedBox(
                                                   width: 50,
                                                 ),
-                                          TextWidget(
-                                            text: index == 0
-                                                ? '${data['pts']}'
-                                                : index == 1
-                                                    ? '${data['wallet']}'
-                                                    : double.parse(
-                                                            (data['pts'] / 50)
-                                                                .toString())
-                                                        .toStringAsFixed(0),
-                                            fontFamily: 'Bold',
-                                            fontSize: 50,
-                                            color: Colors.white,
-                                          ),
+                                          StreamBuilder<QuerySnapshot>(
+                                              stream: FirebaseFirestore.instance
+                                                  .collection('Slots')
+                                                  .where('uid',
+                                                      isEqualTo: FirebaseAuth
+                                                          .instance
+                                                          .currentUser!
+                                                          .uid)
+                                                  .snapshots(),
+                                              builder: (BuildContext context,
+                                                  AsyncSnapshot<QuerySnapshot>
+                                                      snapshot) {
+                                                if (snapshot.hasError) {
+                                                  print(snapshot.error);
+                                                  return const Center(
+                                                      child: Text('Error'));
+                                                }
+                                                if (snapshot.connectionState ==
+                                                    ConnectionState.waiting) {
+                                                  return const Padding(
+                                                    padding: EdgeInsets.only(
+                                                        top: 50),
+                                                    child: Center(
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                      color: Colors.black,
+                                                    )),
+                                                  );
+                                                }
+
+                                                final mydata =
+                                                    snapshot.requireData;
+
+                                                return TextWidget(
+                                                  text: index == 0
+                                                      ? '${data['pts']}'
+                                                      : index == 1
+                                                          ? '${data['wallet']}'
+                                                          : mydata.docs.length
+                                                              .toString(),
+                                                  fontFamily: 'Bold',
+                                                  fontSize: 50,
+                                                  color: Colors.white,
+                                                );
+                                              }),
                                           index == 2
                                               ? const SizedBox(
                                                   width: 50,
@@ -301,7 +349,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                     ),
                                     index == 2
                                         ? TextWidget(
-                                            text: 'Your Overall Slot/s',
+                                            text: 'Your Slot/s',
                                             fontSize: 14,
                                             color: Colors.white,
                                           )
