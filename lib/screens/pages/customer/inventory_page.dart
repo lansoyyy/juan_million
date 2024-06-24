@@ -37,6 +37,20 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
         // 'wallet': FieldValue.increment(total),
         'pts': FieldValue.increment(-total),
       });
+      await FirebaseFirestore.instance
+          .collection('Community Wallet')
+          .doc('business')
+          .update({
+        // 'wallet': FieldValue.increment(total),
+        'pts': FieldValue.increment(2400),
+      });
+      await FirebaseFirestore.instance
+          .collection('Community Wallet')
+          .doc('it')
+          .update({
+        // 'wallet': FieldValue.increment(total),
+        'pts': FieldValue.increment(100),
+      });
     } else {
       print('Points are within the limit.');
     }
@@ -232,7 +246,9 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                             return SizedBox(
                               height: 300,
                               child: ListView.builder(
-                                itemCount: data.docs.length,
+                                itemCount: data.docs.length > 10
+                                    ? 10
+                                    : data.docs.length,
                                 itemBuilder: (context, index) {
                                   return StreamBuilder<DocumentSnapshot>(
                                       stream: FirebaseFirestore.instance
@@ -258,17 +274,15 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                                         dynamic mydata = snapshot.data;
                                         return Padding(
                                           padding: const EdgeInsets.all(5.0),
-                                          child: ListTile(
-                                            shape: RoundedRectangleBorder(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
                                               borderRadius:
-                                                  BorderRadius.circular(
-                                                15,
-                                              ),
+                                                  BorderRadius.circular(15),
                                             ),
-                                            tileColor: Colors.white,
-                                            leading: SizedBox(
-                                              height: 50,
-                                              width: 300,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
                                               child: Row(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.start,
