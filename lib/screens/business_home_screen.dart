@@ -12,6 +12,7 @@ import 'package:juan_million/screens/pages/business/wallet_page.dart';
 import 'package:juan_million/screens/pages/payment_selection_screen.dart';
 import 'package:juan_million/screens/pages/store_page.dart';
 import 'package:juan_million/services/add_points.dart';
+import 'package:juan_million/utlis/app_constants.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:juan_million/widgets/toast_widget.dart';
@@ -335,7 +336,10 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                           text: index == 0
                                                               ? '${mydata['pts']}'
                                                               : index == 1
-                                                                  ? '${mydata['wallet']}'
+                                                                  ? AppConstants
+                                                                      .formatNumberWithPeso(
+                                                                          mydata[
+                                                                              'wallet'])
                                                                   : data.docs
                                                                       .length
                                                                       .toString(),

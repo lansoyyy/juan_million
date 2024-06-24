@@ -20,6 +20,7 @@ import 'package:juan_million/screens/pages/customer/wallet_page.dart';
 import 'package:juan_million/screens/pages/payment_selection_screen.dart';
 import 'package:juan_million/screens/pages/store_page.dart';
 import 'package:juan_million/services/add_slots.dart';
+import 'package:juan_million/utlis/app_constants.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 
@@ -266,7 +267,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                           ? 'Total Points'
                                           : index == 1
                                               ? 'Cash Wallet'
-                                              : 'Bayanihan Fund',
+                                              : 'Community Wallet',
                                       fontSize: 14,
                                       color: Colors.white,
                                     ),
@@ -326,7 +327,10 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                                   text: index == 0
                                                       ? '${data['pts']}'
                                                       : index == 1
-                                                          ? '${data['wallet']}'
+                                                          ? AppConstants
+                                                                      .formatNumberWithPeso(
+                                                                          data[
+                                                                              'wallet'])
                                                           : mydata.docs.length
                                                               .toString(),
                                                   fontFamily: 'Bold',
@@ -615,95 +619,104 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                               height: 150,
                               width: 500,
                               child: ListView.builder(
-                                itemCount: 2,
+                                itemCount: data.docs.length,
                                 scrollDirection: Axis.horizontal,
                                 itemBuilder: (context, index) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 5, right: 5),
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    PaymentSelectionScreen(
-                                                      item: data.docs[index],
-                                                    )));
-                                      },
-                                      child: Card(
-                                        elevation: 5,
-                                        color: Colors.white,
-                                        child: SizedBox(
-                                          height: 150,
-                                          width: 150,
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(10.0),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                TextWidget(
-                                                  text:
-                                                      'P${data.docs[index]['price']}',
-                                                  fontSize: 14,
-                                                  fontFamily: 'Medium',
-                                                  color: blue,
+                                  return data.docs[index]['price'] == 250 ||
+                                          data.docs[index]['price'] == 20
+                                      ? const SizedBox()
+                                      : Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 5, right: 5),
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              Navigator.of(context).push(
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          PaymentSelectionScreen(
+                                                            item: data
+                                                                .docs[index],
+                                                          )));
+                                            },
+                                            child: Card(
+                                              elevation: 5,
+                                              color: Colors.white,
+                                              child: SizedBox(
+                                                height: 150,
+                                                width: 150,
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(
+                                                      10.0),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      TextWidget(
+                                                        text:
+                                                            'P${data.docs[index]['price']}',
+                                                        fontSize: 14,
+                                                        fontFamily: 'Medium',
+                                                        color: blue,
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 15,
+                                                      ),
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          TextWidget(
+                                                            text:
+                                                                '${data.docs[index]['slots'] * 150}',
+                                                            fontSize: 38,
+                                                            fontFamily: 'Bold',
+                                                            color: blue,
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 5,
+                                                          ),
+                                                          TextWidget(
+                                                            text: 'pts',
+                                                            fontSize: 12,
+                                                            fontFamily: 'Bold',
+                                                            color: blue,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 15,
+                                                      ),
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Icon(
+                                                            Icons.circle,
+                                                            color: secondary,
+                                                            size: 15,
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 5,
+                                                          ),
+                                                          TextWidget(
+                                                            text:
+                                                                'Limited offer',
+                                                            fontSize: 10,
+                                                            fontFamily: 'Bold',
+                                                            color: Colors.black,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
-                                                const SizedBox(
-                                                  height: 15,
-                                                ),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    TextWidget(
-                                                      text:
-                                                          '${data.docs[index]['slots'] * 150}',
-                                                      fontSize: 38,
-                                                      fontFamily: 'Bold',
-                                                      color: blue,
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 5,
-                                                    ),
-                                                    TextWidget(
-                                                      text: 'pts',
-                                                      fontSize: 12,
-                                                      fontFamily: 'Bold',
-                                                      color: blue,
-                                                    ),
-                                                  ],
-                                                ),
-                                                const SizedBox(
-                                                  height: 15,
-                                                ),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Icon(
-                                                      Icons.circle,
-                                                      color: secondary,
-                                                      size: 15,
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 5,
-                                                    ),
-                                                    TextWidget(
-                                                      text: 'Limited offer',
-                                                      fontSize: 10,
-                                                      fontFamily: 'Bold',
-                                                      color: Colors.black,
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      ),
-                                    ),
-                                  );
+                                        );
                                 },
                               ),
                             );

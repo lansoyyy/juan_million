@@ -7,7 +7,9 @@ import 'package:juan_million/screens/auth/payment_screen.dart';
 import 'package:juan_million/screens/customer_home_screen.dart';
 import 'package:juan_million/screens/pages/customer/qr_scanned_page.dart';
 import 'package:juan_million/services/add_points.dart';
+import 'package:juan_million/utlis/app_constants.dart';
 import 'package:juan_million/utlis/colors.dart';
+import 'package:juan_million/widgets/button_widget.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:juan_million/widgets/toast_widget.dart';
 
@@ -111,26 +113,193 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                   ),
                   GestureDetector(
                     onTap: () async {
-                      if (data['wallet'] > widget.item['price']) {
-                        // Check if business
-                        await FirebaseFirestore.instance
-                            .collection(
-                                widget.inbusiness! ? 'Business' : 'Users')
-                            .doc(FirebaseAuth.instance.currentUser!.uid)
-                            .update({
-                          'pts':
-                              FieldValue.increment(widget.item['slots'] * 150),
-                          'wallet':
-                              FieldValue.increment(-(widget.item['price'])),
-                        });
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return Dialog(
+                            child: SizedBox(
+                              height: 275,
+                              width: 250,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 20, right: 20),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        TextWidget(
+                                          text: 'Payment Details',
+                                          fontSize: 24,
+                                          fontFamily: 'Bold',
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(
+                                      height: 20,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        TextWidget(
+                                          text: 'Merchandise',
+                                          fontSize: 12,
+                                        ),
+                                        TextWidget(
+                                          text:
+                                              AppConstants.formatNumberWithPeso(
+                                                  (widget.item['price'] /
+                                                          widget.item['slots'])
+                                                      .toInt()),
+                                          fontSize: 14,
+                                          fontFamily: 'Bold',
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        TextWidget(
+                                          text: 'Quantity',
+                                          fontSize: 12,
+                                        ),
+                                        TextWidget(
+                                          text: widget.item['slots'].toString(),
+                                          fontSize: 14,
+                                          fontFamily: 'Bold',
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        TextWidget(
+                                          text: 'Subtotal',
+                                          fontSize: 12,
+                                        ),
+                                        TextWidget(
+                                          text: AppConstants
+                                              .formatNumberWithPeso(widget
+                                                      .item['slots'] *
+                                                  (widget.item['price'] /
+                                                          widget.item['slots'])
+                                                      .toInt()),
+                                          fontSize: 14,
+                                          fontFamily: 'Bold',
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        TextWidget(
+                                          text: 'Promo Discount(s) 10%',
+                                          fontSize: 12,
+                                        ),
+                                        TextWidget(
+                                          text: AppConstants
+                                              .formatNumberWithPeso(((widget
+                                                              .item['slots'] *
+                                                          (widget.item[
+                                                                      'price'] /
+                                                                  widget.item[
+                                                                      'slots'])
+                                                              .toInt()) *
+                                                      0.10)
+                                                  .toInt()),
+                                          fontSize: 14,
+                                          fontFamily: 'Bold',
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        TextWidget(
+                                          text: 'Total',
+                                          fontSize: 12,
+                                        ),
+                                        TextWidget(
+                                          text: AppConstants.formatNumberWithPeso(widget
+                                                      .item['slots'] *
+                                                  (widget.item['price'] /
+                                                          widget.item['slots'])
+                                                      .toInt() -
+                                              ((widget.item['slots'] *
+                                                          (widget.item[
+                                                                      'price'] /
+                                                                  widget.item[
+                                                                      'slots'])
+                                                              .toInt()) *
+                                                      0.10)
+                                                  .toInt()),
+                                          fontSize: 14,
+                                          fontFamily: 'Bold',
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(
+                                      height: 20,
+                                    ),
+                                    ButtonWidget(
+                                      width: 225,
+                                      label: 'Confirm',
+                                      onPressed: () async {
+                                        Navigator.pop(context);
+                                        if (data['wallet'] >
+                                            widget.item['price']) {
+                                          // Check if business
+                                          await FirebaseFirestore.instance
+                                              .collection(widget.inbusiness!
+                                                  ? 'Business'
+                                                  : 'Users')
+                                              .doc(FirebaseAuth
+                                                  .instance.currentUser!.uid)
+                                              .update({
+                                            'pts': FieldValue.increment(
+                                                widget.item['slots'] * 150),
+                                            'wallet': FieldValue.increment(-(widget
+                                                        .item['slots'] *
+                                                    (widget.item['price'] /
+                                                            widget
+                                                                .item['slots'])
+                                                        .toInt() -
+                                                ((widget.item['slots'] *
+                                                            (widget.item[
+                                                                        'price'] /
+                                                                    widget.item[
+                                                                        'slots'])
+                                                                .toInt()) *
+                                                        0.10)
+                                                    .toInt())),
+                                          });
 
-                        addPoints(widget.item['slots'] * 150, 1);
-                        Navigator.of(context).pop();
+                                          addPoints(
+                                              widget.item['slots'] * 150, 1);
+                                          Navigator.of(context).pop();
 
-                        showToast('Succesfully purchased!');
-                      } else {
-                        showToast('Not enough balance on wallet!');
-                      }
+                                          showToast('Succesfully purchased!');
+                                        } else {
+                                          showToast(
+                                              'Not enough balance on wallet!');
+                                        }
+                                      },
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      );
                     },
                     child: Card(
                       elevation: 3,

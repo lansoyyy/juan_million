@@ -35,7 +35,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
           .doc('wallet')
           .update({
         // 'wallet': FieldValue.increment(total),
-        'pts': FieldValue.increment(-total),
+        'pts': FieldValue.increment(-limit),
       });
       await FirebaseFirestore.instance
           .collection('Community Wallet')
@@ -85,7 +85,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                 ),
                 Center(
                   child: TextWidget(
-                    text: 'Bayanihan Fund',
+                    text: 'Community Wallet',
                     fontSize: 14,
                     color: Colors.white,
                   ),

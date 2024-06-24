@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class AppConstants {
   AppConstants._();
@@ -12,4 +13,9 @@ class AppConstants {
   static final RegExp passwordRegex = RegExp(
     r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$#!%*?&_])[A-Za-z\d@#$!%*?&_].{7,}$',
   );
+
+  static String formatNumberWithPeso(int number) {
+    final numberFormat = NumberFormat("#,##0", "en_US");
+    return '₱${numberFormat.format(number)}';
+  }
 }
