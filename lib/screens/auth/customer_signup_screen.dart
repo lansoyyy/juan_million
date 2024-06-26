@@ -1,9 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:juan_million/models/municipality_model.dart';
+import 'package:juan_million/models/province_model.dart';
+import 'package:juan_million/models/region_model.dart';
 import 'package:juan_million/screens/auth/package_screen.dart';
 import 'package:juan_million/screens/customer_home_screen.dart';
 import 'package:juan_million/services/add_user.dart';
 import 'package:juan_million/utlis/colors.dart';
+import 'package:juan_million/widgets/address_widget.dart';
 import 'package:juan_million/widgets/button_widget.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:juan_million/widgets/textfield_widget.dart';
@@ -28,7 +32,6 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
   final password = TextEditingController();
 
   final nickname = TextEditingController();
-  final address = TextEditingController();
 
   late String fileName = '';
 
@@ -98,6 +101,10 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
       }
     }
   }
+
+  Region? region;
+  Province? province;
+  Municipality? municipality;
 
   @override
   Widget build(BuildContext context) {
@@ -170,16 +177,52 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
               const SizedBox(
                 height: 20,
               ),
-              TextFieldWidget(
-                fontStyle: FontStyle.normal,
-                hint: 'Address',
-                borderColor: blue,
-                radius: 12,
+              SizedBox(
                 width: 350,
-                isRequred: false,
-                prefixIcon: Icons.person_3_outlined,
-                controller: address,
-                label: 'Address',
+                child: CustomRegionDropdownView(
+                    onChanged: (Region? value) {
+                      setState(() {
+                        if (region != value) {
+                          province = null;
+                          municipality = null;
+                        }
+                        region = value;
+                      });
+                    },
+                    value: region),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                width: 350,
+                child: CustomProvinceDropdownView(
+                  provinces: region?.provinces ?? [],
+                  onChanged: (Province? value) {
+                    setState(() {
+                      if (province != value) {
+                        municipality = null;
+                      }
+                      province = value;
+                    });
+                  },
+                  value: province,
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                width: 350,
+                child: CustomMunicipalityDropdownView(
+                  municipalities: province?.municipalities ?? [],
+                  onChanged: (value) {
+                    setState(() {
+                      municipality = value;
+                    });
+                  },
+                  value: municipality,
+                ),
               ),
               const SizedBox(
                 height: 20,
@@ -236,7 +279,8 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: email.text, password: password.text);
 
-      addUser(name.text, email.text, nickname.text, imageURL, address.text);
+      addUser(name.text, email.text, nickname.text, imageURL,
+          '${municipality!.name}, ${province!.name}');
 
       Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const CustomerHomeScreen()));

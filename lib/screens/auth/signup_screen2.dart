@@ -1,11 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:juan_million/models/municipality_model.dart';
+import 'package:juan_million/models/province_model.dart';
+import 'package:juan_million/models/region_model.dart';
 import 'package:juan_million/screens/auth/package_screen.dart';
 import 'package:juan_million/screens/business_home_screen.dart';
 import 'package:juan_million/screens/pages/store_page.dart';
 import 'package:juan_million/services/add_business.dart';
 import 'package:juan_million/utlis/colors.dart';
+import 'package:juan_million/widgets/address_widget.dart';
 import 'package:juan_million/widgets/button_widget.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:juan_million/widgets/textfield_widget.dart';
@@ -26,7 +30,6 @@ class SignupScreen2 extends StatefulWidget {
 }
 
 class _SignupScreen2State extends State<SignupScreen2> {
-  final address = TextEditingController();
   final desc = TextEditingController();
   final clarification = TextEditingController();
 
@@ -101,6 +104,10 @@ class _SignupScreen2State extends State<SignupScreen2> {
     }
   }
 
+  Region? region;
+  Province? province;
+  Municipality? municipality;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -129,18 +136,54 @@ class _SignupScreen2State extends State<SignupScreen2> {
                 ),
               ),
               const SizedBox(
-                height: 10,
+                height: 20,
               ),
-              TextFieldWidget(
-                fontStyle: FontStyle.normal,
-                hint: 'Business Address',
-                borderColor: blue,
-                radius: 12,
+              SizedBox(
                 width: 350,
-                isRequred: false,
-                prefixIcon: Icons.location_on_rounded,
-                controller: address,
-                label: 'Business Address',
+                child: CustomRegionDropdownView(
+                    onChanged: (Region? value) {
+                      setState(() {
+                        if (region != value) {
+                          province = null;
+                          municipality = null;
+                        }
+                        region = value;
+                      });
+                    },
+                    value: region),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                width: 350,
+                child: CustomProvinceDropdownView(
+                  provinces: region?.provinces ?? [],
+                  onChanged: (Province? value) {
+                    setState(() {
+                      if (province != value) {
+                        municipality = null;
+                      }
+                      province = value;
+                    });
+                  },
+                  value: province,
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                width: 350,
+                child: CustomMunicipalityDropdownView(
+                  municipalities: province?.municipalities ?? [],
+                  onChanged: (value) {
+                    setState(() {
+                      municipality = value;
+                    });
+                  },
+                  value: municipality,
+                ),
               ),
               const SizedBox(
                 height: 20,
@@ -195,7 +238,7 @@ class _SignupScreen2State extends State<SignupScreen2> {
                       .doc(widget.id)
                       .update({
                     'logo': imageURL,
-                    'address': address.text,
+                    'address': '${municipality!.name}, ${province!.name}',
                     'desc': desc.text,
                     'clarification': clarification.text,
                     'representative': rep.text,
