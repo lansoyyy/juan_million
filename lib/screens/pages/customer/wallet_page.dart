@@ -8,6 +8,7 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:intl/intl.dart';
 import 'package:juan_million/screens/pages/store_page.dart';
 import 'package:juan_million/services/add_wallet.dart';
+import 'package:juan_million/utlis/app_constants.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:juan_million/widgets/textfield_widget.dart';
@@ -70,7 +71,8 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
                   ),
                   Center(
                     child: TextWidget(
-                      text: data['wallet'].toString(),
+                      text:
+                          '${AppConstants.formatNumberWithPeso(data['wallet'])}.00',
                       fontFamily: 'Bold',
                       fontSize: 75,
                       color: Colors.white,

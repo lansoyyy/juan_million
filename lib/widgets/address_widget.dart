@@ -194,7 +194,13 @@ class CustomMunicipalityDropdownView extends StatelessWidget {
       },
       hint: const Text('Select Municipality'),
       selectedItemBuilder: (BuildContext context, Municipality value) {
-        return Text(value.name, overflow: TextOverflow.ellipsis);
+        return Text(
+          value.name,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            color: Colors.black,
+          ),
+        );
       },
       validator: validator,
     );
