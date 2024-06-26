@@ -153,33 +153,6 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                                   child: CircularProgressIndicator());
                             }
                             dynamic walletdata = snapshot.data;
-
-                            checkPoints(walletdata['pts'], 8000);
-                            return TextWidget(
-                              text: '${walletdata['pts']}/8000 pts',
-                              fontSize: 12,
-                              color: Colors.white,
-                              fontFamily: 'Regular',
-                            );
-                          }),
-                      StreamBuilder<DocumentSnapshot>(
-                          stream: FirebaseFirestore.instance
-                              .collection('Community Wallet')
-                              .doc('wallet')
-                              .snapshots(),
-                          builder: (context,
-                              AsyncSnapshot<DocumentSnapshot> snapshot) {
-                            if (!snapshot.hasData) {
-                              return const Center(child: Text('Loading'));
-                            } else if (snapshot.hasError) {
-                              return const Center(
-                                  child: Text('Something went wrong'));
-                            } else if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            }
-                            dynamic walletdata = snapshot.data;
                             return LinearProgressIndicator(
                               minHeight: 12,
                               color: primary,

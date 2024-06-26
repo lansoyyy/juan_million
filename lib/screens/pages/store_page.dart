@@ -289,7 +289,7 @@ class _StorePageState extends State<StorePage> {
                                               children: [
                                                 TextWidget(
                                                   text:
-                                                      '${data.docs[index]['slots'] * 150}',
+                                                      '${double.parse((data.docs[index]['slots'] * 150).toString()).round()}',
                                                   fontSize: 38,
                                                   fontFamily: 'Bold',
                                                   color: blue,

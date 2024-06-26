@@ -185,11 +185,16 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                                         ),
                                         TextWidget(
                                           text: AppConstants
-                                              .formatNumberWithPeso(widget
-                                                      .item['slots'] *
-                                                  (widget.item['price'] /
-                                                          widget.item['slots'])
-                                                      .toInt()),
+                                              .formatNumberWithPeso(((widget
+                                                                      .item[
+                                                                  'slots'] *
+                                                              (widget.item[
+                                                                      'price'] /
+                                                                  widget.item[
+                                                                      'slots']))
+                                                          .toInt() *
+                                                      0.10)
+                                                  .toInt()),
                                           fontSize: 14,
                                           fontFamily: 'Bold',
                                         ),
@@ -228,17 +233,17 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                                           fontSize: 12,
                                         ),
                                         TextWidget(
-                                          text: AppConstants.formatNumberWithPeso(widget
-                                                      .item['slots'] *
-                                                  (widget.item['price'] /
-                                                          widget.item['slots'])
-                                                      .toInt() -
+                                          text: AppConstants.formatNumberWithPeso((widget
+                                                          .item['slots'] *
+                                                      (widget.item['price'] /
+                                                          widget.item['slots']))
+                                                  .toInt() -
                                               ((widget.item['slots'] *
-                                                          (widget.item[
+                                                              (widget.item[
                                                                       'price'] /
                                                                   widget.item[
-                                                                      'slots'])
-                                                              .toInt()) *
+                                                                      'slots']))
+                                                          .toInt() *
                                                       0.10)
                                                   .toInt()),
                                           fontSize: 14,

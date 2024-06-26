@@ -19,7 +19,7 @@ class AppConstants {
 
   static String formatNumberWithPeso(int number) {
     final numberFormat = NumberFormat("#,##0", "en_US");
-    return '₱${numberFormat.format(number)}';
+    return 'P ${numberFormat.format(number)}';
   }
 }
 

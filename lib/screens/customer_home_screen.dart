@@ -375,15 +375,12 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                                         text: index == 0
                                                             ? '${data['pts']}'
                                                             : index == 1
-                                                                ? AppConstants
-                                                                    .formatNumberWithPeso(
-                                                                        data[
-                                                                            'wallet'])
+                                                                ? '${AppConstants.formatNumberWithPeso(data['wallet'])}.00'
                                                                 : mydata
                                                                     .docs.length
                                                                     .toString(),
                                                         fontFamily: 'Bold',
-                                                        fontSize: 50,
+                                                        fontSize: 42,
                                                         color: Colors.white,
                                                       );
                                                     }),
