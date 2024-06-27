@@ -157,9 +157,8 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                                           TextWidget(
                                             text: AppConstants
                                                 .formatNumberWithPeso(
-                                                    double.parse((widget.item[
-                                                                    'slots'] *
-                                                                150)
+                                                    double.parse((widget
+                                                                .item['price'])
                                                             .toString())
                                                         .round()),
                                             fontSize: 14,
