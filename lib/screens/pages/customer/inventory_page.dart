@@ -159,6 +159,8 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                                   child: CircularProgressIndicator());
                             }
                             dynamic walletdata = snapshot.data;
+
+                            checkPoints(walletdata['pts'], 8000);
                             return LinearProgressIndicator(
                               minHeight: 12,
                               color: primary,

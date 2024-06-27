@@ -115,7 +115,6 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
       int total = points - limit;
 
       int slots = total ~/ limit;
-      print(slots);
 
       FirebaseFirestore.instance
           .collection('Users')
