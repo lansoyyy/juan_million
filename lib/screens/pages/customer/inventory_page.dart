@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:juan_million/services/add_history.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 
@@ -21,12 +22,17 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
 
   void checkPoints(int points, int limit) async {
     if (points > limit) {
+      var document = FirebaseFirestore.instance
+          .doc('Users/${FirebaseAuth.instance.currentUser!.uid}');
+      var snapshot = await document.get();
       int total = points - limit;
 
       await FirebaseFirestore.instance.collection('Users').doc(uid).update({
         'wallet': FieldValue.increment(total),
         // 'pts': FieldValue.increment(-total),
       });
+
+      addHistory(snapshot.data()!['name']);
 
       await FirebaseFirestore.instance.collection('Slots').doc(id).delete();
 
