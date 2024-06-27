@@ -213,7 +213,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               }
               dynamic data = snapshot.data;
 
-              checkPoints(data['pts'], 149);
+              checkPoints(data['pts'].toInt(), 149);
 
               return Column(
                 children: [
@@ -378,7 +378,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
                                                   return TextWidget(
                                                     text: index == 0
-                                                        ? '${data['pts']}'
+                                                        ? '${data['pts'].toInt()}'
                                                         : index == 1
                                                             ? '${AppConstants.formatNumberWithPeso(data['wallet'])}.00'
                                                             : mydata.docs.length
