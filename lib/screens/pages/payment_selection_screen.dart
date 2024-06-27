@@ -193,8 +193,7 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                                             text: AppConstants
                                                 .formatNumberWithPeso(
                                                     double.parse((widget.item[
-                                                                        'slots'] *
-                                                                    150)
+                                                                    'price'])
                                                                 .toString())
                                                             .round() *
                                                         qty),
@@ -237,9 +236,9 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                                           ),
                                           TextWidget(
                                             text: AppConstants.formatNumberWithPeso(((double
-                                                                .parse((widget.item[
-                                                                            'slots'] *
-                                                                        150)
+                                                                .parse((widget
+                                                                            .item[
+                                                                        'price'])
                                                                     .toString())
                                                             .round() *
                                                         qty) -
@@ -298,8 +297,8 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                                         onPressed: () async {
                                           Navigator.pop(context);
                                           if (data['wallet'] >
-                                              ((double.parse((widget.item['slots'] *
-                                                                      150)
+                                              ((double.parse((widget.item[
+                                                                      'price'])
                                                                   .toString())
                                                               .round() *
                                                           qty) -
@@ -323,9 +322,9 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                                                   (widget.item['slots'] * 150) *
                                                       qty),
                                               'wallet': FieldValue.increment(-((double
-                                                                  .parse((widget.item[
-                                                                              'slots'] *
-                                                                          150)
+                                                                  .parse((widget
+                                                                              .item[
+                                                                          'price'])
                                                                       .toString())
                                                               .round() *
                                                           qty) -
@@ -340,7 +339,9 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                                             });
 
                                             addPoints(
-                                                widget.item['slots'] * 150, 1);
+                                                (widget.item['slots'] * 150) *
+                                                    qty,
+                                                qty);
                                             Navigator.of(context).pop();
 
                                             showToast('Succesfully purchased!');
