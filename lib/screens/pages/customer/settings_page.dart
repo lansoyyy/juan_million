@@ -249,7 +249,7 @@ class _CustomerSettingsPageState extends State<CustomerSettingsPage> {
                             child: ListTile(
                               onTap: () {
                                 Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => MyQRPage()));
+                                    builder: (context) => const MyQRPage()));
                               },
                               tileColor: Colors.white,
                               leading: Container(
