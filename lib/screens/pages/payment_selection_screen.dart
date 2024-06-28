@@ -211,16 +211,17 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                                             fontSize: 12,
                                           ),
                                           TextWidget(
-                                            text: AppConstants.formatNumberWithPeso(((widget
-                                                                .item['slots'] *
-                                                            (widget.item[
+                                            text: AppConstants
+                                                .formatNumberWithPeso(((widget
+                                                                        .item[
+                                                                    'slots'] *
+                                                                (widget.item[
                                                                         'price'] /
                                                                     widget.item[
-                                                                        'slots'])
-                                                                .toInt()) *
-                                                        0.10)
-                                                    .toInt() *
-                                                qty),
+                                                                        'slots'])) *
+                                                            0.10)
+                                                        .toInt() *
+                                                    qty),
                                             fontSize: 14,
                                             fontFamily: 'Bold',
                                           ),
@@ -243,9 +244,10 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                                                             .round() *
                                                         qty) -
                                                     (((widget.item['slots'] *
-                                                                    (widget.item['price'] /
-                                                                            widget.item['slots'])
-                                                                        .toInt()) *
+                                                                    (widget.item[
+                                                                            'price'] /
+                                                                        widget.item[
+                                                                            'slots'])) *
                                                                 0.10)
                                                             .toInt() *
                                                         qty))
@@ -296,16 +298,17 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                                         label: 'Confirm',
                                         onPressed: () async {
                                           Navigator.pop(context);
-                                          if (data['wallet'] >
+                                          if (data['wallet'] >=
                                               ((double.parse((widget.item[
                                                                       'price'])
                                                                   .toString())
                                                               .round() *
                                                           qty) -
                                                       (((widget.item['slots'] *
-                                                                      (widget.item['price'] /
-                                                                              widget.item['slots'])
-                                                                          .toInt()) *
+                                                                      (widget.item[
+                                                                              'price'] /
+                                                                          widget
+                                                                              .item['slots'])) *
                                                                   0.10)
                                                               .toInt() *
                                                           qty))
@@ -329,22 +332,22 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                                                               .round() *
                                                           qty) -
                                                       (((widget.item['slots'] *
-                                                                      (widget.item['price'] /
-                                                                              widget.item['slots'])
-                                                                          .toInt()) *
+                                                                      (widget.item[
+                                                                              'price'] /
+                                                                          widget
+                                                                              .item['slots'])) *
                                                                   0.10)
                                                               .toInt() *
                                                           qty))
                                                   .toInt()),
                                             });
+                                            showToast('Succesfully purchased!');
 
                                             addPoints(
                                                 (widget.item['slots'] * 150) *
                                                     qty,
                                                 qty);
                                             Navigator.of(context).pop();
-
-                                            showToast('Succesfully purchased!');
                                           } else {
                                             showToast(
                                                 'Not enough balance on wallet!');
