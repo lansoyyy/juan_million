@@ -261,7 +261,14 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
                 width: 350,
                 label: 'Signup',
                 onPressed: () {
-                  register(context);
+                  if (name.text != '' ||
+                      nickname.text != '' ||
+                      email.text != '' ||
+                      password.text != '') {
+                    register(context);
+                  } else {
+                    showToast('All fields are required!');
+                  }
                 },
               ),
               const SizedBox(
