@@ -184,6 +184,102 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                       ),
                       StreamBuilder<QuerySnapshot>(
                           stream: FirebaseFirestore.instance
+                              .collection('History')
+                              .snapshots(),
+                          builder: (BuildContext context,
+                              AsyncSnapshot<QuerySnapshot> snapshot) {
+                            if (snapshot.hasError) {
+                              print(snapshot.error);
+                              return const Center(child: Text('Error'));
+                            }
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Padding(
+                                padding: EdgeInsets.only(top: 50),
+                                child: Center(
+                                    child: CircularProgressIndicator(
+                                  color: Colors.black,
+                                )),
+                              );
+                            }
+
+                            final data = snapshot.requireData;
+
+                            return data.docs.isNotEmpty
+                                ? Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Stack(
+                                        children: [
+                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              StreamBuilder<DocumentSnapshot>(
+                                                  stream: FirebaseFirestore
+                                                      .instance
+                                                      .collection('Users')
+                                                      .doc(data.docs[
+                                                          data.docs.length -
+                                                              1]['uid'])
+                                                      .snapshots(),
+                                                  builder: (context,
+                                                      AsyncSnapshot<
+                                                              DocumentSnapshot>
+                                                          snapshot) {
+                                                    if (!snapshot.hasData) {
+                                                      return const Center(
+                                                          child:
+                                                              Text('Loading'));
+                                                    } else if (snapshot
+                                                        .hasError) {
+                                                      return const Center(
+                                                          child: Text(
+                                                              'Something went wrong'));
+                                                    } else if (snapshot
+                                                            .connectionState ==
+                                                        ConnectionState
+                                                            .waiting) {
+                                                      return const Center(
+                                                          child:
+                                                              CircularProgressIndicator());
+                                                    }
+                                                    dynamic mydata =
+                                                        snapshot.data;
+                                                    return CircleAvatar(
+                                                      maxRadius: 40,
+                                                      minRadius: 40,
+                                                      backgroundImage:
+                                                          NetworkImage(
+                                                              mydata['pic']),
+                                                    );
+                                                  }),
+                                              const SizedBox(
+                                                height: 5,
+                                              ),
+                                              TextWidget(
+                                                text: data.docs[
+                                                        data.docs.length - 1]
+                                                    ['name'],
+                                                fontSize: 18,
+                                                fontFamily: 'Bold',
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  )
+                                : const SizedBox();
+                          }),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      StreamBuilder<QuerySnapshot>(
+                          stream: FirebaseFirestore.instance
                               .collection('Slots')
                               .snapshots(),
                           builder: (BuildContext context,
