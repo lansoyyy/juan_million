@@ -322,8 +322,8 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                                                     .instance.currentUser!.uid)
                                                 .update({
                                               'pts': FieldValue.increment(
-                                                  (widget.item['slots'] * 150) *
-                                                      qty),
+                                                  ((widget.item['slots'] * 150) *
+                                                      qty).round()),
                                               'wallet': FieldValue.increment(-((double
                                                                   .parse((widget
                                                                               .item[

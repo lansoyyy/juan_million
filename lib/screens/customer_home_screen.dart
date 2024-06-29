@@ -111,7 +111,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   }
 
   void checkPoints(int points, int limit) async {
-    if (points > limit) {
+    print('slots here $points');
+    if (points >= limit) {
       await FirebaseFirestore.instance
           .collection('Slots')
           .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
@@ -129,12 +130,9 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           .get()
           .then((snapshot) {
         int total = points - limit;
-        int slotsFromPoints = total ~/ limit;
+        int slotsFromPoints = points ~/ limit;
         int currentSlots = snapshot.docs.length;
         int slotsLeft = 10 - currentSlots;
-
-        print(slotsFromPoints);
-        print(slotsLeft);
 
         if (slotsLeft > 0) {
           FirebaseFirestore.instance
@@ -142,7 +140,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               .doc(FirebaseAuth.instance.currentUser!.uid)
               .update({
             // 'wallet': FieldValue.increment(total),
-            'pts': FieldValue.increment(-total),
+            'pts': FieldValue.increment(-slotsFromPoints * limit),
           });
         }
         if (slotsFromPoints > slotsLeft) {
@@ -213,7 +211,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               }
               dynamic data = snapshot.data;
 
-              checkPoints(data['pts'].toInt(), 149);
+              checkPoints(data['pts'].toInt(), 150);
 
               return Column(
                 children: [
