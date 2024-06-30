@@ -313,6 +313,16 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                                                               .toInt() *
                                                           qty))
                                                   .toInt()) {
+                                                    if(widget.item[
+                                                                      'price'] == 20) {
+                                                        await FirebaseFirestore.instance
+          .collection('Community Wallet')
+          .doc('wallet')
+          .update({
+        // 'wallet': FieldValue.increment(total),
+        'pts': FieldValue.increment(20),
+      });
+                                                    }
                                             // Check if business
                                             await FirebaseFirestore.instance
                                                 .collection(widget.inbusiness!
