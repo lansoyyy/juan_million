@@ -30,6 +30,7 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
   final email = TextEditingController();
 
   final password = TextEditingController();
+  final confirmpassword = TextEditingController();
 
   final nickname = TextEditingController();
 
@@ -255,19 +256,39 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
                 label: 'Password',
               ),
               const SizedBox(
+                height: 20,
+              ),
+              TextFieldWidget(
+                showEye: true,
+                isObscure: true,
+                prefixIcon: Icons.lock_open_outlined,
+                fontStyle: FontStyle.normal,
+                hint: 'Confirm Password',
+                borderColor: blue,
+                radius: 12,
+                width: 350,
+                isRequred: false,
+                controller: confirmpassword,
+                label: 'Confirm Password',
+              ),
+              const SizedBox(
                 height: 30,
               ),
               ButtonWidget(
                 width: 350,
                 label: 'Signup',
                 onPressed: () {
-                  if (name.text != '' ||
-                      nickname.text != '' ||
-                      email.text != '' ||
-                      password.text != '') {
-                    register(context);
+                  if (password.text == confirmpassword.text) {
+                    if (name.text != '' ||
+                        nickname.text != '' ||
+                        email.text != '' ||
+                        password.text != '') {
+                      register(context);
+                    } else {
+                      showToast('All fields are required!');
+                    }
                   } else {
-                    showToast('All fields are required!');
+                    showToast('Password do not match!');
                   }
                 },
               ),
