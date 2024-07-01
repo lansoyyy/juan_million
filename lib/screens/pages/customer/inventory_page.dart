@@ -28,7 +28,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
       int total = points - limit;
 
       await FirebaseFirestore.instance.collection('Users').doc(uid).update({
-        'wallet': FieldValue.increment(total),
+        'wallet': FieldValue.increment(5500),
         // 'pts': FieldValue.increment(-total),
       });
 
