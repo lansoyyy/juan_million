@@ -31,7 +31,8 @@ class SignupScreen2 extends StatefulWidget {
 
 class _SignupScreen2State extends State<SignupScreen2> {
   final desc = TextEditingController();
-  final clarification = TextEditingController();
+
+  final pts = TextEditingController();
 
   final rep = TextEditingController();
 
@@ -107,6 +108,46 @@ class _SignupScreen2State extends State<SignupScreen2> {
   Region? region;
   Province? province;
   Municipality? municipality;
+
+  String? _selectedCategory;
+  String? _selectedSubCategory;
+
+  final Map<String, List<String>> _categoryOptions = {
+    'Retail': [
+      'Grocery Store',
+      'Electronic & Gadgets',
+      'Apparel & Fashion',
+      'Cosmetics & Beauty',
+      'Toys & Games',
+      'Books & Stationary',
+      'Sports & Fitness',
+      'Home Improvement',
+      'Pet Supplies',
+      'Agri- Products',
+      'Crafts & Hobbies',
+      'Specialty Retail',
+      'Others'
+    ],
+    'Services': [
+      'Personal Care',
+      'Professional Services',
+      'Health & Wellness',
+      'Educational Services',
+      'Home Services',
+      'Automobile',
+      'Laundry',
+      'Fuel Station',
+      'Transportation',
+      'Others'
+    ],
+    'Cafe and Resto': [
+      'Coffee Shops',
+      'Casual Dining',
+      'Fine Dining',
+      'Bakeries & Dessert Shops',
+      'Others'
+    ],
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -203,28 +244,108 @@ class _SignupScreen2State extends State<SignupScreen2> {
               const SizedBox(
                 height: 20,
               ),
-              TextFieldWidget(
-                prefixIcon: Icons.info_outline,
-                fontStyle: FontStyle.normal,
-                hint: 'Business Clarification (Retail, Cafe & Resto, Etc.)',
-                borderColor: blue,
-                radius: 12,
-                width: 350,
-                controller: clarification,
-                label: 'Clarification',
+              Padding(
+                padding: const EdgeInsets.only(
+                    top: 10, bottom: 10, left: 10, right: 10),
+                child: Column(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12.5),
+                        border: Border.all(
+                          color: blue,
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+                        child: DropdownButton<String>(
+                          underline: const SizedBox(),
+                          hint: Text(
+                            'Select Business Clarification',
+                            style: TextStyle(
+                              color: blue,
+                            ),
+                          ),
+                          value: _selectedCategory,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              _selectedCategory = newValue;
+                              _selectedSubCategory = null;
+                            });
+                          },
+                          items: _categoryOptions.keys.map((String category) {
+                            return DropdownMenuItem<String>(
+                              value: category,
+                              child: TextWidget(
+                                text: category,
+                                fontSize: 14,
+                                color: blue,
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    if (_selectedCategory != null)
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12.5),
+                          border: Border.all(
+                            color: blue,
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+                          child: DropdownButton<String>(
+                            underline: const SizedBox(),
+                            hint: Text(
+                              'Select Clarification Type',
+                              style: TextStyle(
+                                color: blue,
+                              ),
+                            ),
+                            value: _selectedSubCategory,
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                _selectedSubCategory = newValue;
+                              });
+                            },
+                            items: _categoryOptions[_selectedCategory]!
+                                .map((String subCategory) {
+                              return DropdownMenuItem<String>(
+                                value: subCategory,
+                                child: TextWidget(
+                                  text: subCategory,
+                                  fontSize: 14,
+                                  color: blue,
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
               const SizedBox(
-                height: 20,
+                height: 10,
               ),
               TextFieldWidget(
-                prefixIcon: Icons.person,
+                inputType: TextInputType.number,
                 fontStyle: FontStyle.normal,
-                hint: 'Business Representative',
+                hint: 'Points Conversion',
                 borderColor: blue,
                 radius: 12,
                 width: 350,
-                controller: clarification,
-                label: 'Business Representative',
+                isRequred: false,
+                controller: pts,
+                prefixIcon: Icons.monetization_on,
+                label: 'Points Conversion',
               ),
               const SizedBox(
                 height: 30,
@@ -233,9 +354,7 @@ class _SignupScreen2State extends State<SignupScreen2> {
                 width: 350,
                 label: 'Next',
                 onPressed: () async {
-                  if (desc.text != '' ||
-                      clarification.text != '' ||
-                      rep.text != '') {
+                  if (desc.text != '' || rep.text != '') {
                     await FirebaseFirestore.instance
                         .collection('Business')
                         .doc(widget.id)
@@ -243,8 +362,9 @@ class _SignupScreen2State extends State<SignupScreen2> {
                       'logo': imageURL,
                       'address': '${municipality!.name}, ${province!.name}',
                       'desc': desc.text,
-                      'clarification': clarification.text,
+                      'clarification': _selectedSubCategory,
                       'representative': rep.text,
+                      'ptsconversion': double.parse(pts.text),
                     }).whenComplete(() {
                       Navigator.of(context).pushReplacement(MaterialPageRoute(
                           builder: (context) => StorePage(

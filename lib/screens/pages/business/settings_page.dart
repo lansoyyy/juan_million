@@ -133,6 +133,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                     Center(
                       child: TextFieldWidget(
+                        isEnabled: false,
                         inputType: TextInputType.number,
                         fontStyle: FontStyle.normal,
                         hint: 'Points Conversion',
@@ -158,7 +159,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               .doc(data.id)
                               .update({
                             'name': name.text,
-                            'ptsconversion': double.parse(pts.text),
+                            // 'ptsconversion': double.parse(pts.text),
                           });
                           showToast('Business information updated!');
                         },
