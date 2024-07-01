@@ -7,6 +7,7 @@ import 'package:juan_million/screens/auth/payment_screen.dart';
 import 'package:juan_million/screens/pages/business/inventory_page.dart';
 import 'package:juan_million/screens/pages/business/points_page.dart';
 import 'package:juan_million/screens/pages/business/qr_page.dart';
+import 'package:juan_million/screens/pages/business/reports_screen.dart';
 import 'package:juan_million/screens/pages/business/settings_page.dart';
 import 'package:juan_million/screens/pages/business/wallet_page.dart';
 import 'package:juan_million/screens/pages/payment_selection_screen.dart';
@@ -204,10 +205,21 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                 onPressed: () {
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (context) =>
+                                          const ReportsScreen()));
+                                },
+                                icon: const Icon(
+                                  Icons.report,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) =>
                                           const SettingsPage()));
                                 },
                                 icon: const Icon(
-                                  Icons.settings,
+                                  Icons.groups_2_outlined,
                                   color: Colors.white,
                                 ),
                               ),
