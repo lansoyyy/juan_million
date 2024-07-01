@@ -298,7 +298,32 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                                         label: 'Confirm',
                                         onPressed: () async {
                                           Navigator.pop(context);
-                                          if (data['wallet'] >=
+
+
+                                           await FirebaseFirestore.instance
+          .collection('Slots')
+          .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+          .where('dateTime',
+              isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime(
+                  DateTime.now().year,
+                  DateTime.now().month,
+                  DateTime.now().day)))
+          .where('dateTime',
+              isLessThanOrEqualTo: Timestamp.fromDate(DateTime(
+                      DateTime.now().year,
+                      DateTime.now().month,
+                      DateTime.now().day + 1)
+                  .subtract(const Duration(seconds: 1))))
+          .get()
+          .then((snapshot) async {
+    
+        int currentSlots = snapshot.docs.length;
+        int slotsLeft = 10 - currentSlots;
+
+        if(widget.item['slots'].round() * qty >= slotsLeft) {
+
+
+           if (data['wallet'] >=
                                               ((double.parse((widget.item[
                                                                       'price'])
                                                                   .toString())
@@ -362,6 +387,15 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                                             showToast(
                                                 'Not enough balance on wallet!');
                                           }
+
+        } else {
+           showToast(
+                                                "You've reached the maximum slots as of today!");
+          
+        }
+
+      });
+                                         
                                         },
                                       )
                                     ],

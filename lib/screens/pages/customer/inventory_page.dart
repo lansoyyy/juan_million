@@ -249,6 +249,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                                                     }
                                                     dynamic mydata =
                                                         snapshot.data;
+
                                                     return CircleAvatar(
                                                       maxRadius: 40,
                                                       minRadius: 40,
