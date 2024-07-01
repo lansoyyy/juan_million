@@ -489,7 +489,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                       children: [
                                                         TextWidget(
                                                           text:
-                                                              '${data.docs[index]['slots'] * 150}',
+                                                              '${(data.docs[index]['slots'] * 150).round()}',
                                                           fontSize: 38,
                                                           fontFamily: 'Bold',
                                                           color: blue,
@@ -652,7 +652,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                       children: [
                                                         TextWidget(
                                                           text:
-                                                              '${data.docs[index]['slots'] * 150}',
+                                                              '${(data.docs[index]['slots'] * 150).round()}',
                                                           fontSize: 38,
                                                           fontFamily: 'Bold',
                                                           color: blue,
