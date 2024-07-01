@@ -299,103 +299,109 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                                         onPressed: () async {
                                           Navigator.pop(context);
 
+                                          await FirebaseFirestore.instance
+                                              .collection('Slots')
+                                              .where('uid',
+                                                  isEqualTo: FirebaseAuth
+                                                      .instance
+                                                      .currentUser!
+                                                      .uid)
+                                              .where('dateTime',
+                                                  isGreaterThanOrEqualTo:
+                                                      Timestamp.fromDate(DateTime(
+                                                          DateTime.now().year,
+                                                          DateTime.now().month,
+                                                          DateTime.now().day)))
+                                              .where('dateTime',
+                                                  isLessThanOrEqualTo:
+                                                      Timestamp.fromDate(DateTime(
+                                                              DateTime.now()
+                                                                  .year,
+                                                              DateTime.now()
+                                                                  .month,
+                                                              DateTime.now().day + 1)
+                                                          .subtract(const Duration(seconds: 1))))
+                                              .get()
+                                              .then((snapshot) async {
+                                            int currentSlots =
+                                                snapshot.docs.length;
+                                            int slotsLeft = 10 - currentSlots;
 
-                                           await FirebaseFirestore.instance
-          .collection('Slots')
-          .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-          .where('dateTime',
-              isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime(
-                  DateTime.now().year,
-                  DateTime.now().month,
-                  DateTime.now().day)))
-          .where('dateTime',
-              isLessThanOrEqualTo: Timestamp.fromDate(DateTime(
-                      DateTime.now().year,
-                      DateTime.now().month,
-                      DateTime.now().day + 1)
-                  .subtract(const Duration(seconds: 1))))
-          .get()
-          .then((snapshot) async {
-    
-        int currentSlots = snapshot.docs.length;
-        int slotsLeft = 10 - currentSlots;
-
-        if(widget.item['slots'].round() * qty >= slotsLeft) {
-
-
-           if (data['wallet'] >=
-                                              ((double.parse((widget.item[
-                                                                      'price'])
-                                                                  .toString())
-                                                              .round() *
-                                                          qty) -
-                                                      (((widget.item['slots'] *
-                                                                      (widget.item[
-                                                                              'price'] /
-                                                                          widget
-                                                                              .item['slots'])) *
-                                                                  0.10)
-                                                              .toInt() *
-                                                          qty))
-                                                  .toInt()) {
-                                                    if(widget.item[
-                                                                      'price'] == 20) {
-                                                        await FirebaseFirestore.instance
-          .collection('Community Wallet')
-          .doc('wallet')
-          .update({
-        // 'wallet': FieldValue.increment(total),
-        'pts': FieldValue.increment(20),
-      });
-                                                    }
-                                            // Check if business
-                                            await FirebaseFirestore.instance
-                                                .collection(widget.inbusiness!
-                                                    ? 'Business'
-                                                    : 'Users')
-                                                .doc(FirebaseAuth
-                                                    .instance.currentUser!.uid)
-                                                .update({
-                                              'pts': FieldValue.increment(
-                                                  ((widget.item['slots'] * 150) *
-                                                      qty).round()),
-                                              'wallet': FieldValue.increment(-((double
-                                                                  .parse((widget
-                                                                              .item[
+                                            if (widget.item['slots'].round() *
+                                                    qty >=
+                                                slotsLeft) {
+                                              if (data['wallet'] >=
+                                                  ((double.parse((widget.item[
                                                                           'price'])
                                                                       .toString())
-                                                              .round() *
-                                                          qty) -
-                                                      (((widget.item['slots'] *
-                                                                      (widget.item[
-                                                                              'price'] /
-                                                                          widget
-                                                                              .item['slots'])) *
-                                                                  0.10)
-                                                              .toInt() *
-                                                          qty))
-                                                  .toInt()),
-                                            });
-                                            showToast('Succesfully purchased!');
+                                                                  .round() *
+                                                              qty) -
+                                                          (((widget.item['slots'] *
+                                                                          (widget.item['price'] /
+                                                                              widget.item['slots'])) *
+                                                                      0.10)
+                                                                  .toInt() *
+                                                              qty))
+                                                      .toInt()) {
+                                                if (widget.item['price'] ==
+                                                    20) {
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection(
+                                                          'Community Wallet')
+                                                      .doc('wallet')
+                                                      .update({
+                                                    // 'wallet': FieldValue.increment(total),
+                                                    'pts': FieldValue.increment(
+                                                        20),
+                                                  });
+                                                }
+                                                // Check if business
+                                                await FirebaseFirestore.instance
+                                                    .collection(
+                                                        widget.inbusiness!
+                                                            ? 'Business'
+                                                            : 'Users')
+                                                    .doc(FirebaseAuth.instance
+                                                        .currentUser!.uid)
+                                                    .update({
+                                                  'pts': FieldValue.increment(
+                                                      ((widget.item['slots'] *
+                                                                  150) *
+                                                              qty)
+                                                          .round()),
+                                                  'wallet': FieldValue.increment(
+                                                      -((double.parse((widget.item[
+                                                                              'price'])
+                                                                          .toString())
+                                                                      .round() *
+                                                                  qty) -
+                                                              (((widget.item['slots'] *
+                                                                              (widget.item['price'] / widget.item['slots'])) *
+                                                                          0.10)
+                                                                      .toInt() *
+                                                                  qty))
+                                                          .toInt()),
+                                                });
+                                                showToast(
+                                                    'Succesfully purchased!');
 
-                                            addPoints(
-                                                (widget.item['slots'] * 150) *
+                                                addPoints(
+                                                    (widget.item['slots'] *
+                                                            150) *
+                                                        qty,
                                                     qty,
-                                                qty);
-                                            Navigator.of(context).pop();
-                                          } else {
-                                            showToast(
-                                                'Not enough balance on wallet!');
-                                          }
-
-        } else {
-           showToast(
-                                                "You've reached the maximum slots as of today!");
-          
-        }
-
-      });
-                                         
+                                                    '');
+                                                Navigator.of(context).pop();
+                                              } else {
+                                                showToast(
+                                                    'Not enough balance on wallet!');
+                                              }
+                                            } else {
+                                              showToast(
+                                                  "You've reached the maximum slots as of today!");
+                                            }
+                                          });
                                         },
                                       )
                                     ],

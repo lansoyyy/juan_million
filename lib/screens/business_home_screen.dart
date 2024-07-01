@@ -7,7 +7,7 @@ import 'package:juan_million/screens/auth/payment_screen.dart';
 import 'package:juan_million/screens/pages/business/inventory_page.dart';
 import 'package:juan_million/screens/pages/business/points_page.dart';
 import 'package:juan_million/screens/pages/business/qr_page.dart';
-import 'package:juan_million/screens/pages/business/reports_screen.dart';
+import 'package:juan_million/screens/pages/business/cashier_screen.dart';
 import 'package:juan_million/screens/pages/business/settings_page.dart';
 import 'package:juan_million/screens/pages/business/wallet_page.dart';
 import 'package:juan_million/screens/pages/payment_selection_screen.dart';
@@ -18,6 +18,9 @@ import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:juan_million/widgets/toast_widget.dart';
 
+import '../widgets/button_widget.dart';
+import '../widgets/textfield_widget.dart';
+
 class BusinessHomeScreen extends StatefulWidget {
   const BusinessHomeScreen({super.key});
 
@@ -26,6 +29,7 @@ class BusinessHomeScreen extends StatefulWidget {
 }
 
 class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
+  final pin = TextEditingController();
   @override
   Widget build(BuildContext context) {
     final Stream<DocumentSnapshot> userData = FirebaseFirestore.instance
@@ -67,134 +71,204 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                               ),
                               IconButton(
                                 onPressed: () {
-                                  if (mydata['pts'] > 1) {
-                                    int qty = 1;
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return Dialog(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(20.0),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              TextFieldWidget(
+                                                showEye: true,
+                                                isObscure: true,
+                                                fontStyle: FontStyle.normal,
+                                                hint: 'PIN Code',
+                                                borderColor: blue,
+                                                radius: 12,
+                                                width: 350,
+                                                prefixIcon: Icons.lock,
+                                                isRequred: false,
+                                                controller: pin,
+                                                label: 'PIN Code',
+                                              ),
+                                              const SizedBox(
+                                                height: 20,
+                                              ),
+                                              ButtonWidget(
+                                                label: 'Confirm',
+                                                onPressed: () async {
+                                                  Navigator.pop(context);
 
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return AlertDialog(
-                                          content: StatefulBuilder(
-                                              builder: (context, setState) {
-                                            int total =
-                                                mydata['ptsconversion'] * qty;
-                                            return Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                TextWidget(
-                                                  text: 'Input quantity',
-                                                  fontSize: 12,
-                                                  fontFamily: 'Regular',
-                                                  color: Colors.grey,
-                                                ),
-                                                const SizedBox(
-                                                  height: 10,
-                                                ),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    IconButton(
-                                                      onPressed: () {
-                                                        if (qty > 1) {
-                                                          setState(() {
-                                                            qty--;
-                                                          });
-                                                        }
-                                                      },
-                                                      icon: const Icon(
-                                                        Icons.remove,
-                                                        size: 50,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 10,
-                                                    ),
-                                                    TextWidget(
-                                                      text: qty.toString(),
-                                                      fontSize: 48,
-                                                      fontFamily: 'Bold',
-                                                      color: blue,
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 10,
-                                                    ),
-                                                    IconButton(
-                                                      onPressed: () {
-                                                        if (mydata['pts'] >
-                                                            total) {
-                                                          setState(() {
-                                                            qty++;
-                                                          });
-                                                        } else {
-                                                          showToast(
-                                                              'Points not enough!');
-                                                        }
-                                                      },
-                                                      icon: const Icon(
-                                                        Icons.add,
-                                                        size: 50,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                const SizedBox(
-                                                  height: 10,
-                                                ),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.end,
-                                                  children: [
-                                                    MaterialButton(
-                                                      onPressed: () =>
-                                                          Navigator.of(context)
-                                                              .pop(true),
-                                                      child: const Text(
-                                                        'Close',
-                                                        style: TextStyle(
-                                                            color: Colors.grey,
-                                                            fontFamily:
-                                                                'Medium',
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
-                                                      ),
-                                                    ),
-                                                    MaterialButton(
-                                                      onPressed: () async {
-                                                        addPoints(total, qty)
-                                                            .then((value) {
-                                                          Navigator.of(context)
-                                                              .pop(true);
-                                                          Navigator.of(context).push(
-                                                              MaterialPageRoute(
-                                                                  builder:
-                                                                      (context) =>
-                                                                          QRPage(
-                                                                            id: value,
-                                                                          )));
-                                                        });
-                                                      },
-                                                      child: const Text(
-                                                        'Continue',
-                                                        style: TextStyle(
-                                                            fontFamily: 'Bold',
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            );
-                                          }),
-                                        );
-                                      },
-                                    );
-                                  } else {
-                                    showToast("You don't have enough points.");
-                                  }
+                                                  DocumentSnapshot doc =
+                                                      await FirebaseFirestore
+                                                          .instance
+                                                          .collection(
+                                                              'Cashiers')
+                                                          .doc(pin.text)
+                                                          .get();
+
+                                                  if (doc.exists) {
+                                                    if (mydata['pts'] > 1) {
+                                                      int qty = 1;
+
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return AlertDialog(
+                                                            content: StatefulBuilder(
+                                                                builder: (context,
+                                                                    setState) {
+                                                              int total = mydata[
+                                                                      'ptsconversion'] *
+                                                                  qty;
+                                                              return Column(
+                                                                mainAxisSize:
+                                                                    MainAxisSize
+                                                                        .min,
+                                                                children: [
+                                                                  TextWidget(
+                                                                    text:
+                                                                        'Input quantity',
+                                                                    fontSize:
+                                                                        12,
+                                                                    fontFamily:
+                                                                        'Regular',
+                                                                    color: Colors
+                                                                        .grey,
+                                                                  ),
+                                                                  const SizedBox(
+                                                                    height: 10,
+                                                                  ),
+                                                                  Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      IconButton(
+                                                                        onPressed:
+                                                                            () {
+                                                                          if (qty >
+                                                                              1) {
+                                                                            setState(() {
+                                                                              qty--;
+                                                                            });
+                                                                          }
+                                                                        },
+                                                                        icon:
+                                                                            const Icon(
+                                                                          Icons
+                                                                              .remove,
+                                                                          size:
+                                                                              50,
+                                                                        ),
+                                                                      ),
+                                                                      const SizedBox(
+                                                                        width:
+                                                                            10,
+                                                                      ),
+                                                                      TextWidget(
+                                                                        text: qty
+                                                                            .toString(),
+                                                                        fontSize:
+                                                                            48,
+                                                                        fontFamily:
+                                                                            'Bold',
+                                                                        color:
+                                                                            blue,
+                                                                      ),
+                                                                      const SizedBox(
+                                                                        width:
+                                                                            10,
+                                                                      ),
+                                                                      IconButton(
+                                                                        onPressed:
+                                                                            () {
+                                                                          if (mydata['pts'] >
+                                                                              total) {
+                                                                            setState(() {
+                                                                              qty++;
+                                                                            });
+                                                                          } else {
+                                                                            showToast('Points not enough!');
+                                                                          }
+                                                                        },
+                                                                        icon:
+                                                                            const Icon(
+                                                                          Icons
+                                                                              .add,
+                                                                          size:
+                                                                              50,
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  const SizedBox(
+                                                                    height: 10,
+                                                                  ),
+                                                                  Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .end,
+                                                                    children: [
+                                                                      MaterialButton(
+                                                                        onPressed:
+                                                                            () =>
+                                                                                Navigator.of(context).pop(true),
+                                                                        child:
+                                                                            const Text(
+                                                                          'Close',
+                                                                          style: TextStyle(
+                                                                              color: Colors.grey,
+                                                                              fontFamily: 'Medium',
+                                                                              fontWeight: FontWeight.bold),
+                                                                        ),
+                                                                      ),
+                                                                      MaterialButton(
+                                                                        onPressed:
+                                                                            () async {
+                                                                          addPoints(total, qty, doc['name'])
+                                                                              .then((value) {
+                                                                            Navigator.of(context).pop(true);
+                                                                            Navigator.of(context).push(MaterialPageRoute(
+                                                                                builder: (context) => QRPage(
+                                                                                      id: value,
+                                                                                    )));
+                                                                          });
+                                                                        },
+                                                                        child:
+                                                                            const Text(
+                                                                          'Continue',
+                                                                          style: TextStyle(
+                                                                              fontFamily: 'Bold',
+                                                                              fontWeight: FontWeight.bold),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ],
+                                                              );
+                                                            }),
+                                                          );
+                                                        },
+                                                      );
+                                                    } else {
+                                                      showToast(
+                                                          "You don't have enough points.");
+                                                    }
+                                                  } else {
+                                                    showToast(
+                                                        'PIN Code does not exist!');
+                                                  }
+                                                },
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
                                 },
                                 icon: const Icon(
                                   Icons.qr_code,
@@ -205,10 +279,10 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                 onPressed: () {
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (context) =>
-                                          const ReportsScreen()));
+                                          const CashiersScreen()));
                                 },
                                 icon: const Icon(
-                                  Icons.report,
+                                  Icons.groups_2_outlined,
                                   color: Colors.white,
                                 ),
                               ),
@@ -219,7 +293,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                           const SettingsPage()));
                                 },
                                 icon: const Icon(
-                                  Icons.groups_2_outlined,
+                                  Icons.settings,
                                   color: Colors.white,
                                 ),
                               ),

@@ -106,22 +106,22 @@ class _InventoryPageState extends State<InventoryPage> {
                             children: [
                               TextWidget(
                                 text: 'Name',
-                                fontSize: 14,
+                                fontSize: 12,
                                 color: Colors.black,
                                 fontFamily: 'Bold',
                               ),
                               Padding(
-                                padding: const EdgeInsets.only(left: 50),
+                                padding: const EdgeInsets.only(left: 30),
                                 child: TextWidget(
                                   text: 'Points Balance',
-                                  fontSize: 14,
+                                  fontSize: 12,
                                   color: Colors.black,
                                   fontFamily: 'Bold',
                                 ),
                               ),
                               TextWidget(
                                 text: 'Points Redeemed',
-                                fontSize: 14,
+                                fontSize: 12,
                                 color: Colors.black,
                                 fontFamily: 'Bold',
                               ),

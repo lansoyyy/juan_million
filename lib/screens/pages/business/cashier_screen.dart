@@ -8,14 +8,14 @@ import 'package:juan_million/widgets/textfield_widget.dart';
 import '../../../utlis/colors.dart';
 import '../../../widgets/text_widget.dart';
 
-class ReportsScreen extends StatefulWidget {
-  const ReportsScreen({super.key});
+class CashiersScreen extends StatefulWidget {
+  const CashiersScreen({super.key});
 
   @override
-  State<ReportsScreen> createState() => _ReportsScreenState();
+  State<CashiersScreen> createState() => _CashiersScreenState();
 }
 
-class _ReportsScreenState extends State<ReportsScreen> {
+class _CashiersScreenState extends State<CashiersScreen> {
   final name = TextEditingController();
   final pin = TextEditingController();
   @override
