@@ -73,11 +73,11 @@ class LandingScreen extends StatelessWidget {
                   ),
                   GestureDetector(
                     onTap: () {
-                      showToast('Under development');
-                      // Navigator.of(context).push(MaterialPageRoute(
-                      //     builder: (context) => LoginScreen(
-                      //           inCustomer: false,
-                      //         )));
+                      // showToast('Under development');
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => LoginScreen(
+                                inCustomer: false,
+                              )));
                     },
                     child: Container(
                       height: 300,

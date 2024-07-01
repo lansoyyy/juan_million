@@ -22,6 +22,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final email = TextEditingController();
 
   final password = TextEditingController();
+  final confirmpassword = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,13 +89,39 @@ class _SignupScreenState extends State<SignupScreen> {
                 label: 'Password',
               ),
               const SizedBox(
+                height: 20,
+              ),
+              TextFieldWidget(
+                showEye: true,
+                isObscure: true,
+                prefixIcon: Icons.lock_open_outlined,
+                fontStyle: FontStyle.normal,
+                hint: 'Confirm Password',
+                borderColor: blue,
+                radius: 12,
+                width: 350,
+                isRequred: false,
+                controller: confirmpassword,
+                label: 'Confirm Password',
+              ),
+              const SizedBox(
                 height: 30,
               ),
               ButtonWidget(
                 width: 350,
                 label: 'Next',
                 onPressed: () {
-                  register(context);
+                  if (email.text != '' ||
+                      password.text != '' ||
+                      name.text != '') {
+                    if (password.text == confirmpassword.text) {
+                      register(context);
+                    } else {
+                      showToast('Password do not match!');
+                    }
+                  } else {
+                    showToast('All fields are required!');
+                  }
                 },
               ),
               const SizedBox(

@@ -129,7 +129,7 @@ class _SignupScreen2State extends State<SignupScreen2> {
                   uploadPicture('gallery');
                 },
                 child: TextWidget(
-                  text: 'Upload Logo',
+                  text: 'Company Logo',
                   fontSize: 14,
                   fontFamily: 'Bold',
                   color: primary,
@@ -233,21 +233,27 @@ class _SignupScreen2State extends State<SignupScreen2> {
                 width: 350,
                 label: 'Next',
                 onPressed: () async {
-                  await FirebaseFirestore.instance
-                      .collection('Business')
-                      .doc(widget.id)
-                      .update({
-                    'logo': imageURL,
-                    'address': '${municipality!.name}, ${province!.name}',
-                    'desc': desc.text,
-                    'clarification': clarification.text,
-                    'representative': rep.text,
-                  }).whenComplete(() {
-                    Navigator.of(context).pushReplacement(MaterialPageRoute(
-                        builder: (context) => StorePage(
-                              inbusiness: true,
-                            )));
-                  });
+                  if (desc.text != '' ||
+                      clarification.text != '' ||
+                      rep.text != '') {
+                    await FirebaseFirestore.instance
+                        .collection('Business')
+                        .doc(widget.id)
+                        .update({
+                      'logo': imageURL,
+                      'address': '${municipality!.name}, ${province!.name}',
+                      'desc': desc.text,
+                      'clarification': clarification.text,
+                      'representative': rep.text,
+                    }).whenComplete(() {
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(
+                          builder: (context) => StorePage(
+                                inbusiness: true,
+                              )));
+                    });
+                  } else {
+                    showToast('All fields are required!');
+                  }
                 },
               ),
               const SizedBox(
