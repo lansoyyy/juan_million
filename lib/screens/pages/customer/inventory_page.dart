@@ -35,7 +35,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
 
       addWallet(5500, '', uid);
 
-      addHistory(snapshot.data()!['name']);
+      addHistory(snapshot.data()!['name'], uid);
 
       await FirebaseFirestore.instance.collection('Slots').doc(id).delete();
 
