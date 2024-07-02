@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:juan_million/services/add_history.dart';
+import 'package:juan_million/services/add_wallet.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 
@@ -31,6 +32,8 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
         'wallet': FieldValue.increment(5500),
         // 'pts': FieldValue.increment(-total),
       });
+
+      addWallet(5500, '', uid);
 
       addHistory(snapshot.data()!['name']);
 

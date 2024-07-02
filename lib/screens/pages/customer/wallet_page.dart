@@ -399,7 +399,8 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
       }).whenComplete(() {
         // Add transaction
 
-        addWallet(int.parse(pts.text), qrCode);
+        addWallet(int.parse(pts.text), qrCode,
+            FirebaseAuth.instance.currentUser!.uid);
         Navigator.of(context).pop();
       });
     } on PlatformException {

@@ -111,7 +111,6 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   }
 
   void checkPoints(int points, int limit) async {
-    print('slots here $points');
     if (points >= limit) {
       await FirebaseFirestore.instance
           .collection('Slots')
@@ -130,6 +129,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           .get()
           .then((snapshot) {
         int total = points - limit;
+
         int slotsFromPoints = points ~/ limit;
         int currentSlots = snapshot.docs.length;
         int slotsLeft = 10 - currentSlots;
