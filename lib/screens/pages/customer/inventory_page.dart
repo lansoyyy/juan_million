@@ -15,51 +15,67 @@ class CustomerInventoryPage extends StatefulWidget {
 }
 
 class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    checkPoints(7999);
+    super.initState();
+  }
+
   final searchController = TextEditingController();
   String nameSearched = '';
 
   int position = 0;
   int total = 0;
 
-  void checkPoints(int points, int limit) async {
-    if (points > limit) {
-      var document = FirebaseFirestore.instance
-          .doc('Users/${FirebaseAuth.instance.currentUser!.uid}');
-      var snapshot = await document.get();
-      int total = points - limit;
+  void checkPoints(int limit) async {
+    // if (points < 0) {
+    //   FirebaseFirestore.instance
+    //       .collection('Community Wallet')
+    //       .doc('wallet')
+    //       .update({
+    //     'pts': points.abs(),
+    //   });
+    // }
 
-      await FirebaseFirestore.instance.collection('Users').doc(uid).update({
-        'wallet': FieldValue.increment(5500),
-        // 'pts': FieldValue.increment(-total),
-      });
-
-      addWallet(5500, '', uid);
-
-      addHistory(snapshot.data()!['name'], uid);
-
-      await FirebaseFirestore.instance.collection('Slots').doc(id).delete();
-
+    var document1 = FirebaseFirestore.instance.doc('Community Wallet/wallet');
+    var snapshot1 = await document1.get();
+    if (snapshot1.data()!['pts'] > limit) {
       await FirebaseFirestore.instance
           .collection('Community Wallet')
           .doc('wallet')
           .update({
         // 'wallet': FieldValue.increment(total),
-        'pts': FieldValue.increment(-limit),
-      });
+        'pts': FieldValue.increment(-7999),
+      }).whenComplete(() async {
+        var document = FirebaseFirestore.instance.doc('Users/$uid');
+        var snapshot = await document.get();
 
-      await FirebaseFirestore.instance
-          .collection('Community Wallet')
-          .doc('business')
-          .update({
-        // 'wallet': FieldValue.increment(total),
-        'pts': FieldValue.increment(2400),
-      });
-      await FirebaseFirestore.instance
-          .collection('Community Wallet')
-          .doc('it')
-          .update({
-        // 'wallet': FieldValue.increment(total),
-        'pts': FieldValue.increment(100),
+        await FirebaseFirestore.instance.collection('Users').doc(uid).update({
+          'wallet': FieldValue.increment(5500),
+          // 'pts': FieldValue.increment(-total),
+        });
+
+        await FirebaseFirestore.instance.collection('Slots').doc(id).delete();
+
+        await FirebaseFirestore.instance
+            .collection('Community Wallet')
+            .doc('business')
+            .update({
+          // 'wallet': FieldValue.increment(total),
+          'pts': FieldValue.increment(2400),
+        });
+        await FirebaseFirestore.instance
+            .collection('Community Wallet')
+            .doc('it')
+            .update({
+          // 'wallet': FieldValue.increment(total),
+          'pts': FieldValue.increment(100),
+        });
+
+        addWallet(5500, '', uid);
+
+        addHistory(snapshot.data()!['name'], uid);
       });
     } else {
       print('Points are within the limit.');
@@ -69,6 +85,12 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
   String uid = '';
 
   String id = '';
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -164,18 +186,6 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                             }
                             dynamic walletdata = snapshot.data;
 
-                            int mypoints = walletdata['pts'].toInt();
-
-                            checkPoints(walletdata['pts'], 7999);
-
-                            if (mypoints < 0) {
-                              FirebaseFirestore.instance
-                                  .collection('Community Wallet')
-                                  .doc('wallet')
-                                  .update({
-                                'pts': mypoints.abs(),
-                              });
-                            }
                             return LinearProgressIndicator(
                               minHeight: 12,
                               color: primary,
