@@ -46,6 +46,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
         // 'wallet': FieldValue.increment(total),
         'pts': FieldValue.increment(-limit),
       });
+
       await FirebaseFirestore.instance
           .collection('Community Wallet')
           .doc('business')
@@ -163,7 +164,18 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                             }
                             dynamic walletdata = snapshot.data;
 
-                            checkPoints(walletdata['pts'], 8000);
+                            int mypoints = walletdata['pts'].toInt();
+
+                            checkPoints(walletdata['pts'], 7999);
+
+                            if (mypoints < 0) {
+                              FirebaseFirestore.instance
+                                  .collection('Community Wallet')
+                                  .doc('wallet')
+                                  .update({
+                                'pts': mypoints.abs(),
+                              });
+                            }
                             return LinearProgressIndicator(
                               minHeight: 12,
                               color: primary,

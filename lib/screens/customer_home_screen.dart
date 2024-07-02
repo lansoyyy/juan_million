@@ -211,6 +211,17 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               }
               dynamic data = snapshot.data;
 
+              int mypoints = data['pts'].toInt();
+
+              if (mypoints < 0) {
+                FirebaseFirestore.instance
+                    .collection('Users')
+                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                    .update({
+                  'pts': mypoints.abs(),
+                });
+              }
+
               checkPoints(data['pts'].toInt(), 150);
 
               return Column(
