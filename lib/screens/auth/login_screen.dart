@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -5,6 +6,7 @@ import 'package:juan_million/screens/auth/customer_signup_screen.dart';
 import 'package:juan_million/screens/auth/signup_screen.dart';
 import 'package:juan_million/screens/business_home_screen.dart';
 import 'package:juan_million/screens/customer_home_screen.dart';
+import 'package:juan_million/utlis/app_constants.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/button_widget.dart';
 import 'package:juan_million/widgets/text_widget.dart';
@@ -194,8 +196,14 @@ class _LoginScreenState extends State<LoginScreen> {
             ButtonWidget(
               width: 350,
               label: 'Log in',
-              onPressed: () {
-                login(context);
+              onPressed: () async {
+                var document = FirebaseFirestore.instance.doc('App/versions');
+                var snapshot = await document.get();
+                if (snapshot.data()!['version'] == version) {
+                  login(context);
+                } else {
+                  showToast('Cannot Proceed! Your app version is outdated!');
+                }
               },
             ),
             const SizedBox(

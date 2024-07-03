@@ -327,10 +327,6 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                                                 snapshot.docs.length;
                                             int slotsLeft = 10 - currentSlots;
 
-                                            print(widget.item['slots'].round() *
-                                                qty);
-                                            print(slotsLeft);
-
                                             if (slotsLeft >=
                                                 widget.item['slots'].round() *
                                                     qty) {
@@ -361,6 +357,7 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                                                   });
                                                 }
                                                 // Check if business
+
                                                 await FirebaseFirestore.instance
                                                     .collection(
                                                         widget.inbusiness!
@@ -369,11 +366,16 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                                                     .doc(FirebaseAuth.instance
                                                         .currentUser!.uid)
                                                     .update({
-                                                  'pts': FieldValue.increment(
-                                                      ((widget.item['slots'] *
-                                                                  150) *
-                                                              qty)
-                                                          .round()),
+                                                  'pts': widget.item['slots'] ==
+                                                          0.066
+                                                      ? FieldValue.increment(
+                                                          ((0.0665 * 150) * qty)
+                                                              .round())
+                                                      : FieldValue.increment(
+                                                          ((widget.item['slots'] *
+                                                                      150) *
+                                                                  qty)
+                                                              .round()),
                                                   'wallet': FieldValue.increment(
                                                       -((double.parse((widget.item[
                                                                               'price'])
