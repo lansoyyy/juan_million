@@ -264,15 +264,22 @@ class _LoginScreenState extends State<LoginScreen> {
 
   login(context) async {
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      final user = await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: username.text, password: password.text);
 
       if (widget.inCustomer) {
         Navigator.of(context).pushReplacement(MaterialPageRoute(
             builder: (context) => const CustomerHomeScreen()));
       } else {
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-            builder: (context) => const BusinessHomeScreen()));
+        var document =
+            FirebaseFirestore.instance.doc('Business/${user.user!.uid}');
+        var snapshot = await document.get();
+        if (snapshot.data()!['verified'] == true) {
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (context) => const BusinessHomeScreen()));
+        } else {
+          showToast('Cannot Proceed! Your account is not yet verified');
+        }
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
