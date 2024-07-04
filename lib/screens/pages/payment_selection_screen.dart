@@ -280,9 +280,22 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                                           ),
                                           IconButton(
                                             onPressed: () {
-                                              setState(() {
+
+                                              if( widget.item['slots'] ==
+                                                          0.066) {
+
+                                                            if(qty <= 14) {
+                                                              setState(() {
                                                 qty++;
                                               });
+                                                            }
+
+                                                          } else {
+                                                            setState(() {
+                                                qty++;
+                                              });
+                                                          }
+                                              
                                             },
                                             icon: const Icon(
                                               Icons.add,
