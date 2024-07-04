@@ -22,6 +22,9 @@ Future addBusiness(
     'desc': desc,
     'clarification': clarification,
     'representative': representative,
+    'verified': false,
+    'packagePayment': 0,
+    'packageWallet': 0,
   };
 
   await docUser.set(json);

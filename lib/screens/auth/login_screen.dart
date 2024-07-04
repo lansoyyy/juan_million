@@ -32,16 +32,33 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Image.asset(
-              'assets/images/Ellipse 7.png',
+            Container(
               width: double.infinity,
+              height: 225,
+              decoration: BoxDecoration(
+                image: const DecorationImage(
+                  fit: BoxFit.cover,
+                  image: AssetImage(
+                    'assets/images/newbackground.png',
+                  ),
+                ),
+                border: Border.all(color: blue, width: 10),
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(
+                    150,
+                  ),
+                  bottomRight: Radius.circular(
+                    150,
+                  ),
+                ),
+              ),
             ),
             Image.asset(
               'assets/images/Juan4All 2.png',
               height: 200,
             ),
             TextWidget(
-              text: 'Hello ka-Juan!',
+              text: widget.inCustomer ? 'Hello ka-Juan!' : 'Hello ka-Negosyo',
               fontSize: 32,
               fontFamily: 'Bold',
               color: primary,

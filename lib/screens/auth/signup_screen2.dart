@@ -6,6 +6,7 @@ import 'package:juan_million/models/province_model.dart';
 import 'package:juan_million/models/region_model.dart';
 import 'package:juan_million/screens/auth/package_screen.dart';
 import 'package:juan_million/screens/business_home_screen.dart';
+import 'package:juan_million/screens/pages/business/packages_page.dart';
 import 'package:juan_million/screens/pages/store_page.dart';
 import 'package:juan_million/services/add_business.dart';
 import 'package:juan_million/utlis/colors.dart';
@@ -366,9 +367,9 @@ class _SignupScreen2State extends State<SignupScreen2> {
                       'representative': rep.text,
                       'ptsconversion': double.parse(pts.text),
                     }).whenComplete(() {
-                      Navigator.of(context).pushReplacement(MaterialPageRoute(
-                          builder: (context) => StorePage(
-                                inbusiness: true,
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => PackagePage(
+                                id: widget.id,
                               )));
                     });
                   } else {
