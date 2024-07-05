@@ -122,14 +122,57 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                     color: Colors.white,
                   ),
                 ),
-                Center(
-                  child: TextWidget(
-                    text: position.toString(),
-                    fontFamily: 'Bold',
-                    fontSize: 75,
-                    color: Colors.white,
-                  ),
-                ),
+                StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('Slots')
+                        .where('uid',
+                            isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                        .where('dateTime',
+                            isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime(
+                                DateTime.now().year,
+                                DateTime.now().month,
+                                DateTime.now().day)))
+                        .where('dateTime',
+                            isLessThanOrEqualTo: Timestamp.fromDate(DateTime(
+                                    DateTime.now().year,
+                                    DateTime.now().month,
+                                    DateTime.now().day + 1)
+                                .subtract(const Duration(seconds: 1))))
+                        .snapshots(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.hasError) {
+                        print(snapshot.error);
+                        return const Center(child: Text('Error'));
+                      }
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Padding(
+                          padding: EdgeInsets.only(top: 50),
+                          child: Center(
+                              child: CircularProgressIndicator(
+                            color: Colors.black,
+                          )),
+                        );
+                      }
+
+                      final data = snapshot.requireData;
+
+                      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                        if (position == 0) {
+                          setState(() {});
+                        }
+
+                        position = data.docs.length;
+                      });
+                      return Center(
+                        child: TextWidget(
+                          text: data.docs.length.toString(),
+                          fontFamily: 'Bold',
+                          fontSize: 75,
+                          color: Colors.white,
+                        ),
+                      );
+                    }),
                 Center(
                   child: Column(
                     children: [
