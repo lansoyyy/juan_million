@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:juan_million/screens/auth/package_screen.dart';
 import 'package:juan_million/screens/auth/signup_screen2.dart';
 import 'package:juan_million/screens/business_home_screen.dart';
+import 'package:juan_million/screens/pages/terms_conditions_page.dart';
 import 'package:juan_million/services/add_business.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/button_widget.dart';
@@ -123,6 +124,28 @@ class _SignupScreenState extends State<SignupScreen> {
                     showToast('All fields are required!');
                   }
                 },
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Center(
+                child: TextWidget(
+                    text: 'Signing up means you agree to our',
+                    fontSize: 12,
+                    color: Colors.black),
+              ),
+              Center(
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const TermsAndConditionsPage()));
+                  },
+                  child: TextWidget(
+                      text: 'Terms and Conditions',
+                      fontSize: 14,
+                      fontFamily: 'Bold',
+                      color: blue),
+                ),
               ),
               const SizedBox(
                 height: 50,

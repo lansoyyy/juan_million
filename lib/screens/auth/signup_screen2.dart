@@ -263,7 +263,7 @@ class _SignupScreen2State extends State<SignupScreen2> {
                         child: DropdownButton<String>(
                           underline: const SizedBox(),
                           hint: Text(
-                            'Select Business Clarification',
+                            'Select Business Classification',
                             style: TextStyle(
                               color: blue,
                             ),
@@ -339,14 +339,14 @@ class _SignupScreen2State extends State<SignupScreen2> {
               TextFieldWidget(
                 inputType: TextInputType.number,
                 fontStyle: FontStyle.normal,
-                hint: 'Points Conversion',
+                hint: 'Points Conversion (%)',
                 borderColor: blue,
                 radius: 12,
                 width: 350,
                 isRequred: false,
                 controller: pts,
                 prefixIcon: Icons.monetization_on,
-                label: 'Points Conversion',
+                label: 'Points Conversion (%)',
               ),
               const SizedBox(
                 height: 30,
