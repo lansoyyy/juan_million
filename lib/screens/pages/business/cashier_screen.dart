@@ -47,6 +47,7 @@ class _CashiersScreenState extends State<CashiersScreen> {
                         height: 10,
                       ),
                       TextFieldWidget(
+                        maxLength: 4,
                         showEye: true,
                         isObscure: true,
                         fontStyle: FontStyle.normal,
@@ -54,6 +55,7 @@ class _CashiersScreenState extends State<CashiersScreen> {
                         borderColor: blue,
                         radius: 12,
                         width: 350,
+                        height: 75,
                         prefixIcon: Icons.lock,
                         isRequred: false,
                         controller: pin,

@@ -10,6 +10,7 @@ class TextFieldWidget extends StatefulWidget {
   final IconData? prefixIcon;
   final double? height;
   final int? maxLine;
+  final int? maxLength;
   final TextInputType? inputType;
   late bool? showEye;
   late Color? color;
@@ -35,6 +36,7 @@ class TextFieldWidget extends StatefulWidget {
       this.isObscure = false,
       this.width = 275,
       this.height = 50,
+      this.maxLength,
       this.maxLine = 1,
       this.hintColor = Colors.white,
       this.borderColor = const Color(0xff1A1851),
@@ -68,6 +70,7 @@ class _TextFieldWidgetState extends State<TextFieldWidget> {
         ),
         textCapitalization: widget.textCapitalization!,
         keyboardType: widget.inputType,
+        maxLength: widget.maxLength,
         decoration: InputDecoration(
           prefixIcon: Icon(
             widget.prefixIcon,
