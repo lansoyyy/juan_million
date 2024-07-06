@@ -161,7 +161,7 @@ class PointsPage extends StatelessWidget {
                                             ),
                                             TextWidget(
                                               text:
-                                                  'Transferred ${data.docs[index]['pts'].round()} points',
+                                                  'Recieved ${data.docs[index]['pts'].round()} points',
                                               fontSize: 16,
                                               color: Colors.black,
                                               fontFamily: 'Medium',

@@ -1,15 +1,33 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:intl/intl.dart';
 import 'package:juan_million/screens/pages/business/myqr_page.dart';
+import 'package:juan_million/screens/pages/customer/qr_scanned_page.dart';
 import 'package:juan_million/screens/pages/store_page.dart';
+import 'package:juan_million/services/add_points.dart';
+import 'package:juan_million/services/add_wallet.dart';
 import 'package:juan_million/utlis/colors.dart';
+import 'package:juan_million/widgets/button_widget.dart';
 import 'package:juan_million/widgets/text_widget.dart';
+import 'package:juan_million/widgets/textfield_widget.dart';
+import 'package:juan_million/widgets/toast_widget.dart';
 
-class WalletPage extends StatelessWidget {
+class WalletPage extends StatefulWidget {
   const WalletPage({super.key});
+
+  @override
+  State<WalletPage> createState() => _WalletPageState();
+}
+
+class _WalletPageState extends State<WalletPage> {
+  final pin = TextEditingController();
+
+  String selected = '';
 
   @override
   Widget build(BuildContext context) {
@@ -77,9 +95,56 @@ class WalletPage extends StatelessWidget {
                         children: [
                           GestureDetector(
                             onTap: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) =>
-                                      const MyQRBusinessPage()));
+                              showModalBottomSheet(
+                                context: context,
+                                builder: (context) {
+                                  return SizedBox(
+                                    height: 150,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(10.0),
+                                      child: Column(
+                                        children: [
+                                          ListTile(
+                                            onTap: () {
+                                              setState(() {
+                                                selected = 'Users';
+                                              });
+                                              Navigator.pop(context);
+                                              showAmountDialog();
+                                            },
+                                            leading: const Icon(
+                                              Icons.person,
+                                            ),
+                                            title: TextWidget(
+                                              text: 'From member',
+                                              fontSize: 14,
+                                              fontFamily: 'Bold',
+                                            ),
+                                          ),
+                                          const Divider(),
+                                          ListTile(
+                                            onTap: () {
+                                              setState(() {
+                                                selected = 'Business';
+                                              });
+                                              Navigator.pop(context);
+                                              showAmountDialog();
+                                            },
+                                            leading: const Icon(
+                                              Icons.business,
+                                            ),
+                                            title: TextWidget(
+                                              text: 'From affiliate',
+                                              fontSize: 14,
+                                              fontFamily: 'Bold',
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
                             },
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -107,10 +172,62 @@ class WalletPage extends StatelessWidget {
                           ),
                           GestureDetector(
                             onTap: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => StorePage(
-                                        inbusiness: true,
-                                      )));
+                              // Navigator.of(context).push(MaterialPageRoute(
+                              //     builder: (context) => StorePage(
+                              //           inbusiness: true,
+                              //         )));
+
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return Dialog(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(20.0),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          TextFieldWidget(
+                                            showEye: true,
+                                            isObscure: true,
+                                            fontStyle: FontStyle.normal,
+                                            hint: 'PIN Code',
+                                            borderColor: blue,
+                                            radius: 12,
+                                            width: 350,
+                                            prefixIcon: Icons.lock,
+                                            isRequred: false,
+                                            controller: pin,
+                                            label: 'PIN Code',
+                                          ),
+                                          const SizedBox(
+                                            height: 20,
+                                          ),
+                                          ButtonWidget(
+                                            label: 'Confirm',
+                                            onPressed: () async {
+                                              Navigator.pop(context);
+
+                                              DocumentSnapshot doc =
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection('Cashiers')
+                                                      .doc(pin.text)
+                                                      .get();
+
+                                              if (doc.exists) {
+                                                reloadPointsDialog(doc['name']);
+                                              } else {
+                                                showToast(
+                                                    'PIN Code does not exist!');
+                                              }
+                                            },
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
                             },
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -122,7 +239,7 @@ class WalletPage extends StatelessWidget {
                                   size: 30,
                                 ),
                                 TextWidget(
-                                  text: 'Top up',
+                                  text: 'Reload points',
                                   fontSize: 12,
                                   color: Colors.white,
                                 ),
@@ -233,5 +350,231 @@ class WalletPage extends StatelessWidget {
             );
           }),
     );
+  }
+
+  final pts = TextEditingController();
+
+  reloadPointsDialog(String name) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          child: StatefulBuilder(builder: (context, setState) {
+            return Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: IconButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          icon: const Icon(
+                            Icons.close,
+                            color: Colors.red,
+                          )),
+                    ),
+                    Center(
+                      child: Image.asset(
+                        'assets/images/Juan4All 2.png',
+                      ),
+                    ),
+                    Form(
+                      onChanged: () {
+                        setState(
+                          () {},
+                        );
+                      },
+                      child: TextFieldWidget(
+                        inputType: TextInputType.number,
+                        fontStyle: FontStyle.normal,
+                        hint: 'Points to Reload',
+                        borderColor: blue,
+                        radius: 12,
+                        width: 350,
+                        prefixIcon: Icons.control_point_duplicate,
+                        isRequred: false,
+                        controller: pts,
+                        label: 'Points to Reload',
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    ButtonWidget(
+                      color: blue,
+                      label: 'Confirm',
+                      onPressed: pts.text == ''
+                          ? () {}
+                          : () async {
+                              DocumentSnapshot doc = await FirebaseFirestore
+                                  .instance
+                                  .collection('Business')
+                                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                                  .get();
+
+                              if (doc['wallet'] >= int.parse(pts.text)) {
+                                await FirebaseFirestore.instance
+                                    .collection('Business')
+                                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                                    .update({
+                                  'wallet': FieldValue.increment(
+                                      -int.parse(pts.text)),
+                                  'pts':
+                                      FieldValue.increment(int.parse(pts.text))
+                                });
+                                showToast('Transaction was succesfull!');
+                              } else {
+                                showToast(
+                                    'Cannot proceed! Insufficient cash wallet');
+                              }
+
+                              addPoints(int.parse(pts.text), 1, name);
+
+                              DocumentSnapshot doc1 = await FirebaseFirestore
+                                  .instance
+                                  .collection('Business')
+                                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                                  .get();
+
+                              Navigator.pop(context);
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => QRScannedPage(
+                                        inuser: false,
+                                        pts: doc1['pts'].toString(),
+                                        store: FirebaseAuth
+                                            .instance.currentUser!.uid,
+                                      )));
+
+                              pts.clear();
+                            },
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }),
+        );
+      },
+    );
+  }
+
+  showAmountDialog() {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: const Text(
+                'Enter amount',
+                style: TextStyle(
+                    fontFamily: 'Bold',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFieldWidget(
+                    prefixIcon: null,
+                    inputType: TextInputType.number,
+                    controller: pts,
+                    label: 'Amount',
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                MaterialButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text(
+                    'Close',
+                    style: TextStyle(
+                        fontFamily: 'QRegular', fontWeight: FontWeight.bold),
+                  ),
+                ),
+                MaterialButton(
+                  onPressed: () async {
+                    scanQRCode();
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text(
+                    'Continue',
+                    style: TextStyle(
+                        fontFamily: 'QRegular', fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ));
+  }
+
+  String qrCode = 'Unknown';
+
+  Future<void> scanQRCode() async {
+    try {
+      final qrCode = await FlutterBarcodeScanner.scanBarcode(
+        '#ff6666',
+        'Cancel',
+        true,
+        ScanMode.QR,
+      );
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return const AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+              ],
+            ),
+          );
+        },
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        this.qrCode = qrCode;
+      });
+
+      await FirebaseFirestore.instance
+          .collection(selected)
+          .doc(qrCode)
+          .get()
+          .then((DocumentSnapshot documentSnapshot) async {
+        if (documentSnapshot['wallet'] > int.parse(pts.text)) {
+          await FirebaseFirestore.instance
+              .collection('Business')
+              .doc(FirebaseAuth.instance.currentUser!.uid)
+              .update({
+            'wallet': FieldValue.increment(int.parse(pts.text)),
+          });
+          await FirebaseFirestore.instance
+              .collection(selected)
+              .doc(qrCode)
+              .update({
+            'wallet': FieldValue.increment(-int.parse(pts.text)),
+          });
+        } else {
+          showToast('Wallet balance for this user is not enough!');
+        }
+      }).whenComplete(() {
+        // Add transaction
+
+        addWallet(int.parse(pts.text), qrCode,
+            FirebaseAuth.instance.currentUser!.uid);
+        Navigator.of(context).pop();
+      });
+    } on PlatformException {
+      qrCode = 'Failed to get platform version.';
+    }
   }
 }

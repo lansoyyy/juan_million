@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:intl/intl.dart';
+import 'package:juan_million/screens/business_home_screen.dart';
 import 'package:juan_million/screens/customer_home_screen.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/button_widget.dart';
@@ -14,8 +15,11 @@ class QRScannedPage extends StatefulWidget {
   String store;
   String pts;
 
+  bool? inuser;
+
   QRScannedPage({
     super.key,
+    this.inuser = true,
     required this.pts,
     required this.store,
   });
@@ -184,7 +188,7 @@ class _QRScannedPageState extends State<QRScannedPage> {
                       ),
                       Center(
                         child: TextWidget(
-                          text: '20',
+                          text: widget.pts,
                           fontSize: 48,
                           color: Colors.black,
                           fontFamily: 'Bold',
@@ -194,83 +198,90 @@ class _QRScannedPageState extends State<QRScannedPage> {
                       const SizedBox(
                         height: 10,
                       ),
-                      TextWidget(
-                        maxLines: 2,
-                        text: 'Points earned from',
-                        fontSize: 14,
-                        color: Colors.grey,
-                        fontFamily: 'Regular',
-                      ),
+                      !widget.inuser!
+                          ? const SizedBox()
+                          : TextWidget(
+                              maxLines: 2,
+                              text: 'Points earned from',
+                              fontSize: 14,
+                              color: Colors.grey,
+                              fontFamily: 'Regular',
+                            ),
                       const SizedBox(
                         height: 10,
                       ),
-                      StreamBuilder<DocumentSnapshot>(
-                          stream: userData,
-                          builder: (context,
-                              AsyncSnapshot<DocumentSnapshot> snapshot) {
-                            if (!snapshot.hasData) {
-                              return const Center(child: Text('Loading'));
-                            } else if (snapshot.hasError) {
-                              return const Center(
-                                  child: Text('Something went wrong'));
-                            } else if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            }
-                            dynamic data = snapshot.data;
-                            return Container(
-                              width: 275,
-                              height: 55,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[200],
-                                borderRadius: BorderRadius.circular(
-                                  10,
-                                ),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(5.0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    CircleAvatar(
-                                      maxRadius: 25,
-                                      minRadius: 25,
-                                      backgroundImage:
-                                          NetworkImage(data['logo']),
+                      !widget.inuser!
+                          ? const SizedBox()
+                          : StreamBuilder<DocumentSnapshot>(
+                              stream: userData,
+                              builder: (context,
+                                  AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                if (!snapshot.hasData) {
+                                  return const Center(child: Text('Loading'));
+                                } else if (snapshot.hasError) {
+                                  return const Center(
+                                      child: Text('Something went wrong'));
+                                } else if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Center(
+                                      child: CircularProgressIndicator());
+                                }
+                                dynamic data = snapshot.data;
+                                return Container(
+                                  width: 275,
+                                  height: 55,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[200],
+                                    borderRadius: BorderRadius.circular(
+                                      10,
                                     ),
-                                    const SizedBox(
-                                      width: 20,
-                                    ),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(5.0),
+                                    child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
                                       children: [
-                                        TextWidget(
-                                          text: data['name'],
-                                          fontSize: 14,
-                                          color: Colors.black,
-                                          fontFamily: 'Bold',
+                                        CircleAvatar(
+                                          maxRadius: 25,
+                                          minRadius: 25,
+                                          backgroundImage:
+                                              NetworkImage(data['logo']),
                                         ),
-                                        TextWidget(
-                                          text: DateFormat.yMMMd()
-                                              .add_jm()
-                                              .format(DateTime.now()),
-                                          fontSize: 12,
-                                          color: Colors.grey,
-                                          fontFamily: 'Regular',
+                                        const SizedBox(
+                                          width: 20,
+                                        ),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            TextWidget(
+                                              text: data['name'],
+                                              fontSize: 14,
+                                              color: Colors.black,
+                                              fontFamily: 'Bold',
+                                            ),
+                                            TextWidget(
+                                              text: DateFormat.yMMMd()
+                                                  .add_jm()
+                                                  .format(DateTime.now()),
+                                              fontSize: 12,
+                                              color: Colors.grey,
+                                              fontFamily: 'Regular',
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          }),
-                      const SizedBox(
-                        height: 10,
+                                  ),
+                                );
+                              }),
+                      const Expanded(
+                        child: SizedBox(
+                          height: 10,
+                        ),
                       ),
                       ButtonWidget(
                         radius: 15,
@@ -278,22 +289,34 @@ class _QRScannedPageState extends State<QRScannedPage> {
                         width: 275,
                         label: 'Done',
                         onPressed: () {
-                          Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const CustomerHomeScreen()));
+                          if (widget.inuser!) {
+                            Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const CustomerHomeScreen()));
+                          } else {
+                            Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const BusinessHomeScreen()));
+                          }
                         },
                       ),
-                      TextButton(
-                        onPressed: () {
-                          scanQRCode();
-                        },
-                        child: TextWidget(
-                          text: 'Scan Again',
-                          fontSize: 14,
-                          color: primary,
-                          fontFamily: 'Bold',
-                        ),
+                      !widget.inuser!
+                          ? const SizedBox()
+                          : TextButton(
+                              onPressed: () {
+                                scanQRCode();
+                              },
+                              child: TextWidget(
+                                text: 'Scan Again',
+                                fontSize: 14,
+                                color: primary,
+                                fontFamily: 'Bold',
+                              ),
+                            ),
+                      const SizedBox(
+                        height: 10,
                       ),
                     ],
                   ),
