@@ -101,15 +101,16 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                               ButtonWidget(
                                                 label: 'Confirm',
                                                 onPressed: () async {
-                                                  Navigator.pop(context);
-
                                                   DocumentSnapshot doc =
                                                       await FirebaseFirestore
                                                           .instance
                                                           .collection(
                                                               'Cashiers')
                                                           .doc(pin.text)
-                                                          .get();
+                                                          .get()
+                                                          .whenComplete(() {
+                                                    Navigator.pop(context);
+                                                  });
 
                                                   if (doc.exists) {
                                                     if (mydata['pts'] > 1) {
@@ -122,9 +123,10 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                             content: StatefulBuilder(
                                                                 builder: (context,
                                                                     setState) {
-                                                              int total = mydata[
-                                                                      'ptsconversion'] *
-                                                                  qty;
+                                                              int total =
+                                                                  (mydata['ptsconversion'] *
+                                                                          qty)
+                                                                      .toInt();
                                                               return Column(
                                                                 mainAxisSize:
                                                                     MainAxisSize
@@ -535,7 +537,9 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           TextWidget(
-                                            text: 'Reload your POINTS!',
+                                            align: TextAlign.start,
+                                            maxLines: 2,
+                                            text: 'Reload your\nPOINTS!',
                                             fontSize: 18,
                                             color: blue,
                                             fontFamily: 'Bold',
