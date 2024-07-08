@@ -126,10 +126,6 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                             content: StatefulBuilder(
                                                                 builder: (context,
                                                                     setState) {
-                                                              int total =
-                                                                  (mydata['ptsconversion'] *
-                                                                          qty)
-                                                                      .toInt();
                                                               return Column(
                                                                 mainAxisSize:
                                                                     MainAxisSize
@@ -181,7 +177,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                                       MaterialButton(
                                                                         onPressed:
                                                                             () async {
-                                                                          addPoints(((int.parse(amount.text) * int.parse(mydata['ptsconversion'])) * 0.01).toInt(), qty, doc['name'])
+                                                                          addPoints(((int.parse(amount.text) * mydata['ptsconversion']) * 0.01).toInt(), qty, doc['name'])
                                                                               .then((value) {
                                                                             Navigator.of(context).pop(true);
                                                                             Navigator.of(context).push(MaterialPageRoute(
