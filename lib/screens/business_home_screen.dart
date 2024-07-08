@@ -32,6 +32,9 @@ class BusinessHomeScreen extends StatefulWidget {
 
 class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
   final pin = TextEditingController();
+
+  final amount = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     final Stream<DocumentSnapshot> userData = FirebaseFirestore.instance
@@ -134,7 +137,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                                 children: [
                                                                   TextWidget(
                                                                     text:
-                                                                        'Input quantity',
+                                                                        'Input Amount Purchased',
                                                                     fontSize:
                                                                         12,
                                                                     fontFamily:
@@ -145,68 +148,14 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                                   const SizedBox(
                                                                     height: 10,
                                                                   ),
-                                                                  Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .center,
-                                                                    children: [
-                                                                      IconButton(
-                                                                        onPressed:
-                                                                            () {
-                                                                          if (qty >
-                                                                              1) {
-                                                                            setState(() {
-                                                                              qty--;
-                                                                            });
-                                                                          }
-                                                                        },
-                                                                        icon:
-                                                                            const Icon(
-                                                                          Icons
-                                                                              .remove,
-                                                                          size:
-                                                                              50,
-                                                                        ),
-                                                                      ),
-                                                                      const SizedBox(
-                                                                        width:
-                                                                            10,
-                                                                      ),
-                                                                      TextWidget(
-                                                                        text: qty
-                                                                            .toString(),
-                                                                        fontSize:
-                                                                            48,
-                                                                        fontFamily:
-                                                                            'Bold',
-                                                                        color:
-                                                                            blue,
-                                                                      ),
-                                                                      const SizedBox(
-                                                                        width:
-                                                                            10,
-                                                                      ),
-                                                                      IconButton(
-                                                                        onPressed:
-                                                                            () {
-                                                                          if (mydata['pts'] >
-                                                                              total) {
-                                                                            setState(() {
-                                                                              qty++;
-                                                                            });
-                                                                          } else {
-                                                                            showToast('Points not enough!');
-                                                                          }
-                                                                        },
-                                                                        icon:
-                                                                            const Icon(
-                                                                          Icons
-                                                                              .add,
-                                                                          size:
-                                                                              50,
-                                                                        ),
-                                                                      ),
-                                                                    ],
+                                                                  TextFieldWidget(
+                                                                    controller:
+                                                                        amount,
+                                                                    label:
+                                                                        'Amount',
+                                                                    inputType:
+                                                                        TextInputType
+                                                                            .number,
                                                                   ),
                                                                   const SizedBox(
                                                                     height: 10,
@@ -232,7 +181,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                                       MaterialButton(
                                                                         onPressed:
                                                                             () async {
-                                                                          addPoints(total, qty, doc['name'])
+                                                                          addPoints(((int.parse(amount.text) * int.parse(mydata['ptsconversion'])) * 0.01).toInt(), qty, doc['name'])
                                                                               .then((value) {
                                                                             Navigator.of(context).pop(true);
                                                                             Navigator.of(context).push(MaterialPageRoute(

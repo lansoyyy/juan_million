@@ -102,6 +102,7 @@ class PointsPage extends StatelessWidget {
                         StreamBuilder<QuerySnapshot>(
                             stream: FirebaseFirestore.instance
                                 .collection('Points')
+                                .where('scanned', isEqualTo: true)
                                 .where('uid',
                                     isEqualTo:
                                         FirebaseAuth.instance.currentUser!.uid)
@@ -166,6 +167,42 @@ class PointsPage extends StatelessWidget {
                                               color: Colors.black,
                                               fontFamily: 'Medium',
                                             ),
+                                            StreamBuilder<DocumentSnapshot>(
+                                                stream: FirebaseFirestore
+                                                    .instance
+                                                    .collection('Users')
+                                                    .doc(data.docs[index]
+                                                        ['scannedId'])
+                                                    .snapshots(),
+                                                builder: (context,
+                                                    AsyncSnapshot<
+                                                            DocumentSnapshot>
+                                                        snapshot) {
+                                                  if (!snapshot.hasData) {
+                                                    return const Center(
+                                                        child: Text('Loading'));
+                                                  } else if (snapshot
+                                                      .hasError) {
+                                                    return const Center(
+                                                        child: Text(
+                                                            'Something went wrong'));
+                                                  } else if (snapshot
+                                                          .connectionState ==
+                                                      ConnectionState.waiting) {
+                                                    return const Center(
+                                                        child:
+                                                            CircularProgressIndicator());
+                                                  }
+                                                  dynamic customerdata =
+                                                      snapshot.data;
+                                                  return TextWidget(
+                                                    text:
+                                                        'Customer: ${customerdata['name']}',
+                                                    fontSize: 11,
+                                                    color: Colors.grey,
+                                                    fontFamily: 'Medium',
+                                                  );
+                                                }),
                                             TextWidget(
                                               text:
                                                   'By: ${data.docs[index]['cashier']}',
