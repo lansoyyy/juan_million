@@ -354,17 +354,6 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                                 stream: FirebaseFirestore
                                                     .instance
                                                     .collection('Slots')
-                                                        .where('dateTime',
-                            isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime(
-                                DateTime.now().year,
-                                DateTime.now().month,
-                                DateTime.now().day)))
-                        .where('dateTime',
-                            isLessThanOrEqualTo: Timestamp.fromDate(DateTime(
-                                    DateTime.now().year,
-                                    DateTime.now().month,
-                                    DateTime.now().day + 1)
-                                .subtract(const Duration(seconds: 1))))
                                                     .where('uid',
                                                         isEqualTo: FirebaseAuth
                                                             .instance

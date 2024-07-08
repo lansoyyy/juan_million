@@ -23,7 +23,7 @@ class AppConstants {
   }
 }
 
-String version = '1.0.6';
+String version = '1.0.7';
 List<Region> philippineRegions = [
   Region(
     id: "01",

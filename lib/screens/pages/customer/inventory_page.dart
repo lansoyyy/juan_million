@@ -127,17 +127,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                         .collection('Slots')
                         .where('uid',
                             isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-                        .where('dateTime',
-                            isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime(
-                                DateTime.now().year,
-                                DateTime.now().month,
-                                DateTime.now().day)))
-                        .where('dateTime',
-                            isLessThanOrEqualTo: Timestamp.fromDate(DateTime(
-                                    DateTime.now().year,
-                                    DateTime.now().month,
-                                    DateTime.now().day + 1)
-                                .subtract(const Duration(seconds: 1))))
+                       
                         .snapshots(),
                     builder: (BuildContext context,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -157,13 +147,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
 
                       final data = snapshot.requireData;
 
-                      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                        if (position == 0) {
-                          setState(() {});
-                        }
-
-                        position = data.docs.length;
-                      });
+                      
                       return Center(
                         child: TextWidget(
                           text: data.docs.length.toString(),
@@ -193,23 +177,63 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          TextWidget(
-                            text: 'Slot Progress',
-                            fontSize: 18,
-                            color: Colors.white,
-                            fontFamily: 'Bold',
-                          ),
-                          TextWidget(
-                            text: '$position/10 slots per day',
-                            fontSize: 14,
-                            color: Colors.white,
-                            fontFamily: 'Regular',
-                          ),
-                        ],
-                      ),
+                      StreamBuilder<QuerySnapshot>(
+                          stream: FirebaseFirestore.instance
+                              .collection('Slots')
+                              .where('uid',
+                                  isEqualTo:
+                                      FirebaseAuth.instance.currentUser!.uid)
+                              .where('dateTime',
+                                  isGreaterThanOrEqualTo: Timestamp.fromDate(
+                                      DateTime(
+                                          DateTime.now().year,
+                                          DateTime.now().month,
+                                          DateTime.now().day)))
+                              .where('dateTime',
+                                  isLessThanOrEqualTo: Timestamp.fromDate(
+                                      DateTime(
+                                              DateTime.now().year,
+                                              DateTime.now().month,
+                                              DateTime.now().day + 1)
+                                          .subtract(
+                                              const Duration(seconds: 1))))
+                              .snapshots(),
+                          builder: (BuildContext context,
+                              AsyncSnapshot<QuerySnapshot> snapshot) {
+                            if (snapshot.hasError) {
+                              print(snapshot.error);
+                              return const Center(child: Text('Error'));
+                            }
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Padding(
+                                padding: EdgeInsets.only(top: 50),
+                                child: Center(
+                                    child: CircularProgressIndicator(
+                                  color: Colors.black,
+                                )),
+                              );
+                            }
+
+                            final data = snapshot.requireData;
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                TextWidget(
+                                  text: 'Slot Progress',
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                  fontFamily: 'Bold',
+                                ),
+                                TextWidget(
+                                  text: '${data.docs.length}/10 slots per day',
+                                  fontSize: 14,
+                                  color: Colors.white,
+                                  fontFamily: 'Regular',
+                                ),
+                              ],
+                            );
+                          }),
                       StreamBuilder<DocumentSnapshot>(
                           stream: FirebaseFirestore.instance
                               .collection('Community Wallet')
@@ -375,19 +399,19 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                               id = data.docs.first.id;
                             }
 
-                            for (int i = 0; i < data.docs.length; i++) {
-                              if (data.docs[i]['uid'] ==
-                                  FirebaseAuth.instance.currentUser!.uid) {
-                                WidgetsBinding.instance
-                                    .addPostFrameCallback((timeStamp) {
-                                  if (position == 0) {
-                                    setState(() {});
-                                  }
+                            // for (int i = 0; i < data.docs.length; i++) {
+                            //   if (data.docs[i]['uid'] ==
+                            //       FirebaseAuth.instance.currentUser!.uid) {
+                            //     WidgetsBinding.instance
+                            //         .addPostFrameCallback((timeStamp) {
+                            //       if (position == 0) {
+                            //         setState(() {});
+                            //       }
 
-                                  position++;
-                                });
-                              }
-                            }
+                            //       position++;
+                            //     });
+                            //   }
+                            // }
 
                             return SizedBox(
                               height: 300,
