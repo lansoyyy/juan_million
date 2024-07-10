@@ -545,34 +545,38 @@ class _WalletPageState extends State<WalletPage> {
         this.qrCode = qrCode;
       });
 
-      await FirebaseFirestore.instance
-          .collection(selected)
-          .doc(qrCode)
-          .get()
-          .then((DocumentSnapshot documentSnapshot) async {
-        if (documentSnapshot['wallet'] > int.parse(pts.text)) {
-          await FirebaseFirestore.instance
-              .collection('Business')
-              .doc(FirebaseAuth.instance.currentUser!.uid)
-              .update({
-            'wallet': FieldValue.increment(int.parse(pts.text)),
-          });
-          await FirebaseFirestore.instance
-              .collection(selected)
-              .doc(qrCode)
-              .update({
-            'wallet': FieldValue.increment(-int.parse(pts.text)),
-          });
-        } else {
-          showToast('Wallet balance for this user is not enough!');
-        }
-      }).whenComplete(() {
-        // Add transaction
+      if (qrCode != '-1') {
+        await FirebaseFirestore.instance
+            .collection(selected)
+            .doc(qrCode)
+            .get()
+            .then((DocumentSnapshot documentSnapshot) async {
+          if (documentSnapshot['wallet'] > int.parse(pts.text)) {
+            await FirebaseFirestore.instance
+                .collection('Business')
+                .doc(FirebaseAuth.instance.currentUser!.uid)
+                .update({
+              'wallet': FieldValue.increment(int.parse(pts.text)),
+            });
+            await FirebaseFirestore.instance
+                .collection(selected)
+                .doc(qrCode)
+                .update({
+              'wallet': FieldValue.increment(-int.parse(pts.text)),
+            });
+          } else {
+            showToast('Wallet balance for this user is not enough!');
+          }
+        }).whenComplete(() {
+          // Add transaction
 
-        addWallet(int.parse(pts.text), qrCode,
-            FirebaseAuth.instance.currentUser!.uid);
-        Navigator.of(context).pop();
-      });
+          addWallet(int.parse(pts.text), qrCode,
+              FirebaseAuth.instance.currentUser!.uid);
+          Navigator.of(context).pop();
+        });
+      } else {
+        Navigator.pop(context);
+      }
     } on PlatformException {
       qrCode = 'Failed to get platform version.';
     }

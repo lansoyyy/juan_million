@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 
@@ -42,8 +43,8 @@ class CustomerNotifPage extends StatelessWidget {
             ),
             StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
-                    .collection('Notifs')
-                    .where('userId',
+                    .collection('Points')
+                    .where('uid',
                         isEqualTo: FirebaseAuth.instance.currentUser!.uid)
                     .snapshots(),
                 builder: (BuildContext context,
@@ -78,7 +79,7 @@ class CustomerNotifPage extends StatelessWidget {
                           height: 10,
                         ),
                         SizedBox(
-                          height: 300,
+                          height: 500,
                           child: ListView.builder(
                             itemCount: data.docs.length,
                             itemBuilder: (context, index) {
@@ -92,11 +93,6 @@ class CustomerNotifPage extends StatelessWidget {
                                       ),
                                     ),
                                     tileColor: Colors.white,
-                                    trailing: const Icon(
-                                      Icons.arrow_circle_down_outlined,
-                                      color: Colors.red,
-                                      size: 32,
-                                    ),
                                     title: Column(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
@@ -104,13 +100,17 @@ class CustomerNotifPage extends StatelessWidget {
                                           CrossAxisAlignment.start,
                                       children: [
                                         TextWidget(
-                                          text: 'February 2, 2024, 7:14 PM',
-                                          fontSize: 11,
+                                          text: DateFormat.yMMMd()
+                                              .add_jm()
+                                              .format(data.docs[index]
+                                                      ['dateTime']
+                                                  .toDate()),
+                                          fontSize: 12,
                                           color: Colors.grey,
-                                          fontFamily: 'Medium',
                                         ),
                                         TextWidget(
-                                          text: 'Bought 25 points',
+                                          text:
+                                              'Bought ${data.docs[index]['pts']} points',
                                           fontSize: 16,
                                           color: Colors.black,
                                           fontFamily: 'Medium',

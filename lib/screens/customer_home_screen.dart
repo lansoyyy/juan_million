@@ -60,51 +60,57 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         },
       );
 
+      print('qr value $qrCode');
+
       if (!mounted) return;
 
       setState(() {
         this.qrCode = qrCode;
       });
 
-      await FirebaseFirestore.instance
-          .collection('Points')
-          .doc(qrCode)
-          .get()
-          .then((DocumentSnapshot documentSnapshot) async {
-        if (documentSnapshot.exists) {
-          await FirebaseFirestore.instance
-              .collection('Users')
-              .doc(FirebaseAuth.instance.currentUser!.uid)
-              .update({
-            'pts': FieldValue.increment(documentSnapshot['pts']),
+      if (qrCode != '-1') {
+        await FirebaseFirestore.instance
+            .collection('Points')
+            .doc(qrCode)
+            .get()
+            .then((DocumentSnapshot documentSnapshot) async {
+          if (documentSnapshot.exists) {
+            await FirebaseFirestore.instance
+                .collection('Users')
+                .doc(FirebaseAuth.instance.currentUser!.uid)
+                .update({
+              'pts': FieldValue.increment(documentSnapshot['pts']),
+            });
+            await FirebaseFirestore.instance
+                .collection('Business')
+                .doc(documentSnapshot['uid'])
+                .update({
+              'pts': FieldValue.increment(-documentSnapshot['pts']),
+            });
+            await FirebaseFirestore.instance
+                .collection('Points')
+                .doc(documentSnapshot.id)
+                .update({
+              'scanned': true,
+              'scannedId': FirebaseAuth.instance.currentUser!.uid,
+            });
+            // Update my points
+            // Update business points
+          }
+          setState(() {
+            pts = documentSnapshot['pts'].toString();
+            store = documentSnapshot['uid'];
           });
-          await FirebaseFirestore.instance
-              .collection('Business')
-              .doc(documentSnapshot['uid'])
-              .update({
-            'pts': FieldValue.increment(-documentSnapshot['pts']),
-          });
-          await FirebaseFirestore.instance
-              .collection('Points')
-              .doc(documentSnapshot.id)
-              .update({
-            'scanned': true,
-            'scannedId': FirebaseAuth.instance.currentUser!.uid,
-          });
-          // Update my points
-          // Update business points
-        }
-        setState(() {
-          pts = documentSnapshot['pts'].toString();
-          store = documentSnapshot['uid'];
+        }).whenComplete(() {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => QRScannedPage(
+                    pts: pts,
+                    store: store,
+                  )));
         });
-      }).whenComplete(() {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => QRScannedPage(
-                  pts: pts,
-                  store: store,
-                )));
-      });
+      } else {
+        Navigator.pop(context);
+      }
     } on PlatformException {
       qrCode = 'Failed to get platform version.';
     }
