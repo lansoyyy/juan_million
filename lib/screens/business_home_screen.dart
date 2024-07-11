@@ -877,28 +877,28 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                       FieldValue.increment(int.parse(pts.text))
                                 });
                                 showToast('Transaction was succesfull!');
+
+                                addPoints(int.parse(pts.text), 1, name,
+                                    'Points from reload');
+
+                                DocumentSnapshot doc1 = await FirebaseFirestore
+                                    .instance
+                                    .collection('Business')
+                                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                                    .get();
+
+                                Navigator.pop(context);
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => QRScannedPage(
+                                          inuser: false,
+                                          pts: doc1['pts'].toString(),
+                                          store: FirebaseAuth
+                                              .instance.currentUser!.uid,
+                                        )));
                               } else {
                                 showToast(
                                     'Cannot proceed! Insufficient cash wallet');
                               }
-
-                              addPoints(int.parse(pts.text), 1, name,
-                                  'Points from reload');
-
-                              DocumentSnapshot doc1 = await FirebaseFirestore
-                                  .instance
-                                  .collection('Business')
-                                  .doc(FirebaseAuth.instance.currentUser!.uid)
-                                  .get();
-
-                              Navigator.pop(context);
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => QRScannedPage(
-                                        inuser: false,
-                                        pts: doc1['pts'].toString(),
-                                        store: FirebaseAuth
-                                            .instance.currentUser!.uid,
-                                      )));
 
                               pts.clear();
                             },

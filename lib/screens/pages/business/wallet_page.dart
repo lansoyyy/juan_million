@@ -329,8 +329,15 @@ class _WalletPageState extends State<WalletPage> {
                                             ),
                                             TextWidget(
                                               text:
-                                                  'Transferred ${data.docs[index]['pts']} amount',
+                                                  '${data.docs[index]['pts']}',
                                               fontSize: 16,
+                                              color: Colors.black,
+                                              fontFamily: 'Medium',
+                                            ),
+                                            TextWidget(
+                                              text:
+                                                  '${data.docs[index]['type']}',
+                                              fontSize: 12,
                                               color: Colors.black,
                                               fontFamily: 'Medium',
                                             ),
@@ -429,28 +436,28 @@ class _WalletPageState extends State<WalletPage> {
                                       FieldValue.increment(int.parse(pts.text))
                                 });
                                 showToast('Transaction was succesfull!');
+
+                                addPoints(int.parse(pts.text), 1, name,
+                                    'Points from reload');
+
+                                DocumentSnapshot doc1 = await FirebaseFirestore
+                                    .instance
+                                    .collection('Business')
+                                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                                    .get();
+
+                                Navigator.pop(context);
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => QRScannedPage(
+                                          inuser: false,
+                                          pts: doc1['pts'].toString(),
+                                          store: FirebaseAuth
+                                              .instance.currentUser!.uid,
+                                        )));
                               } else {
                                 showToast(
                                     'Cannot proceed! Insufficient cash wallet');
                               }
-
-                              addPoints(int.parse(pts.text), 1, name,
-                                  'Points from reload');
-
-                              DocumentSnapshot doc1 = await FirebaseFirestore
-                                  .instance
-                                  .collection('Business')
-                                  .doc(FirebaseAuth.instance.currentUser!.uid)
-                                  .get();
-
-                              Navigator.pop(context);
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => QRScannedPage(
-                                        inuser: false,
-                                        pts: doc1['pts'].toString(),
-                                        store: FirebaseAuth
-                                            .instance.currentUser!.uid,
-                                      )));
 
                               pts.clear();
                             },
