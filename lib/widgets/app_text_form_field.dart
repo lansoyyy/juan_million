@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppTextFormField extends StatelessWidget {
   const AppTextFormField({
+    super.key,
     required this.textInputAction,
     required this.labelText,
     required this.keyboardType,
@@ -30,7 +31,7 @@ class AppTextFormField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.only(bottom: 20, left: 10, right: 10),
       child: TextFormField(
         controller: controller,
         keyboardType: keyboardType,
