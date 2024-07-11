@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:juan_million/models/municipality_model.dart';
 import 'package:juan_million/models/province_model.dart';
 import 'package:juan_million/models/region_model.dart';
+import 'package:juan_million/screens/auth/login_screen.dart';
 import 'package:juan_million/screens/auth/package_screen.dart';
 import 'package:juan_million/screens/customer_home_screen.dart';
 import 'package:juan_million/services/add_user.dart';
@@ -320,14 +321,24 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
 
   register(context) async {
     try {
-      final user = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: email.text, password: password.text);
 
       addUser('${fname.text} ${lname.text}', email.text, nickname.text,
           imageURL, '${municipality!.name}, ${province!.name}');
 
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: email.text, password: password.text);
+
+      await FirebaseAuth.instance.currentUser!.sendEmailVerification();
+
+      showToast("Registered Successfully! Verification was sent to your email");
+
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const CustomerHomeScreen()),
+        MaterialPageRoute(
+            builder: (context) => LoginScreen(
+                  inCustomer: true,
+                )),
         (route) {
           return true;
         },

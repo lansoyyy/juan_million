@@ -268,12 +268,16 @@ class _LoginScreenState extends State<LoginScreen> {
           email: username.text, password: password.text);
 
       if (widget.inCustomer) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const CustomerHomeScreen()),
-          (route) {
-            return true;
-          },
-        );
+        if (user.user!.emailVerified) {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const CustomerHomeScreen()),
+            (route) {
+              return true;
+            },
+          );
+        } else {
+          showToast('Cannot proceed! Email not verified');
+        }
       } else {
         var document =
             FirebaseFirestore.instance.doc('Business/${user.user!.uid}');
