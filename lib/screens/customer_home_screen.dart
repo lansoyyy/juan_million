@@ -167,13 +167,13 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               //   'pts': FieldValue.increment(-150),
               // });
 
-              FirebaseFirestore.instance
-                  .collection('Community Wallet')
-                  .doc('wallet')
-                  .update({
-                // 'wallet': FieldValue.increment(total),
-                'pts': FieldValue.increment(150),
-              });
+              // FirebaseFirestore.instance
+              //     .collection('Community Wallet')
+              //     .doc('wallet')
+              //     .update({
+              //   // 'wallet': FieldValue.increment(total),
+              //   'pts': FieldValue.increment(150),
+              // });
             }
           } else {
             for (int i = 0; i < slotsFromPoints; i++) {
@@ -187,13 +187,13 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               //   'pts': FieldValue.increment(-150),
               // });
 
-              FirebaseFirestore.instance
-                  .collection('Community Wallet')
-                  .doc('wallet')
-                  .update({
-                // 'wallet': FieldValue.increment(total),
-                'pts': FieldValue.increment(150),
-              });
+              // FirebaseFirestore.instance
+              //     .collection('Community Wallet')
+              //     .doc('wallet')
+              //     .update({
+              //   // 'wallet': FieldValue.increment(total),
+              //   'pts': FieldValue.increment(150),
+              // });
             }
           }
         });
@@ -236,8 +236,6 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                 return const Center(child: CircularProgressIndicator());
               }
               dynamic data = snapshot.data;
-
-              int mypoints = data['pts'].toInt();
 
               // if (mypoints < 0) {
               //   FirebaseFirestore.instance

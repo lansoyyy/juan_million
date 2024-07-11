@@ -391,6 +391,15 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
               // 'wallet': FieldValue.increment(total),
               'pts': FieldValue.increment(10 * qty),
             });
+          } else {
+            await FirebaseFirestore.instance
+                .collection('Community Wallet')
+                .doc('wallet')
+                .update({
+              // 'wallet': FieldValue.increment(total),
+              'pts': FieldValue.increment(
+                  ((widget.item['slots'] * 150) * qty).round()),
+            });
           }
 
           await FirebaseFirestore.instance
