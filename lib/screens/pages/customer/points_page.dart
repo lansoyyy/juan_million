@@ -87,7 +87,7 @@ class CustomerPointsPage extends StatelessWidget {
                         StreamBuilder<QuerySnapshot>(
                             stream: FirebaseFirestore.instance
                                 .collection('Points')
-                                .where('scannedId',
+                                .where('uid',
                                     isEqualTo:
                                         FirebaseAuth.instance.currentUser!.uid)
                                 .snapshots(),
@@ -146,8 +146,15 @@ class CustomerPointsPage extends StatelessWidget {
                                             ),
                                             TextWidget(
                                               text:
-                                                  'Received ${data.docs[index]['pts']} points',
+                                                  '${data.docs[index]['pts']} points',
                                               fontSize: 16,
+                                              color: Colors.black,
+                                              fontFamily: 'Medium',
+                                            ),
+                                            TextWidget(
+                                              text:
+                                                  '${data.docs[index]['type']}',
+                                              fontSize: 12,
                                               color: Colors.black,
                                               fontFamily: 'Medium',
                                             ),

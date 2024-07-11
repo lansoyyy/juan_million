@@ -238,7 +238,7 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
 
                               final data = snapshot.requireData;
                               return SizedBox(
-                                height: 300,
+                                height: 325,
                                 child: ListView.builder(
                                   itemCount: data.docs.length,
                                   itemBuilder: (context, index) {
@@ -274,8 +274,15 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
                                             ),
                                             TextWidget(
                                               text:
-                                                  'Received ${data.docs[index]['pts']} amount',
+                                                  '${data.docs[index]['pts']}',
                                               fontSize: 16,
+                                              color: Colors.black,
+                                              fontFamily: 'Medium',
+                                            ),
+                                            TextWidget(
+                                              text:
+                                                  '${data.docs[index]['type']}',
+                                              fontSize: 12,
                                               color: Colors.black,
                                               fontFamily: 'Medium',
                                             ),
