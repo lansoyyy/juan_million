@@ -133,10 +133,15 @@ class _PackagesPaymentPageState extends State<PackagesPaymentPage> {
                                     'packagePayment': widget.data['price'],
                                     'packageWallet': widget.data['wallet'],
                                   }).whenComplete(() {
-                                    Navigator.of(context).pushReplacement(
-                                        MaterialPageRoute(
-                                            builder: (context) => LoginScreen(
-                                                inCustomer: false)));
+                                    Navigator.of(context).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                          builder: (context) => LoginScreen(
+                                                inCustomer: false,
+                                              )),
+                                      (route) {
+                                        return true;
+                                      },
+                                    );
                                   });
                                 },
                               )

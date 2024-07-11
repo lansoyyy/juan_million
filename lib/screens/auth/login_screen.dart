@@ -268,17 +268,25 @@ class _LoginScreenState extends State<LoginScreen> {
           email: username.text, password: password.text);
 
       if (widget.inCustomer) {
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-            builder: (context) => const CustomerHomeScreen()));
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const CustomerHomeScreen()),
+          (route) {
+            return true;
+          },
+        );
       } else {
         var document =
             FirebaseFirestore.instance.doc('Business/${user.user!.uid}');
         var snapshot = await document.get();
         if (snapshot.data()!['verified'] == true) {
-          Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (context) => const BusinessHomeScreen()));
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const BusinessHomeScreen()),
+            (route) {
+              return true;
+            },
+          );
         } else {
-          showToast('Cannot Proceed! Your account is not yet verified');
+          showToast('Request grant access!');
         }
       }
     } on FirebaseAuthException catch (e) {

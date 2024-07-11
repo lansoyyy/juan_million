@@ -26,7 +26,8 @@ class CustomerSignupScreen extends StatefulWidget {
 }
 
 class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
-  final name = TextEditingController();
+  final fname = TextEditingController();
+  final lname = TextEditingController();
   final email = TextEditingController();
 
   final password = TextEditingController();
@@ -152,14 +153,28 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
               ),
               TextFieldWidget(
                 fontStyle: FontStyle.normal,
-                hint: 'Fullname',
+                hint: 'Firstname',
                 borderColor: blue,
                 radius: 12,
                 width: 350,
                 isRequred: false,
                 prefixIcon: Icons.person_3_outlined,
-                controller: name,
-                label: 'Fullname',
+                controller: fname,
+                label: 'Firstname',
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              TextFieldWidget(
+                fontStyle: FontStyle.normal,
+                hint: 'Lastname',
+                borderColor: blue,
+                radius: 12,
+                width: 350,
+                isRequred: false,
+                prefixIcon: Icons.person_3_outlined,
+                controller: lname,
+                label: 'Lastname',
               ),
               const SizedBox(
                 height: 20,
@@ -279,7 +294,8 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
                 label: 'Signup',
                 onPressed: () {
                   if (password.text == confirmpassword.text) {
-                    if (name.text != '' ||
+                    if (fname.text != '' ||
+                        lname.text != '' ||
                         nickname.text != '' ||
                         email.text != '' ||
                         password.text != '') {
@@ -304,14 +320,18 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
 
   register(context) async {
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      final user = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: email.text, password: password.text);
 
-      addUser(name.text, email.text, nickname.text, imageURL,
-          '${municipality!.name}, ${province!.name}');
+      addUser('${fname.text} ${lname.text}', email.text, nickname.text,
+          imageURL, '${municipality!.name}, ${province!.name}');
 
-      Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const CustomerHomeScreen()));
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const CustomerHomeScreen()),
+        (route) {
+          return true;
+        },
+      );
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         showToast('The password provided is too weak.');
