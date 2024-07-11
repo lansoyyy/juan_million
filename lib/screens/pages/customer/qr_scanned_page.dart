@@ -16,9 +16,11 @@ class QRScannedPage extends StatefulWidget {
   String pts;
 
   bool? inuser;
+  bool? fromWallet;
 
   QRScannedPage({
     super.key,
+    this.fromWallet = false,
     this.inuser = true,
     required this.pts,
     required this.store,
@@ -121,7 +123,8 @@ class _QRScannedPageState extends State<QRScannedPage> {
             ),
             Center(
               child: TextWidget(
-                text: 'Points Receipt',
+                text:
+                    widget.fromWallet! ? 'Transfer Receipt' : 'Points Receipt',
                 fontSize: 24,
                 color: Colors.white,
                 fontFamily: 'Bold',
@@ -156,7 +159,9 @@ class _QRScannedPageState extends State<QRScannedPage> {
                       ),
                       Center(
                         child: TextWidget(
-                          text: 'Points Added',
+                          text: widget.fromWallet!
+                              ? 'Wallet Transfer'
+                              : 'Points Added',
                           fontSize: 24,
                           color: Colors.black,
                           fontFamily: 'Bold',
@@ -169,8 +174,9 @@ class _QRScannedPageState extends State<QRScannedPage> {
                         width: 250,
                         child: TextWidget(
                           maxLines: 2,
-                          text:
-                              'Your purchase from Juan Store is converted as points',
+                          text: widget.fromWallet!
+                              ? 'You transferred points wallet'
+                              : 'Your purchase from Juan Store is converted as points',
                           fontSize: 14,
                           color: Colors.grey,
                           fontFamily: 'Regular',
@@ -181,7 +187,8 @@ class _QRScannedPageState extends State<QRScannedPage> {
                       ),
                       TextWidget(
                         maxLines: 2,
-                        text: 'Total Points',
+                        text:
+                            widget.fromWallet! ? 'Transferred' : 'Total Points',
                         fontSize: 16,
                         color: Colors.grey,
                         fontFamily: 'Regular',
@@ -198,86 +205,92 @@ class _QRScannedPageState extends State<QRScannedPage> {
                       const SizedBox(
                         height: 10,
                       ),
-                      !widget.inuser!
+                      widget.fromWallet!
                           ? const SizedBox()
-                          : TextWidget(
-                              maxLines: 2,
-                              text: 'Points earned from',
-                              fontSize: 14,
-                              color: Colors.grey,
-                              fontFamily: 'Regular',
-                            ),
+                          : !widget.inuser!
+                              ? const SizedBox()
+                              : TextWidget(
+                                  maxLines: 2,
+                                  text: 'Points earned from',
+                                  fontSize: 14,
+                                  color: Colors.grey,
+                                  fontFamily: 'Regular',
+                                ),
                       const SizedBox(
                         height: 10,
                       ),
-                      !widget.inuser!
+                      widget.fromWallet!
                           ? const SizedBox()
-                          : StreamBuilder<DocumentSnapshot>(
-                              stream: userData,
-                              builder: (context,
-                                  AsyncSnapshot<DocumentSnapshot> snapshot) {
-                                if (!snapshot.hasData) {
-                                  return const Center(child: Text('Loading'));
-                                } else if (snapshot.hasError) {
-                                  return const Center(
-                                      child: Text('Something went wrong'));
-                                } else if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const Center(
-                                      child: CircularProgressIndicator());
-                                }
-                                dynamic data = snapshot.data;
-                                return Container(
-                                  width: 275,
-                                  height: 55,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[200],
-                                    borderRadius: BorderRadius.circular(
-                                      10,
-                                    ),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        CircleAvatar(
-                                          maxRadius: 25,
-                                          minRadius: 25,
-                                          backgroundImage:
-                                              NetworkImage(data['logo']),
+                          : !widget.inuser!
+                              ? const SizedBox()
+                              : StreamBuilder<DocumentSnapshot>(
+                                  stream: userData,
+                                  builder: (context,
+                                      AsyncSnapshot<DocumentSnapshot>
+                                          snapshot) {
+                                    if (!snapshot.hasData) {
+                                      return const Center(
+                                          child: Text('Loading'));
+                                    } else if (snapshot.hasError) {
+                                      return const Center(
+                                          child: Text('Something went wrong'));
+                                    } else if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const Center(
+                                          child: CircularProgressIndicator());
+                                    }
+                                    dynamic data = snapshot.data;
+                                    return Container(
+                                      width: 275,
+                                      height: 55,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[200],
+                                        borderRadius: BorderRadius.circular(
+                                          10,
                                         ),
-                                        const SizedBox(
-                                          width: 20,
-                                        ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(5.0),
+                                        child: Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.start,
                                           children: [
-                                            TextWidget(
-                                              text: data['name'],
-                                              fontSize: 14,
-                                              color: Colors.black,
-                                              fontFamily: 'Bold',
+                                            CircleAvatar(
+                                              maxRadius: 25,
+                                              minRadius: 25,
+                                              backgroundImage:
+                                                  NetworkImage(data['logo']),
                                             ),
-                                            TextWidget(
-                                              text: DateFormat.yMMMd()
-                                                  .add_jm()
-                                                  .format(DateTime.now()),
-                                              fontSize: 12,
-                                              color: Colors.grey,
-                                              fontFamily: 'Regular',
+                                            const SizedBox(
+                                              width: 20,
+                                            ),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                TextWidget(
+                                                  text: data['name'],
+                                                  fontSize: 14,
+                                                  color: Colors.black,
+                                                  fontFamily: 'Bold',
+                                                ),
+                                                TextWidget(
+                                                  text: DateFormat.yMMMd()
+                                                      .add_jm()
+                                                      .format(DateTime.now()),
+                                                  fontSize: 12,
+                                                  color: Colors.grey,
+                                                  fontFamily: 'Regular',
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }),
+                                      ),
+                                    );
+                                  }),
                       const Expanded(
                         child: SizedBox(
                           height: 10,
@@ -302,19 +315,21 @@ class _QRScannedPageState extends State<QRScannedPage> {
                           }
                         },
                       ),
-                      !widget.inuser!
+                      widget.fromWallet!
                           ? const SizedBox()
-                          : TextButton(
-                              onPressed: () {
-                                scanQRCode();
-                              },
-                              child: TextWidget(
-                                text: 'Scan Again',
-                                fontSize: 14,
-                                color: primary,
-                                fontFamily: 'Bold',
-                              ),
-                            ),
+                          : !widget.inuser!
+                              ? const SizedBox()
+                              : TextButton(
+                                  onPressed: () {
+                                    scanQRCode();
+                                  },
+                                  child: TextWidget(
+                                    text: 'Scan Again',
+                                    fontSize: 14,
+                                    color: primary,
+                                    fontFamily: 'Bold',
+                                  ),
+                                ),
                       const SizedBox(
                         height: 10,
                       ),

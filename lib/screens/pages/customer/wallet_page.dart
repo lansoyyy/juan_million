@@ -414,6 +414,7 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
 
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => QRScannedPage(
+                    fromWallet: true,
                     inuser: true,
                     pts: pts.text,
                     store: FirebaseAuth.instance.currentUser!.uid,
