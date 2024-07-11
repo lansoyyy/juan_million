@@ -6,6 +6,7 @@ import 'package:juan_million/screens/auth/customer_signup_screen.dart';
 import 'package:juan_million/screens/auth/signup_screen.dart';
 import 'package:juan_million/screens/business_home_screen.dart';
 import 'package:juan_million/screens/customer_home_screen.dart';
+import 'package:juan_million/services/add_user.dart';
 import 'package:juan_million/utlis/app_constants.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/button_widget.dart';
@@ -256,7 +257,9 @@ class _LoginScreenState extends State<LoginScreen> {
               height: 10,
             ),
             GestureDetector(
-              onTap: () {},
+              onTap: () {
+                googleLogin();
+              },
               child: Container(
                 width: 325,
                 height: 50,
@@ -380,4 +383,89 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   final GoogleSignIn googleSignIn = GoogleSignIn(scopes: ['email']);
+
+  bool userExist = false;
+
+  googleLogin() async {
+    try {
+      final googleSignInAccount = await googleSignIn.signIn();
+
+      print(googleSignInAccount!.email);
+
+      FirebaseFirestore.instance
+          .collection('Users')
+          .where('email', isEqualTo: googleSignInAccount.email)
+          .get()
+          .then(
+        (value) {
+          print(value);
+        },
+      );
+
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .where('email', isEqualTo: googleSignInAccount.email)
+          .get()
+          .then((QuerySnapshot querySnapshot) async {
+        for (var doc in querySnapshot.docs) {
+          if (doc['email'] == googleSignInAccount.email) {
+            setState(() {
+              userExist = true;
+            });
+          }
+        }
+      }).whenComplete(
+        () async {
+          if (userExist) {
+            print('1');
+
+            // Authenticate the GoogleSignInAccount and get the credentials
+            final googleSignInAuth = await googleSignInAccount.authentication;
+            final credential = GoogleAuthProvider.credential(
+              accessToken: googleSignInAuth.accessToken,
+              idToken: googleSignInAuth.idToken,
+            );
+
+            // Sign in to Firebase with the obtained credentials
+            await FirebaseAuth.instance.signInWithCredential(credential);
+          } else {
+            // If the user doesn't exist, create a new user with Google credentials
+            try {
+              // Authenticate the GoogleSignInAccount and get the credentials
+              final googleSignInAuth = await googleSignInAccount.authentication;
+              final credential = GoogleAuthProvider.credential(
+                accessToken: googleSignInAuth.accessToken,
+                idToken: googleSignInAuth.idToken,
+              );
+
+              // Sign in to Firebase with the obtained credentials
+              UserCredential userCredential =
+                  await FirebaseAuth.instance.signInWithCredential(credential);
+
+              // Add the user to your Firestore or Realtime Database if needed
+              addUser(
+                  googleSignInAccount.displayName,
+                  googleSignInAccount.email,
+                  googleSignInAccount.displayName,
+                  googleSignInAccount.photoUrl,
+                  '');
+            } catch (e) {
+              print('Error: $e');
+              // Handle the error accordingly
+            }
+          }
+
+// Navigate to the CustomerHomeScreen and remove all previous routes
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const CustomerHomeScreen()),
+            (route) {
+              return true;
+            },
+          );
+        },
+      );
+    } catch (e) {
+      print(e);
+    }
+  }
 }

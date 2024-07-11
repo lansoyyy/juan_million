@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:juan_million/models/municipality_model.dart';
 import 'package:juan_million/models/province_model.dart';
 import 'package:juan_million/models/region_model.dart';
@@ -307,6 +309,79 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
                 },
               ),
               const SizedBox(
+                height: 20,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(
+                    width: 150,
+                    child: Divider(),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  TextWidget(
+                    text: 'or',
+                    fontSize: 12,
+                    color: blue,
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  const SizedBox(
+                    width: 150,
+                    child: Divider(),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              GestureDetector(
+                onTap: () {
+                  googleLogin();
+                },
+                child: Container(
+                  width: 325,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.grey,
+                    ),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(
+                      50,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 20, right: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/images/googlelogo.png',
+                          width: 25,
+                        ),
+                        const SizedBox(
+                          width: 50,
+                        ),
+                        TextWidget(
+                          text: 'Continue with Google',
+                          fontSize: 14,
+                          color: blue,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              const SizedBox(
                 height: 50,
               ),
             ],
@@ -352,6 +427,87 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
       }
     } on Exception catch (e) {
       showToast("An error occurred: $e");
+    }
+  }
+
+  final GoogleSignIn googleSignIn = GoogleSignIn(scopes: ['email']);
+
+  bool userExist = false;
+
+  googleLogin() async {
+    try {
+      final googleSignInAccount = await googleSignIn.signIn();
+
+      print(googleSignInAccount!.email);
+
+      FirebaseFirestore.instance
+          .collection('Users')
+          .where('email', isEqualTo: googleSignInAccount.email)
+          .get()
+          .then(
+        (value) {
+          print(value);
+        },
+      );
+
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .where('email', isEqualTo: googleSignInAccount.email)
+          .get()
+          .then((QuerySnapshot querySnapshot) async {
+        for (var doc in querySnapshot.docs) {
+          if (doc['email'] == googleSignInAccount.email) {
+            setState(() {
+              userExist = true;
+            });
+          }
+        }
+      }).whenComplete(
+        () async {
+          if (userExist) {
+            Navigator.pop(context);
+
+            showToast('Your google account is already used! Try logging in.');
+          } else {
+            // If the user doesn't exist, create a new user with Google credentials
+            try {
+              // Authenticate the GoogleSignInAccount and get the credentials
+              final googleSignInAuth = await googleSignInAccount.authentication;
+              final credential = GoogleAuthProvider.credential(
+                accessToken: googleSignInAuth.accessToken,
+                idToken: googleSignInAuth.idToken,
+              );
+
+              // Sign in to Firebase with the obtained credentials
+              UserCredential userCredential =
+                  await FirebaseAuth.instance.signInWithCredential(credential);
+
+              // Add the user to your Firestore or Realtime Database if needed
+              addUser(
+                  googleSignInAccount.displayName,
+                  googleSignInAccount.email,
+                  googleSignInAccount.displayName,
+                  googleSignInAccount.photoUrl,
+                  '');
+            } catch (e) {
+              print('Error: $e');
+              // Handle the error accordingly
+            }
+
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                  builder: (context) => const CustomerHomeScreen()),
+              (route) {
+                return true;
+              },
+            );
+          }
+
+// Navigate to the CustomerHomeScreen and remove all previous routes
+        },
+      );
+    } catch (e) {
+      print(e);
     }
   }
 }
