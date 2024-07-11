@@ -401,7 +401,7 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
           // Add transaction
 
           addWallet(int.parse(pts.text), qrCode,
-              FirebaseAuth.instance.currentUser!.uid);
+              FirebaseAuth.instance.currentUser!.uid, 'Receive & Transfers');
           Navigator.of(context).pop();
         });
       } else {

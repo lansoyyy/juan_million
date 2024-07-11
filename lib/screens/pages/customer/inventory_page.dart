@@ -73,7 +73,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
           'pts': FieldValue.increment(100),
         });
 
-        addWallet(5500, '', uid);
+        addWallet(5500, '', uid, 'REWARDS 5,500');
 
         addHistory(snapshot.data()!['name'], uid);
       });

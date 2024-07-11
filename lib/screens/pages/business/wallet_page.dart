@@ -434,7 +434,8 @@ class _WalletPageState extends State<WalletPage> {
                                     'Cannot proceed! Insufficient cash wallet');
                               }
 
-                              addPoints(int.parse(pts.text), 1, name);
+                              addPoints(int.parse(pts.text), 1, name,
+                                  'Points from reload');
 
                               DocumentSnapshot doc1 = await FirebaseFirestore
                                   .instance
@@ -571,7 +572,7 @@ class _WalletPageState extends State<WalletPage> {
           // Add transaction
 
           addWallet(int.parse(pts.text), qrCode,
-              FirebaseAuth.instance.currentUser!.uid);
+              FirebaseAuth.instance.currentUser!.uid, 'Receive & Transfers');
           Navigator.of(context).pop();
         });
       } else {

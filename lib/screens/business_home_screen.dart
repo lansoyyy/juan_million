@@ -177,7 +177,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                                       MaterialButton(
                                                                         onPressed:
                                                                             () async {
-                                                                          addPoints(((int.parse(amount.text) * mydata['ptsconversion']) * 0.01).toInt(), qty, doc['name'])
+                                                                          addPoints(((int.parse(amount.text) * mydata['ptsconversion']) * 0.01).toInt(), qty, doc['name'], 'Points received by member')
                                                                               .then((value) {
                                                                             Navigator.of(context).pop(true);
                                                                             Navigator.of(context).push(MaterialPageRoute(
@@ -882,7 +882,8 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                     'Cannot proceed! Insufficient cash wallet');
                               }
 
-                              addPoints(int.parse(pts.text), 1, name);
+                              addPoints(int.parse(pts.text), 1, name,
+                                  'Points from reload');
 
                               DocumentSnapshot doc1 = await FirebaseFirestore
                                   .instance
