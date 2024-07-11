@@ -127,7 +127,6 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                         .collection('Slots')
                         .where('uid',
                             isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-                       
                         .snapshots(),
                     builder: (BuildContext context,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -147,7 +146,6 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
 
                       final data = snapshot.requireData;
 
-                      
                       return Center(
                         child: TextWidget(
                           text: data.docs.length.toString(),

@@ -282,7 +282,7 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                                             onPressed: () {
                                               if (widget.item['slots'] ==
                                                   0.066) {
-                                                if (qty <= 13) {
+                                                if (qty <= 14) {
                                                   setState(() {
                                                     qty++;
                                                   });

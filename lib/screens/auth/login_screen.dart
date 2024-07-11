@@ -210,7 +210,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             const SizedBox(
-              height: 30,
+              height: 10,
             ),
             ButtonWidget(
               width: 350,
@@ -344,7 +344,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (context) => const CustomerHomeScreen()),
             (route) {
-              return true;
+              return false;
             },
           );
         } else {
@@ -358,7 +358,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (context) => const BusinessHomeScreen()),
             (route) {
-              return true;
+              return false;
             },
           );
         } else {
@@ -459,7 +459,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (context) => const CustomerHomeScreen()),
             (route) {
-              return true;
+              return false;
             },
           );
         },

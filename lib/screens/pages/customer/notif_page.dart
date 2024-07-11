@@ -110,7 +110,7 @@ class CustomerNotifPage extends StatelessWidget {
                                         ),
                                         TextWidget(
                                           text:
-                                              'Bought ${data.docs[index]['pts']} points',
+                                              'Bought ${data.docs[index]['pts'].round()} points',
                                           fontSize: 16,
                                           color: Colors.black,
                                           fontFamily: 'Medium',

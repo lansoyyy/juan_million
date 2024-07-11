@@ -412,7 +412,7 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
                   inCustomer: true,
                 )),
         (route) {
-          return true;
+          return false;
         },
       );
     } on FirebaseAuthException catch (e) {
@@ -498,7 +498,7 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
               MaterialPageRoute(
                   builder: (context) => const CustomerHomeScreen()),
               (route) {
-                return true;
+                return false;
               },
             );
           }

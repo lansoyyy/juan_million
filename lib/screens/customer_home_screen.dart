@@ -116,94 +116,114 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     }
   }
 
-  void checkPoints(int points, int limit) async {
-    if (points >= limit) {
-      await FirebaseFirestore.instance
-          .collection('Slots')
-          .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-          .where('dateTime',
-              isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime(
-                  DateTime.now().year,
-                  DateTime.now().month,
-                  DateTime.now().day)))
-          .where('dateTime',
-              isLessThanOrEqualTo: Timestamp.fromDate(DateTime(
-                      DateTime.now().year,
-                      DateTime.now().month,
-                      DateTime.now().day + 1)
-                  .subtract(const Duration(seconds: 1))))
-          .get()
-          .then((snapshot) {
-        int total = points - limit;
+  void checkPoints(int limit) async {
+    FirebaseFirestore.instance
+        .collection('Users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) async {
+      if (documentSnapshot['pts'].toInt() >= limit) {
+        await FirebaseFirestore.instance
+            .collection('Slots')
+            .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+            .where('dateTime',
+                isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime(
+                    DateTime.now().year,
+                    DateTime.now().month,
+                    DateTime.now().day)))
+            .where('dateTime',
+                isLessThanOrEqualTo: Timestamp.fromDate(DateTime(
+                        DateTime.now().year,
+                        DateTime.now().month,
+                        DateTime.now().day + 1)
+                    .subtract(const Duration(seconds: 1))))
+            .get()
+            .then((snapshot) {
+          int total = documentSnapshot['pts'].toInt() - limit;
 
-        int slotsFromPoints = points ~/ limit;
-        int currentSlots = snapshot.docs.length;
-        int slotsLeft = 10 - currentSlots;
+          int slotsFromPoints = documentSnapshot['pts'].toInt() ~/ limit;
+          int currentSlots = snapshot.docs.length;
+          int slotsLeft = 10 - currentSlots;
 
-        if (slotsLeft > 0) {
-          FirebaseFirestore.instance
-              .collection('Users')
-              .doc(FirebaseAuth.instance.currentUser!.uid)
-              .update({
-            // 'wallet': FieldValue.increment(total),
-            'pts': FieldValue.increment(-slotsFromPoints * limit),
-          });
-        }
-        if (slotsFromPoints > slotsLeft) {
-          for (int i = 0; i < slotsLeft; i++) {
-            addSlots();
-
-            // FirebaseFirestore.instance
-            //     .collection('Users')
-            //     .doc(FirebaseAuth.instance.currentUser!.uid)
-            //     .update({
-            //   // 'wallet': FieldValue.increment(total),
-            //   'pts': FieldValue.increment(-150),
-            // });
-
+          if (slotsLeft > 0) {
+            print('slot here called');
             FirebaseFirestore.instance
-                .collection('Community Wallet')
-                .doc('wallet')
+                .collection('Users')
+                .doc(FirebaseAuth.instance.currentUser!.uid)
                 .update({
               // 'wallet': FieldValue.increment(total),
-              'pts': FieldValue.increment(150),
+              'pts': FieldValue.increment(-slotsFromPoints * limit),
             });
           }
-        } else {
-          for (int i = 0; i < slotsFromPoints; i++) {
-            addSlots();
+          if (slotsFromPoints > slotsLeft) {
+            for (int i = 0; i < slotsLeft; i++) {
+              addSlots();
 
-            // FirebaseFirestore.instance
-            //     .collection('Users')
-            //     .doc(FirebaseAuth.instance.currentUser!.uid)
-            //     .update({
-            //   // 'wallet': FieldValue.increment(total),
-            //   'pts': FieldValue.increment(-150),
-            // });
+              // FirebaseFirestore.instance
+              //     .collection('Users')
+              //     .doc(FirebaseAuth.instance.currentUser!.uid)
+              //     .update({
+              //   // 'wallet': FieldValue.increment(total),
+              //   'pts': FieldValue.increment(-150),
+              // });
 
-            FirebaseFirestore.instance
-                .collection('Community Wallet')
-                .doc('wallet')
-                .update({
-              // 'wallet': FieldValue.increment(total),
-              'pts': FieldValue.increment(150),
-            });
+              FirebaseFirestore.instance
+                  .collection('Community Wallet')
+                  .doc('wallet')
+                  .update({
+                // 'wallet': FieldValue.increment(total),
+                'pts': FieldValue.increment(150),
+              });
+            }
+          } else {
+            for (int i = 0; i < slotsFromPoints; i++) {
+              addSlots();
+
+              // FirebaseFirestore.instance
+              //     .collection('Users')
+              //     .doc(FirebaseAuth.instance.currentUser!.uid)
+              //     .update({
+              //   // 'wallet': FieldValue.increment(total),
+              //   'pts': FieldValue.increment(-150),
+              // });
+
+              FirebaseFirestore.instance
+                  .collection('Community Wallet')
+                  .doc('wallet')
+                  .update({
+                // 'wallet': FieldValue.increment(total),
+                'pts': FieldValue.increment(150),
+              });
+            }
           }
-        }
-      });
+        });
 
-      // Add to Slot
-    } else {
-      print('Points are within the limit.');
-    }
+        // Add to Slot
+      } else {
+        print('Points are within the limit.');
+      }
+    });
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    checkPoints(150);
+    // TODO: implement initState
+    super.initState();
+  }
+
+  final Stream<DocumentSnapshot> userData = FirebaseFirestore.instance
+      .collection('Users')
+      .doc(FirebaseAuth.instance.currentUser!.uid)
+      .snapshots();
+  @override
   Widget build(BuildContext context) {
-    final Stream<DocumentSnapshot> userData = FirebaseFirestore.instance
-        .collection('Users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .snapshots();
     return Scaffold(
         body: StreamBuilder<DocumentSnapshot>(
             stream: userData,
@@ -219,16 +239,14 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
               int mypoints = data['pts'].toInt();
 
-              if (mypoints < 0) {
-                FirebaseFirestore.instance
-                    .collection('Users')
-                    .doc(FirebaseAuth.instance.currentUser!.uid)
-                    .update({
-                  'pts': mypoints.abs(),
-                });
-              }
-
-              checkPoints(data['pts'].toInt(), 150);
+              // if (mypoints < 0) {
+              //   FirebaseFirestore.instance
+              //       .collection('Users')
+              //       .doc(FirebaseAuth.instance.currentUser!.uid)
+              //       .update({
+              //     'pts': mypoints.abs(),
+              //   });
+              // }
 
               return Column(
                 children: [
@@ -254,6 +272,20 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                               },
                               icon: const Icon(
                                 Icons.qr_code,
+                                color: Colors.white,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const CustomerHomeScreen()),
+                                  (route) => false,
+                                );
+                              },
+                              icon: const Icon(
+                                Icons.refresh,
                                 color: Colors.white,
                               ),
                             ),
