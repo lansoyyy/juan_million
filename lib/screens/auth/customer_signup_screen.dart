@@ -195,7 +195,6 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
                 height: 20,
               ),
               SizedBox(
-                width: 350,
                 child: CustomRegionDropdownView(
                     onChanged: (Region? value) {
                       setState(() {
@@ -212,7 +211,6 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
                 height: 20,
               ),
               SizedBox(
-                width: 350,
                 child: CustomProvinceDropdownView(
                   provinces: region?.provinces ?? [],
                   onChanged: (Province? value) {
@@ -230,7 +228,6 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
                 height: 20,
               ),
               SizedBox(
-                width: 350,
                 child: CustomMunicipalityDropdownView(
                   municipalities: province?.municipalities ?? [],
                   onChanged: (value) {

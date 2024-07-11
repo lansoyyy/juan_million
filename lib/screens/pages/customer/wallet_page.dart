@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:intl/intl.dart';
+import 'package:juan_million/screens/pages/customer/qr_scanned_page.dart';
 import 'package:juan_million/screens/pages/store_page.dart';
 import 'package:juan_million/services/add_wallet.dart';
 import 'package:juan_million/utlis/app_constants.dart';
@@ -410,6 +411,13 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
           addWallet(int.parse(pts.text), qrCode,
               FirebaseAuth.instance.currentUser!.uid, 'Receive & Transfers');
           Navigator.of(context).pop();
+
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => QRScannedPage(
+                    inuser: true,
+                    pts: pts.text,
+                    store: FirebaseAuth.instance.currentUser!.uid,
+                  )));
         });
       } else {
         Navigator.pop(context);

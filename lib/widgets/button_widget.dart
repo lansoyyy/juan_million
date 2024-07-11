@@ -23,13 +23,17 @@ class ButtonWidget extends StatelessWidget {
       this.color = const Color(0xff007BFF)});
   @override
   Widget build(BuildContext context) {
-    return MaterialButton(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(radius!)),
-        minWidth: width,
-        height: height,
-        color: color,
-        onPressed: onPressed,
-        child: TextWidget(text: label, fontSize: fontSize!, color: textColor));
+    return Padding(
+      padding: const EdgeInsets.only(left: 40, right: 40),
+      child: MaterialButton(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(radius!)),
+          minWidth: width,
+          height: height,
+          color: color,
+          onPressed: onPressed,
+          child:
+              TextWidget(text: label, fontSize: fontSize!, color: textColor)),
+    );
   }
 }

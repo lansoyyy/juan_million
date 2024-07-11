@@ -25,25 +25,67 @@ class LandingScreen extends StatelessWidget {
             const SizedBox(
               height: 10,
             ),
-            SizedBox(
-              height: 450,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => LoginScreen(
-                                inCustomer: true,
-                              )));
-                    },
-                    child: Align(
-                      alignment: Alignment.topCenter,
+            Padding(
+              padding: const EdgeInsets.only(left: 10, right: 10),
+              child: SizedBox(
+                height: 450,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => LoginScreen(
+                                  inCustomer: true,
+                                )));
+                      },
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: Container(
+                          height: 300,
+                          width: 150,
+                          decoration: BoxDecoration(
+                            color: primary,
+                            borderRadius: BorderRadius.circular(
+                              15,
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.account_circle_outlined,
+                                color: Colors.white,
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              TextWidget(
+                                text: 'Customer\naccount',
+                                maxLines: 2,
+                                fontSize: 18,
+                                fontFamily: 'Bold',
+                                color: Colors.white,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        // showToast('Under development');
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => LoginScreen(
+                                  inCustomer: false,
+                                )));
+                      },
                       child: Container(
                         height: 300,
-                        width: 175,
+                        width: 150,
                         decoration: BoxDecoration(
-                          color: primary,
+                          color: secondary,
                           borderRadius: BorderRadius.circular(
                             15,
                           ),
@@ -53,14 +95,14 @@ class LandingScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             const Icon(
-                              Icons.account_circle_outlined,
+                              Icons.business_center_outlined,
                               color: Colors.white,
                             ),
                             const SizedBox(
                               height: 10,
                             ),
                             TextWidget(
-                              text: 'Customer\naccount',
+                              text: 'Business\naccount',
                               maxLines: 2,
                               fontSize: 18,
                               fontFamily: 'Bold',
@@ -70,47 +112,8 @@ class LandingScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      // showToast('Under development');
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => LoginScreen(
-                                inCustomer: false,
-                              )));
-                    },
-                    child: Container(
-                      height: 300,
-                      width: 175,
-                      decoration: BoxDecoration(
-                        color: secondary,
-                        borderRadius: BorderRadius.circular(
-                          15,
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.business_center_outlined,
-                            color: Colors.white,
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          TextWidget(
-                            text: 'Business\naccount',
-                            maxLines: 2,
-                            fontSize: 18,
-                            fontFamily: 'Bold',
-                            color: Colors.white,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],

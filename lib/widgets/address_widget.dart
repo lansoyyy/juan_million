@@ -84,32 +84,35 @@ class CustomRegionDropdownView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _CustomDropdownView(
-      choices: philippineRegions,
-      onChanged: onChanged,
-      value: value,
-      itemBuilder: (BuildContext context, e) {
-        return itemBuilder?.call(context, e) ??
-            DropdownMenuItem(
-                value: e,
-                child: Text(
-                  e.regionName,
-                  style: const TextStyle(
-                    color: Colors.black,
-                  ),
-                ));
-      },
-      hint: const Text('Select Region'),
-      selectedItemBuilder: (BuildContext context, Region value) {
-        return Text(
-          value.regionName,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            color: Colors.black,
-          ),
-        );
-      },
-      validator: validator,
+    return Padding(
+      padding: const EdgeInsets.only(left: 20, right: 20),
+      child: _CustomDropdownView(
+        choices: philippineRegions,
+        onChanged: onChanged,
+        value: value,
+        itemBuilder: (BuildContext context, e) {
+          return itemBuilder?.call(context, e) ??
+              DropdownMenuItem(
+                  value: e,
+                  child: Text(
+                    e.regionName,
+                    style: const TextStyle(
+                      color: Colors.black,
+                    ),
+                  ));
+        },
+        hint: const Text('Select Region'),
+        selectedItemBuilder: (BuildContext context, Region value) {
+          return Text(
+            value.regionName,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Colors.black,
+            ),
+          );
+        },
+        validator: validator,
+      ),
     );
   }
 }
@@ -131,32 +134,35 @@ class CustomProvinceDropdownView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _CustomDropdownView(
-        choices: provinces,
-        onChanged: onChanged,
-        value: value,
-        itemBuilder: (BuildContext context, e) {
-          return itemBuilder?.call(context, e) ??
-              DropdownMenuItem(
-                  value: e,
-                  child: Text(
-                    e.name,
-                    style: const TextStyle(
-                      color: Colors.black,
-                    ),
-                  ));
-        },
-        hint: const Text('Select Province'),
-        selectedItemBuilder: (BuildContext context, Province value) {
-          return Text(
-            value.name,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: Colors.black,
-            ),
-          );
-        },
-        validator: validator);
+    return Padding(
+      padding: const EdgeInsets.only(left: 20, right: 20),
+      child: _CustomDropdownView(
+          choices: provinces,
+          onChanged: onChanged,
+          value: value,
+          itemBuilder: (BuildContext context, e) {
+            return itemBuilder?.call(context, e) ??
+                DropdownMenuItem(
+                    value: e,
+                    child: Text(
+                      e.name,
+                      style: const TextStyle(
+                        color: Colors.black,
+                      ),
+                    ));
+          },
+          hint: const Text('Select Province'),
+          selectedItemBuilder: (BuildContext context, Province value) {
+            return Text(
+              value.name,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Colors.black,
+              ),
+            );
+          },
+          validator: validator),
+    );
   }
 }
 
@@ -177,32 +183,35 @@ class CustomMunicipalityDropdownView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _CustomDropdownView(
-      choices: municipalities,
-      onChanged: onChanged,
-      value: value,
-      itemBuilder: (BuildContext context, e) {
-        return itemBuilder?.call(context, e) ??
-            DropdownMenuItem(
-                value: e,
-                child: Text(
-                  e.name,
-                  style: const TextStyle(
-                    color: Colors.black,
-                  ),
-                ));
-      },
-      hint: const Text('Select Municipality'),
-      selectedItemBuilder: (BuildContext context, Municipality value) {
-        return Text(
-          value.name,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            color: Colors.black,
-          ),
-        );
-      },
-      validator: validator,
+    return Padding(
+      padding: const EdgeInsets.only(left: 20, right: 20),
+      child: _CustomDropdownView(
+        choices: municipalities,
+        onChanged: onChanged,
+        value: value,
+        itemBuilder: (BuildContext context, e) {
+          return itemBuilder?.call(context, e) ??
+              DropdownMenuItem(
+                  value: e,
+                  child: Text(
+                    e.name,
+                    style: const TextStyle(
+                      color: Colors.black,
+                    ),
+                  ));
+        },
+        hint: const Text('Select Municipality'),
+        selectedItemBuilder: (BuildContext context, Municipality value) {
+          return Text(
+            value.name,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Colors.black,
+            ),
+          );
+        },
+        validator: validator,
+      ),
     );
   }
 }
