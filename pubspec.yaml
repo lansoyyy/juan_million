@@ -46,6 +46,7 @@ dependencies:
   flutter_barcode_scanner:
   paymongo_sdk:
   image_picker:
+  google_sign_in:
 
 dev_dependencies:
   flutter_test:

@@ -12,6 +12,7 @@ import 'package:juan_million/widgets/button_widget.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:juan_million/widgets/textfield_widget.dart';
 import 'package:juan_million/widgets/toast_widget.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends StatefulWidget {
   bool inCustomer;
@@ -228,6 +229,74 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(
+                  width: 150,
+                  child: Divider(),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                TextWidget(
+                  text: 'or',
+                  fontSize: 12,
+                  color: blue,
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                const SizedBox(
+                  width: 150,
+                  child: Divider(),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            GestureDetector(
+              onTap: () {},
+              child: Container(
+                width: 325,
+                height: 50,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.grey,
+                  ),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(
+                    50,
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 20, right: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/images/googlelogo.png',
+                        width: 25,
+                      ),
+                      const SizedBox(
+                        width: 50,
+                      ),
+                      TextWidget(
+                        text: 'Continue with Google',
+                        fontSize: 14,
+                        color: blue,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextWidget(
                   text: 'Don’t have an account yet?',
@@ -309,4 +378,6 @@ class _LoginScreenState extends State<LoginScreen> {
       showToast("An error occurred: $e");
     }
   }
+
+  final GoogleSignIn googleSignIn = GoogleSignIn(scopes: ['email']);
 }
