@@ -389,7 +389,7 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                 .doc('wallet')
                 .update({
               // 'wallet': FieldValue.increment(total),
-              'pts': FieldValue.increment(20 * qty),
+              'pts': FieldValue.increment(10 * qty),
             });
           }
 
