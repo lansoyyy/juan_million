@@ -218,6 +218,7 @@ class _LoginScreenState extends State<LoginScreen> {
               onPressed: () async {
                 var document = FirebaseFirestore.instance.doc('App/versions');
                 var snapshot = await document.get();
+
                 if (snapshot.data()!['version'] == version) {
                   login(context);
                 } else {
