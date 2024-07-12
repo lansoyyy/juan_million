@@ -175,7 +175,7 @@ class _QRScannedPageState extends State<QRScannedPage> {
                         child: TextWidget(
                           maxLines: 2,
                           text: widget.fromWallet!
-                              ? 'You transferred points wallet'
+                              ? 'You receive Cash'
                               : 'Your purchase from Juan Store is converted as points',
                           fontSize: 14,
                           color: Colors.grey,
@@ -187,8 +187,7 @@ class _QRScannedPageState extends State<QRScannedPage> {
                       ),
                       TextWidget(
                         maxLines: 2,
-                        text:
-                            widget.fromWallet! ? 'Transferred' : 'Total Points',
+                        text: widget.fromWallet! ? 'Received' : 'Total Points',
                         fontSize: 16,
                         color: Colors.grey,
                         fontFamily: 'Regular',
