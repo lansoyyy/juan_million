@@ -24,6 +24,8 @@ class _SignupScreenState extends State<SignupScreen> {
 
   final password = TextEditingController();
   final confirmpassword = TextEditingController();
+
+  bool _value = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,45 +108,66 @@ class _SignupScreenState extends State<SignupScreen> {
                 label: 'Confirm Password',
               ),
               const SizedBox(
-                height: 30,
+                height: 10,
               ),
-              ButtonWidget(
-                width: 350,
-                label: 'Next',
-                onPressed: () {
-                  if (email.text != '' ||
-                      password.text != '' ||
-                      name.text != '') {
-                    if (password.text == confirmpassword.text) {
-                      register(context);
-                    } else {
-                      showToast('Password do not match!');
-                    }
-                  } else {
-                    showToast('All fields are required!');
-                  }
-                },
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Checkbox(
+                    activeColor: blue,
+                    value: _value,
+                    onChanged: (value) {
+                      setState(() {
+                        _value = value!;
+                      });
+                    },
+                  ),
+                  Center(
+                    child: TextWidget(
+                        text: 'I agree with',
+                        fontSize: 12,
+                        color: Colors.black),
+                  ),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                  Center(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                const TermsAndConditionsPage()));
+                      },
+                      child: TextWidget(
+                          text: 'Terms and Conditions',
+                          fontSize: 14,
+                          fontFamily: 'Bold',
+                          color: blue),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(
                 height: 10,
               ),
-              Center(
-                child: TextWidget(
-                    text: 'Signing up means you agree to our',
-                    fontSize: 12,
-                    color: Colors.black),
-              ),
-              Center(
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const TermsAndConditionsPage()));
+              Visibility(
+                visible: _value,
+                child: ButtonWidget(
+                  width: 350,
+                  label: 'Next',
+                  onPressed: () {
+                    if (email.text != '' ||
+                        password.text != '' ||
+                        name.text != '') {
+                      if (password.text == confirmpassword.text) {
+                        register(context);
+                      } else {
+                        showToast('Password do not match!');
+                      }
+                    } else {
+                      showToast('All fields are required!');
+                    }
                   },
-                  child: TextWidget(
-                      text: 'Terms and Conditions',
-                      fontSize: 14,
-                      fontFamily: 'Bold',
-                      color: blue),
                 ),
               ),
               const SizedBox(
