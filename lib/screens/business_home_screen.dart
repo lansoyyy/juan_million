@@ -35,6 +35,26 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
 
   final amount = TextEditingController();
 
+  final email = TextEditingController();
+  final password = TextEditingController();
+
+  Future<void> reauthenticateUser(String email, String password) async {
+    User user = FirebaseAuth.instance.currentUser!;
+    AuthCredential credential =
+        EmailAuthProvider.credential(email: email, password: password);
+
+    try {
+      await user.reauthenticateWithCredential(credential);
+      print("Re-authentication successful");
+
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => const SettingsPage()));
+    } on FirebaseAuthException catch (e) {
+      showToast('Unauthorized to access this feature!');
+      print("Error: ${e.message}");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final Stream<DocumentSnapshot> userData = FirebaseFirestore.instance
@@ -237,9 +257,50 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                               ),
                               IconButton(
                                 onPressed: () {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) =>
-                                          const SettingsPage()));
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return Dialog(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(20.0),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const SizedBox(
+                                                height: 10,
+                                              ),
+                                              TextFieldWidget(
+                                                showEye: true,
+                                                isObscure: true,
+                                                fontStyle: FontStyle.normal,
+                                                hint: 'Enter Password',
+                                                borderColor: blue,
+                                                radius: 12,
+                                                width: 350,
+                                                height: 75,
+                                                prefixIcon: Icons.lock,
+                                                isRequred: false,
+                                                controller: password,
+                                                label: 'Enter Password',
+                                              ),
+                                              const SizedBox(
+                                                height: 20,
+                                              ),
+                                              ButtonWidget(
+                                                label: 'Continue',
+                                                onPressed: () {
+                                                  reauthenticateUser(
+                                                      mydata['email'],
+                                                      password.text);
+                                                  Navigator.pop(context);
+                                                },
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
                                 },
                                 icon: const Icon(
                                   Icons.settings,
@@ -504,69 +565,88 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                             width: 75,
                                             fontSize: 12,
                                             label: 'Reload',
-                                            onPressed: () {
-                                              showDialog(
-                                                context: context,
-                                                builder: (context) {
-                                                  return Dialog(
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              20.0),
-                                                      child: Column(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        children: [
-                                                          TextFieldWidget(
-                                                            showEye: true,
-                                                            isObscure: true,
-                                                            fontStyle: FontStyle
-                                                                .normal,
-                                                            hint: 'PIN Code',
-                                                            borderColor: blue,
-                                                            radius: 12,
-                                                            width: 350,
-                                                            prefixIcon:
-                                                                Icons.lock,
-                                                            isRequred: false,
-                                                            controller: pin,
-                                                            label: 'PIN Code',
-                                                          ),
-                                                          const SizedBox(
-                                                            height: 20,
-                                                          ),
-                                                          ButtonWidget(
-                                                            label: 'Confirm',
-                                                            onPressed:
-                                                                () async {
-                                                              Navigator.pop(
-                                                                  context);
+                                            onPressed: () async {
+                                              QuerySnapshot snapshot =
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection('Cashiers')
+                                                      .where('uid',
+                                                          isEqualTo:
+                                                              FirebaseAuth
+                                                                  .instance
+                                                                  .currentUser!
+                                                                  .uid)
+                                                      .get();
 
-                                                              DocumentSnapshot
-                                                                  doc =
-                                                                  await FirebaseFirestore
-                                                                      .instance
-                                                                      .collection(
-                                                                          'Cashiers')
-                                                                      .doc(pin
-                                                                          .text)
-                                                                      .get();
+                                              if (snapshot.docs.isNotEmpty) {
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return Dialog(
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(20.0),
+                                                        child: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: [
+                                                            TextFieldWidget(
+                                                              showEye: true,
+                                                              isObscure: true,
+                                                              fontStyle:
+                                                                  FontStyle
+                                                                      .normal,
+                                                              hint: 'PIN Code',
+                                                              borderColor: blue,
+                                                              radius: 12,
+                                                              width: 350,
+                                                              prefixIcon:
+                                                                  Icons.lock,
+                                                              isRequred: false,
+                                                              controller: pin,
+                                                              label: 'PIN Code',
+                                                            ),
+                                                            const SizedBox(
+                                                              height: 20,
+                                                            ),
+                                                            ButtonWidget(
+                                                              label: 'Confirm',
+                                                              onPressed:
+                                                                  () async {
+                                                                Navigator.pop(
+                                                                    context);
 
-                                                              if (doc.exists) {
-                                                                reloadPointsDialog(
-                                                                    doc['name']);
-                                                              } else {
-                                                                showToast(
-                                                                    'PIN Code does not exist!');
-                                                              }
-                                                            },
-                                                          )
-                                                        ],
+                                                                DocumentSnapshot
+                                                                    doc =
+                                                                    await FirebaseFirestore
+                                                                        .instance
+                                                                        .collection(
+                                                                            'Cashiers')
+                                                                        .doc(pin
+                                                                            .text)
+                                                                        .get();
+
+                                                                if (doc
+                                                                    .exists) {
+                                                                  reloadPointsDialog(
+                                                                      doc['name']);
+                                                                } else {
+                                                                  showToast(
+                                                                      'PIN Code does not exist!');
+                                                                }
+                                                              },
+                                                            )
+                                                          ],
+                                                        ),
                                                       ),
-                                                    ),
-                                                  );
-                                                },
-                                              );
+                                                    );
+                                                  },
+                                                );
+                                              } else {
+                                                showToast(
+                                                    'Please register your authorized user account');
+                                              }
                                             },
                                           ),
                                         ],

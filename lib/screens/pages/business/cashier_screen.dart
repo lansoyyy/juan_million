@@ -18,6 +18,7 @@ class CashiersScreen extends StatefulWidget {
 class _CashiersScreenState extends State<CashiersScreen> {
   final name = TextEditingController();
   final pin = TextEditingController();
+  final position = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,14 +35,28 @@ class _CashiersScreenState extends State<CashiersScreen> {
                     children: [
                       TextFieldWidget(
                         fontStyle: FontStyle.normal,
-                        hint: 'Cashier Name',
+                        hint: 'Name',
                         borderColor: blue,
                         radius: 12,
                         width: 350,
                         prefixIcon: Icons.person_3_outlined,
                         isRequred: false,
                         controller: name,
-                        label: 'Cashier Name',
+                        label: 'Name',
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextFieldWidget(
+                        fontStyle: FontStyle.normal,
+                        hint: 'Position',
+                        borderColor: blue,
+                        radius: 12,
+                        width: 350,
+                        prefixIcon: Icons.person_3_outlined,
+                        isRequred: false,
+                        controller: position,
+                        label: 'Position',
                       ),
                       const SizedBox(
                         height: 10,
@@ -67,7 +82,7 @@ class _CashiersScreenState extends State<CashiersScreen> {
                       ButtonWidget(
                         label: 'Create',
                         onPressed: () {
-                          addCashier(name.text, pin.text);
+                          addCashier(name.text, pin.text, position.text);
                           Navigator.pop(context);
                         },
                       )
@@ -102,7 +117,7 @@ class _CashiersScreenState extends State<CashiersScreen> {
                       )),
                 ),
                 TextWidget(
-                  text: 'Cashiers',
+                  text: 'Account Users',
                   fontSize: 18,
                 ),
                 const SizedBox(
@@ -146,10 +161,20 @@ class _CashiersScreenState extends State<CashiersScreen> {
                               color: blue,
                               size: 50,
                             ),
-                            title: TextWidget(
-                              text: data.docs[index]['name'],
-                              fontSize: 18,
-                              fontFamily: 'Bold',
+                            title: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                TextWidget(
+                                  text: data.docs[index]['name'],
+                                  fontSize: 18,
+                                  fontFamily: 'Bold',
+                                ),
+                                TextWidget(
+                                  text: data.docs[index]['position'],
+                                  fontSize: 12,
+                                  fontFamily: 'Bold',
+                                ),
+                              ],
                             ),
                             trailing: IconButton(
                               onPressed: () async {

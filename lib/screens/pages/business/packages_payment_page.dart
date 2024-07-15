@@ -115,7 +115,7 @@ class _PackagesPaymentPageState extends State<PackagesPaymentPage> {
                             children: [
                               TextWidget(
                                 text:
-                                    'Handover your payment to the coordinator. The coordinator will process your registration',
+                                    'To activate complete your payment to the Area Coordinator',
                                 fontSize: 14,
                                 maxLines: 3,
                               ),
@@ -124,7 +124,7 @@ class _PackagesPaymentPageState extends State<PackagesPaymentPage> {
                               ),
                               ButtonWidget(
                                 width: 225,
-                                label: 'I understand',
+                                label: 'Continue',
                                 onPressed: () async {
                                   await FirebaseFirestore.instance
                                       .collection('Business')
