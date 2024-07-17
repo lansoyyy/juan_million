@@ -70,14 +70,14 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             TextFieldWidget(
               fontStyle: FontStyle.normal,
-              hint: 'Email',
+              hint: 'Email/Phone Number',
               borderColor: blue,
               radius: 12,
               width: 350,
               prefixIcon: Icons.person_3_outlined,
               isRequred: false,
               controller: username,
-              label: 'Email',
+              label: 'Email/Phone Number',
             ),
             const SizedBox(
               height: 20,
@@ -338,18 +338,31 @@ class _LoginScreenState extends State<LoginScreen> {
   login(context) async {
     try {
       final user = await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: username.text, password: password.text);
+          email: isPhoneNumber(username.text)
+              ? '${username.text}@gmail.com'
+              : username.text,
+          password: password.text);
 
       if (widget.inCustomer) {
-        if (user.user!.emailVerified) {
+        if (!isPhoneNumber(username.text)) {
+          if (user.user!.emailVerified) {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                  builder: (context) => const CustomerHomeScreen()),
+              (route) {
+                return false;
+              },
+            );
+          } else {
+            showToast('Cannot proceed! Email not verified');
+          }
+        } else {
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (context) => const CustomerHomeScreen()),
             (route) {
               return false;
             },
           );
-        } else {
-          showToast('Cannot proceed! Email not verified');
         }
       } else {
         var document =
@@ -468,5 +481,17 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (e) {
       print(e);
     }
+  }
+
+  bool isPhoneNumber(String input) {
+    // Define a regex pattern that matches Philippine phone number formats
+    RegExp phoneRegex = RegExp(
+      r'^(09|\+639)\d{9}$',
+      caseSensitive: false,
+      multiLine: false,
+    );
+
+    // Use RegExp's hasMatch method to check if the input matches the pattern
+    return phoneRegex.hasMatch(input);
   }
 }
