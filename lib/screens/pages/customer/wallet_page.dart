@@ -114,7 +114,7 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
                                               Icons.person,
                                             ),
                                             title: TextWidget(
-                                              text: 'From member',
+                                              text: 'To member',
                                               fontSize: 14,
                                               fontFamily: 'Bold',
                                             ),
@@ -132,7 +132,7 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
                                               Icons.business,
                                             ),
                                             title: TextWidget(
-                                              text: 'From affiliate',
+                                              text: 'To affiliate',
                                               fontSize: 14,
                                               fontFamily: 'Bold',
                                             ),
@@ -216,9 +216,6 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
                         StreamBuilder<QuerySnapshot>(
                             stream: FirebaseFirestore.instance
                                 .collection('Wallets')
-                                .where('uid',
-                                    isEqualTo:
-                                        FirebaseAuth.instance.currentUser!.uid)
                                 .snapshots(),
                             builder: (BuildContext context,
                                 AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -243,54 +240,63 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
                                 child: ListView.builder(
                                   itemCount: data.docs.length,
                                   itemBuilder: (context, index) {
-                                    return Padding(
-                                      padding: const EdgeInsets.all(5.0),
-                                      child: ListTile(
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            15,
-                                          ),
-                                        ),
-                                        tileColor: Colors.white,
-                                        leading: Icon(
-                                          Icons.volunteer_activism_outlined,
-                                          color: secondary,
-                                          size: 32,
-                                        ),
-                                        title: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            TextWidget(
-                                              text: DateFormat.yMMMd()
-                                                  .add_jm()
-                                                  .format(data.docs[index]
-                                                          ['dateTime']
-                                                      .toDate()),
-                                              fontSize: 11,
-                                              color: Colors.grey,
-                                              fontFamily: 'Medium',
+                                    return data.docs[index]['uid'] ==
+                                                FirebaseAuth.instance
+                                                    .currentUser!.uid ||
+                                            data.docs[index]['from'] ==
+                                                FirebaseAuth
+                                                    .instance.currentUser!.uid
+                                        ? Padding(
+                                            padding: const EdgeInsets.all(5.0),
+                                            child: ListTile(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                  15,
+                                                ),
+                                              ),
+                                              tileColor: Colors.white,
+                                              leading: Icon(
+                                                Icons
+                                                    .volunteer_activism_outlined,
+                                                color: secondary,
+                                                size: 32,
+                                              ),
+                                              title: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  TextWidget(
+                                                    text: DateFormat.yMMMd()
+                                                        .add_jm()
+                                                        .format(data.docs[index]
+                                                                ['dateTime']
+                                                            .toDate()),
+                                                    fontSize: 11,
+                                                    color: Colors.grey,
+                                                    fontFamily: 'Medium',
+                                                  ),
+                                                  TextWidget(
+                                                    text:
+                                                        '${data.docs[index]['pts']}',
+                                                    fontSize: 16,
+                                                    color: Colors.black,
+                                                    fontFamily: 'Medium',
+                                                  ),
+                                                  TextWidget(
+                                                    text:
+                                                        '${data.docs[index]['type']}',
+                                                    fontSize: 12,
+                                                    color: Colors.black,
+                                                    fontFamily: 'Medium',
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                            TextWidget(
-                                              text:
-                                                  '${data.docs[index]['pts']}',
-                                              fontSize: 16,
-                                              color: Colors.black,
-                                              fontFamily: 'Medium',
-                                            ),
-                                            TextWidget(
-                                              text:
-                                                  '${data.docs[index]['type']}',
-                                              fontSize: 12,
-                                              color: Colors.black,
-                                              fontFamily: 'Medium',
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
+                                          )
+                                        : const SizedBox();
                                   },
                                 ),
                               );
@@ -385,40 +391,44 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
 
       if (qrCode != '-1') {
         await FirebaseFirestore.instance
-            .collection(selected)
-            .doc(qrCode)
+            .collection('Users')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
             .get()
             .then((DocumentSnapshot documentSnapshot) async {
-          if (documentSnapshot['wallet'] > int.parse(pts.text)) {
+          if (documentSnapshot['wallet'] >= int.parse(pts.text)) {
             await FirebaseFirestore.instance
                 .collection('Users')
                 .doc(FirebaseAuth.instance.currentUser!.uid)
                 .update({
-              'wallet': FieldValue.increment(int.parse(pts.text)),
+              'wallet': FieldValue.increment(-int.parse(pts.text)),
             });
             await FirebaseFirestore.instance
                 .collection(selected)
                 .doc(qrCode)
                 .update({
-              'wallet': FieldValue.increment(-int.parse(pts.text)),
-            });
+              'wallet': FieldValue.increment(int.parse(pts.text)),
+            }).whenComplete(
+              () {
+                addWallet(
+                    int.parse(pts.text),
+                    qrCode,
+                    FirebaseAuth.instance.currentUser!.uid,
+                    'Receive & Transfers');
+                Navigator.of(context).pop();
+
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => QRScannedPage(
+                          fromWallet: true,
+                          inuser: true,
+                          pts: pts.text,
+                          store: FirebaseAuth.instance.currentUser!.uid,
+                        )));
+              },
+            );
           } else {
+            Navigator.pop(context);
             showToast('Wallet balance for this user is not enough!');
           }
-        }).whenComplete(() {
-          // Add transaction
-
-          addWallet(int.parse(pts.text), qrCode,
-              FirebaseAuth.instance.currentUser!.uid, 'Receive & Transfers');
-          Navigator.of(context).pop();
-
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => QRScannedPage(
-                    fromWallet: true,
-                    inuser: true,
-                    pts: pts.text,
-                    store: FirebaseAuth.instance.currentUser!.uid,
-                  )));
         });
       } else {
         Navigator.pop(context);
