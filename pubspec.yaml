@@ -47,6 +47,7 @@ dependencies:
   paymongo_sdk:
   image_picker:
   google_sign_in:
+  local_auth:
 
 dev_dependencies:
   flutter_test:

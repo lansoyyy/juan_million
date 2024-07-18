@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:juan_million/screens/auth/customer_signup_screen.dart';
 import 'package:juan_million/screens/auth/signup_screen.dart';
@@ -14,6 +15,7 @@ import 'package:juan_million/widgets/text_widget.dart';
 import 'package:juan_million/widgets/textfield_widget.dart';
 import 'package:juan_million/widgets/toast_widget.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:local_auth/local_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   bool inCustomer;
@@ -28,6 +30,30 @@ class _LoginScreenState extends State<LoginScreen> {
   final username = TextEditingController();
 
   final password = TextEditingController();
+
+  late final LocalAuthentication auth;
+  bool _supportState = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    auth = LocalAuthentication();
+    auth.isDeviceSupported().then(
+      (value) {
+        setState(() {
+          _supportState = value;
+        });
+
+        if (value) {
+          showToast('This device supports biometrics.');
+        } else {
+          showToast("This device doesn't supports biometrics!");
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -216,13 +242,35 @@ class _LoginScreenState extends State<LoginScreen> {
               width: 350,
               label: 'Log in',
               onPressed: () async {
-                var document = FirebaseFirestore.instance.doc('App/versions');
-                var snapshot = await document.get();
+                if (_supportState) {
+                  try {
+                    final bool didAuthenticate = await auth.authenticate(
+                        options: const AuthenticationOptions(
+                          biometricOnly: true,
+                        ),
+                        localizedReason: 'Please authenticate to proceed!');
 
-                if (snapshot.data()!['version'] == version) {
-                  login(context);
+                    if (didAuthenticate) {
+                      var document =
+                          FirebaseFirestore.instance.doc('App/versions');
+                      var snapshot = await document.get();
+
+                      if (snapshot.data()!['version'] == version) {
+                        login(context);
+                      } else {
+                        showToast(
+                            'Cannot Proceed! Your app version is outdated!');
+                      }
+                    } else {
+                      showToast('Invalid biometrics!');
+                    }
+                    // ···
+                  } on PlatformException {
+                    showToast('Something went wrong!');
+                    // ...
+                  }
                 } else {
-                  showToast('Cannot Proceed! Your app version is outdated!');
+                  showToast("This device doesn't supports biometrics!");
                 }
               },
             ),
@@ -258,8 +306,28 @@ class _LoginScreenState extends State<LoginScreen> {
               height: 10,
             ),
             GestureDetector(
-              onTap: () {
-                googleLogin();
+              onTap: () async {
+                if (_supportState) {
+                  try {
+                    final bool didAuthenticate = await auth.authenticate(
+                        options: const AuthenticationOptions(
+                          biometricOnly: true,
+                        ),
+                        localizedReason: 'Please authenticate to proceed!');
+
+                    if (didAuthenticate) {
+                      googleLogin();
+                    } else {
+                      showToast('Invalid biometrics!');
+                    }
+                    // ···
+                  } on PlatformException {
+                    showToast('Something went wrong!');
+                    // ...
+                  }
+                } else {
+                  showToast("This device doesn't supports biometrics!");
+                }
               },
               child: Container(
                 width: 325,
