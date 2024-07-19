@@ -31,27 +31,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final password = TextEditingController();
 
-  late final LocalAuthentication auth;
-  bool _supportState = false;
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    auth = LocalAuthentication();
-    auth.isDeviceSupported().then(
-      (value) {
-        setState(() {
-          _supportState = value;
-        });
-
-        if (value) {
-          showToast('This device supports biometrics.');
-        } else {
-          showToast("This device doesn't supports biometrics!");
-        }
-      },
-    );
   }
 
   @override
@@ -242,35 +225,13 @@ class _LoginScreenState extends State<LoginScreen> {
               width: 350,
               label: 'Log in',
               onPressed: () async {
-                if (_supportState) {
-                  try {
-                    final bool didAuthenticate = await auth.authenticate(
-                        options: const AuthenticationOptions(
-                          biometricOnly: true,
-                        ),
-                        localizedReason: 'Please authenticate to proceed!');
+                var document = FirebaseFirestore.instance.doc('App/versions');
+                var snapshot = await document.get();
 
-                    if (didAuthenticate) {
-                      var document =
-                          FirebaseFirestore.instance.doc('App/versions');
-                      var snapshot = await document.get();
-
-                      if (snapshot.data()!['version'] == version) {
-                        login(context);
-                      } else {
-                        showToast(
-                            'Cannot Proceed! Your app version is outdated!');
-                      }
-                    } else {
-                      showToast('Invalid biometrics!');
-                    }
-                    // ···
-                  } on PlatformException {
-                    showToast('Something went wrong!');
-                    // ...
-                  }
+                if (snapshot.data()!['version'] == version) {
+                  login(context);
                 } else {
-                  showToast("This device doesn't supports biometrics!");
+                  showToast('Cannot Proceed! Your app version is outdated!');
                 }
               },
             ),
@@ -307,27 +268,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             GestureDetector(
               onTap: () async {
-                if (_supportState) {
-                  try {
-                    final bool didAuthenticate = await auth.authenticate(
-                        options: const AuthenticationOptions(
-                          biometricOnly: true,
-                        ),
-                        localizedReason: 'Please authenticate to proceed!');
-
-                    if (didAuthenticate) {
-                      googleLogin();
-                    } else {
-                      showToast('Invalid biometrics!');
-                    }
-                    // ···
-                  } on PlatformException {
-                    showToast('Something went wrong!');
-                    // ...
-                  }
-                } else {
-                  showToast("This device doesn't supports biometrics!");
-                }
+                googleLogin();
               },
               child: Container(
                 width: 325,
