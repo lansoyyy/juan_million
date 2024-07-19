@@ -94,57 +94,70 @@ class _WalletPageState extends State<WalletPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           GestureDetector(
-                            onTap: () {
-                              showModalBottomSheet(
-                                context: context,
-                                builder: (context) {
-                                  return SizedBox(
-                                    height: 150,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(10.0),
-                                      child: Column(
-                                        children: [
-                                          ListTile(
-                                            onTap: () {
-                                              setState(() {
-                                                selected = 'Users';
-                                              });
-                                              Navigator.pop(context);
-                                              showAmountDialog();
-                                            },
-                                            leading: const Icon(
-                                              Icons.person,
+                            onTap: () async {
+                              QuerySnapshot snapshot = await FirebaseFirestore
+                                  .instance
+                                  .collection('Cashiers')
+                                  .where('uid',
+                                      isEqualTo: FirebaseAuth
+                                          .instance.currentUser!.uid)
+                                  .get();
+
+                              if (snapshot.docs.isNotEmpty) {
+                                showModalBottomSheet(
+                                  context: context,
+                                  builder: (context) {
+                                    return SizedBox(
+                                      height: 150,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: Column(
+                                          children: [
+                                            ListTile(
+                                              onTap: () {
+                                                setState(() {
+                                                  selected = 'Users';
+                                                });
+                                                Navigator.pop(context);
+                                                showAmountDialog();
+                                              },
+                                              leading: const Icon(
+                                                Icons.person,
+                                              ),
+                                              title: TextWidget(
+                                                text: 'From member',
+                                                fontSize: 14,
+                                                fontFamily: 'Bold',
+                                              ),
                                             ),
-                                            title: TextWidget(
-                                              text: 'From member',
-                                              fontSize: 14,
-                                              fontFamily: 'Bold',
+                                            const Divider(),
+                                            ListTile(
+                                              onTap: () {
+                                                setState(() {
+                                                  selected = 'Business';
+                                                });
+                                                Navigator.pop(context);
+                                                showAmountDialog();
+                                              },
+                                              leading: const Icon(
+                                                Icons.business,
+                                              ),
+                                              title: TextWidget(
+                                                text: 'From affiliate',
+                                                fontSize: 14,
+                                                fontFamily: 'Bold',
+                                              ),
                                             ),
-                                          ),
-                                          const Divider(),
-                                          ListTile(
-                                            onTap: () {
-                                              setState(() {
-                                                selected = 'Business';
-                                              });
-                                              Navigator.pop(context);
-                                              showAmountDialog();
-                                            },
-                                            leading: const Icon(
-                                              Icons.business,
-                                            ),
-                                            title: TextWidget(
-                                              text: 'From affiliate',
-                                              fontSize: 14,
-                                              fontFamily: 'Bold',
-                                            ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                },
-                              );
+                                    );
+                                  },
+                                );
+                              } else {
+                                showToast(
+                                    'Please register your authorized user account');
+                              }
                             },
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -171,63 +184,77 @@ class _WalletPageState extends State<WalletPage> {
                             ),
                           ),
                           GestureDetector(
-                            onTap: () {
+                            onTap: () async {
                               // Navigator.of(context).push(MaterialPageRoute(
                               //     builder: (context) => StorePage(
                               //           inbusiness: true,
                               //         )));
 
-                              showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return Dialog(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(20.0),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          TextFieldWidget(
-                                            showEye: true,
-                                            isObscure: true,
-                                            fontStyle: FontStyle.normal,
-                                            hint: 'PIN Code',
-                                            borderColor: blue,
-                                            radius: 12,
-                                            width: 350,
-                                            prefixIcon: Icons.lock,
-                                            isRequred: false,
-                                            controller: pin,
-                                            label: 'PIN Code',
-                                          ),
-                                          const SizedBox(
-                                            height: 20,
-                                          ),
-                                          ButtonWidget(
-                                            label: 'Confirm',
-                                            onPressed: () async {
-                                              Navigator.pop(context);
+                              QuerySnapshot snapshot = await FirebaseFirestore
+                                  .instance
+                                  .collection('Cashiers')
+                                  .where('uid',
+                                      isEqualTo: FirebaseAuth
+                                          .instance.currentUser!.uid)
+                                  .get();
 
-                                              DocumentSnapshot doc =
-                                                  await FirebaseFirestore
-                                                      .instance
-                                                      .collection('Cashiers')
-                                                      .doc(pin.text)
-                                                      .get();
+                              if (snapshot.docs.isNotEmpty) {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return Dialog(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(20.0),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            TextFieldWidget(
+                                              showEye: true,
+                                              isObscure: true,
+                                              fontStyle: FontStyle.normal,
+                                              hint: 'PIN Code',
+                                              borderColor: blue,
+                                              radius: 12,
+                                              width: 350,
+                                              prefixIcon: Icons.lock,
+                                              isRequred: false,
+                                              controller: pin,
+                                              label: 'PIN Code',
+                                            ),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            ButtonWidget(
+                                              label: 'Confirm',
+                                              onPressed: () async {
+                                                Navigator.pop(context);
 
-                                              if (doc.exists) {
-                                                reloadPointsDialog(doc['name']);
-                                              } else {
-                                                showToast(
-                                                    'PIN Code does not exist!');
-                                              }
-                                            },
-                                          )
-                                        ],
+                                                DocumentSnapshot doc =
+                                                    await FirebaseFirestore
+                                                        .instance
+                                                        .collection('Cashiers')
+                                                        .doc(pin.text)
+                                                        .get();
+
+                                                if (doc.exists) {
+                                                  reloadPointsDialog(
+                                                      doc['name']);
+                                                } else {
+                                                  showToast(
+                                                      'PIN Code does not exist!');
+                                                }
+                                              },
+                                            )
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                },
-                              );
+                                    );
+                                  },
+                                );
+                              } else {
+                                showToast(
+                                    'Please register your authorized user account');
+                              }
                             },
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
