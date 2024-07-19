@@ -51,11 +51,14 @@ class _CustomerSettingsPageState extends State<CustomerSettingsPage> {
             }
             dynamic data = snapshot.data;
 
+            String isNumber = data['email'].toString().split('@')[0];
+
             fname.text = data['name'].toString().split(' ')[0];
             lname.text = data['name'].toString().split(' ')[1];
-            number.text = data['phone'];
-            email.text = data['email'];
+            number.text = isPhoneNumber(isNumber) ? isNumber : '';
+            email.text = isPhoneNumber(isNumber) ? '' : data['email'];
             password.text = '*******';
+
             return SafeArea(
               child: SingleChildScrollView(
                 child: Column(
@@ -446,5 +449,17 @@ class _CustomerSettingsPageState extends State<CustomerSettingsPage> {
         print(err);
       }
     }
+  }
+
+  bool isPhoneNumber(String input) {
+    // Define a regex pattern that matches Philippine phone number formats
+    RegExp phoneRegex = RegExp(
+      r'^(09|\+639)\d{9}$',
+      caseSensitive: false,
+      multiLine: false,
+    );
+
+    // Use RegExp's hasMatch method to check if the input matches the pattern
+    return phoneRegex.hasMatch(input);
   }
 }
