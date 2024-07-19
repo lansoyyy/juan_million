@@ -396,35 +396,72 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
             .get()
             .then((DocumentSnapshot documentSnapshot) async {
           if (documentSnapshot['wallet'] >= int.parse(pts.text)) {
-            await FirebaseFirestore.instance
+            DocumentSnapshot doc1 = await FirebaseFirestore.instance
                 .collection('Users')
-                .doc(FirebaseAuth.instance.currentUser!.uid)
-                .update({
-              'wallet': FieldValue.increment(-int.parse(pts.text)),
-            });
-            await FirebaseFirestore.instance
-                .collection(selected)
                 .doc(qrCode)
-                .update({
-              'wallet': FieldValue.increment(int.parse(pts.text)),
-            }).whenComplete(
-              () {
-                addWallet(
-                    int.parse(pts.text),
-                    qrCode,
-                    FirebaseAuth.instance.currentUser!.uid,
-                    'Receive & Transfers');
-                Navigator.of(context).pop();
+                .get();
 
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => QRScannedPage(
-                          fromWallet: true,
-                          inuser: true,
-                          pts: pts.text,
-                          store: FirebaseAuth.instance.currentUser!.uid,
-                        )));
-              },
-            );
+            if (doc1.exists) {
+              await FirebaseFirestore.instance
+                  .collection('Users')
+                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                  .update({
+                'pts': FieldValue.increment(-int.parse(pts.text)),
+              });
+              await FirebaseFirestore.instance
+                  .collection(selected)
+                  .doc(qrCode)
+                  .update({
+                'pts': FieldValue.increment(int.parse(pts.text)),
+              }).whenComplete(
+                () {
+                  addWallet(
+                      int.parse(pts.text),
+                      qrCode,
+                      FirebaseAuth.instance.currentUser!.uid,
+                      'Receive & Transfers');
+                  Navigator.of(context).pop();
+
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => QRScannedPage(
+                            fromWallet: true,
+                            inuser: true,
+                            pts: pts.text,
+                            store: FirebaseAuth.instance.currentUser!.uid,
+                          )));
+                },
+              );
+            } else {
+              await FirebaseFirestore.instance
+                  .collection('Users')
+                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                  .update({
+                'wallet': FieldValue.increment(-int.parse(pts.text)),
+              });
+              await FirebaseFirestore.instance
+                  .collection(selected)
+                  .doc(qrCode)
+                  .update({
+                'wallet': FieldValue.increment(int.parse(pts.text)),
+              }).whenComplete(
+                () {
+                  addWallet(
+                      int.parse(pts.text),
+                      qrCode,
+                      FirebaseAuth.instance.currentUser!.uid,
+                      'Receive & Transfers');
+                  Navigator.of(context).pop();
+
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => QRScannedPage(
+                            fromWallet: true,
+                            inuser: true,
+                            pts: pts.text,
+                            store: FirebaseAuth.instance.currentUser!.uid,
+                          )));
+                },
+              );
+            }
           } else {
             Navigator.pop(context);
             showToast('Wallet balance for this user is not enough!');
