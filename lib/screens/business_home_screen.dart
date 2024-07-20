@@ -257,50 +257,9 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                               ),
                               IconButton(
                                 onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return Dialog(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(20.0),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              const SizedBox(
-                                                height: 10,
-                                              ),
-                                              TextFieldWidget(
-                                                showEye: true,
-                                                isObscure: true,
-                                                fontStyle: FontStyle.normal,
-                                                hint: 'Enter Password',
-                                                borderColor: blue,
-                                                radius: 12,
-                                                width: 350,
-                                                height: 75,
-                                                prefixIcon: Icons.lock,
-                                                isRequred: false,
-                                                controller: password,
-                                                label: 'Enter Password',
-                                              ),
-                                              const SizedBox(
-                                                height: 20,
-                                              ),
-                                              ButtonWidget(
-                                                label: 'Continue',
-                                                onPressed: () {
-                                                  reauthenticateUser(
-                                                      mydata['email'],
-                                                      password.text);
-                                                  Navigator.pop(context);
-                                                },
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  );
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          const SettingsPage()));
                                 },
                                 icon: const Icon(
                                   Icons.settings,

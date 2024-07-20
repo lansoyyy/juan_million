@@ -23,8 +23,32 @@ class _SettingsPageState extends State<SettingsPage> {
   final email = TextEditingController();
 
   final password = TextEditingController();
+  final newpassword = TextEditingController();
 
   final pts = TextEditingController();
+
+  Future<void> reauthenticateUser(
+      String email, String password, dynamic data) async {
+    User user = FirebaseAuth.instance.currentUser!;
+    AuthCredential credential =
+        EmailAuthProvider.credential(email: email, password: password);
+
+    try {
+      await user.reauthenticateWithCredential(credential);
+      await FirebaseFirestore.instance
+          .collection('Business')
+          .doc(data.id)
+          .update({
+        'name': name.text,
+        // 'ptsconversion': double.parse(pts.text),
+      });
+      showToast('Business information updated!');
+    } on FirebaseAuthException catch (e) {
+      showToast('Unauthorized to access this feature!');
+      print("Error: ${e.message}");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final Stream<DocumentSnapshot> userData = FirebaseFirestore.instance
@@ -155,14 +179,49 @@ class _SettingsPageState extends State<SettingsPage> {
                         width: 350,
                         label: 'Save',
                         onPressed: () async {
-                          await FirebaseFirestore.instance
-                              .collection('Business')
-                              .doc(data.id)
-                              .update({
-                            'name': name.text,
-                            // 'ptsconversion': double.parse(pts.text),
-                          });
-                          showToast('Business information updated!');
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return Dialog(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(20.0),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      TextFieldWidget(
+                                        showEye: true,
+                                        isObscure: true,
+                                        fontStyle: FontStyle.normal,
+                                        hint: 'Enter Password',
+                                        borderColor: blue,
+                                        radius: 12,
+                                        width: 350,
+                                        height: 75,
+                                        prefixIcon: Icons.lock,
+                                        isRequred: false,
+                                        controller: newpassword,
+                                        label: 'Enter Password',
+                                      ),
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      ButtonWidget(
+                                        label: 'Continue',
+                                        onPressed: () {
+                                          reauthenticateUser(data['email'],
+                                              newpassword.text, data);
+                                          Navigator.pop(context);
+                                        },
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          );
                         },
                       ),
                     ),
