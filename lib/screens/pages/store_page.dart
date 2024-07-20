@@ -71,6 +71,7 @@ class _StorePageState extends State<StorePage> {
                   StreamBuilder<QuerySnapshot>(
                       stream: FirebaseFirestore.instance
                           .collection('Boosters')
+                          .where('price', isNotEqualTo: 20)
                           .snapshots(),
                       builder: (BuildContext context,
                           AsyncSnapshot<QuerySnapshot> snapshot) {

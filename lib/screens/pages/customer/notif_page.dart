@@ -83,6 +83,7 @@ class CustomerNotifPage extends StatelessWidget {
                           child: ListView.builder(
                             itemCount: data.docs.length,
                             itemBuilder: (context, index) {
+                              double points = data.docs[index]['pts'];
                               return Padding(
                                 padding: const EdgeInsets.all(5.0),
                                 child: Card(
@@ -110,7 +111,7 @@ class CustomerNotifPage extends StatelessWidget {
                                         ),
                                         TextWidget(
                                           text:
-                                              'Bought ${data.docs[index]['pts'].round()} points',
+                                              'Bought ${points.round().toStringAsFixed(0)} points',
                                           fontSize: 16,
                                           color: Colors.black,
                                           fontFamily: 'Medium',

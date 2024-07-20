@@ -225,11 +225,13 @@ class _CustomerPointsPageState extends State<CustomerPointsPage> {
                               }
 
                               final data = snapshot.requireData;
+
                               return SizedBox(
                                 height: 375,
                                 child: ListView.builder(
                                   itemCount: data.docs.length,
                                   itemBuilder: (context, index) {
+                                    double points = data.docs[index]['pts'];
                                     return Padding(
                                       padding: const EdgeInsets.all(5.0),
                                       child: ListTile(
@@ -262,7 +264,7 @@ class _CustomerPointsPageState extends State<CustomerPointsPage> {
                                             ),
                                             TextWidget(
                                               text:
-                                                  '${data.docs[index]['pts']} points',
+                                                  '${points.toStringAsFixed(0)} points',
                                               fontSize: 16,
                                               color: Colors.black,
                                               fontFamily: 'Medium',
