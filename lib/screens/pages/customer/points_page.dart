@@ -1,19 +1,36 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:intl/intl.dart';
+import 'package:juan_million/screens/pages/customer/qr_scanned_page.dart';
+import 'package:juan_million/screens/pages/store_page.dart';
+import 'package:juan_million/services/add_points.dart';
+import 'package:juan_million/services/add_wallet.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
+import 'package:juan_million/widgets/textfield_widget.dart';
+import 'package:juan_million/widgets/toast_widget.dart';
 
-class CustomerPointsPage extends StatelessWidget {
+class CustomerPointsPage extends StatefulWidget {
   const CustomerPointsPage({super.key});
 
+  @override
+  State<CustomerPointsPage> createState() => _CustomerPointsPageState();
+}
+
+class _CustomerPointsPageState extends State<CustomerPointsPage> {
+  final pts = TextEditingController();
+
+  String selected = '';
   @override
   Widget build(BuildContext context) {
     final Stream<DocumentSnapshot> userData = FirebaseFirestore.instance
         .collection('Users')
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .snapshots();
+
     return Scaffold(
       backgroundColor: blue,
       body: StreamBuilder<DocumentSnapshot>(
@@ -67,6 +84,105 @@ class CustomerPointsPage extends StatelessWidget {
                       ),
                     ],
                   ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20, right: 20),
+                    child: Container(
+                      width: double.infinity,
+                      height: 75,
+                      decoration: BoxDecoration(
+                        color: Colors.white54,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              showModalBottomSheet(
+                                context: context,
+                                builder: (context) {
+                                  return SizedBox(
+                                    height: 100,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(10.0),
+                                      child: Column(
+                                        children: [
+                                          ListTile(
+                                            onTap: () {
+                                              setState(() {
+                                                selected = 'Users';
+                                              });
+                                              Navigator.pop(context);
+                                              showAmountDialog();
+                                            },
+                                            leading: const Icon(
+                                              Icons.person,
+                                            ),
+                                            title: TextWidget(
+                                              text: 'To member',
+                                              fontSize: 14,
+                                              fontFamily: 'Bold',
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.sync_alt,
+                                  color: Colors.white,
+                                  size: 30,
+                                ),
+                                TextWidget(
+                                  text: 'Transfer',
+                                  fontSize: 12,
+                                  color: Colors.white,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.only(top: 10, bottom: 10),
+                            child: VerticalDivider(
+                              color: Colors.white,
+                              thickness: 0.5,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => StorePage(
+                                        inbusiness: false,
+                                      )));
+                            },
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.wallet,
+                                  color: Colors.white,
+                                  size: 30,
+                                ),
+                                TextWidget(
+                                  text: 'Top up',
+                                  fontSize: 12,
+                                  color: Colors.white,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                   const SizedBox(
                     height: 20,
                   ),
@@ -110,7 +226,7 @@ class CustomerPointsPage extends StatelessWidget {
 
                               final data = snapshot.requireData;
                               return SizedBox(
-                                height: 400,
+                                height: 375,
                                 child: ListView.builder(
                                   itemCount: data.docs.length,
                                   itemBuilder: (context, index) {
@@ -174,5 +290,169 @@ class CustomerPointsPage extends StatelessWidget {
             );
           }),
     );
+  }
+
+  showAmountDialog() {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: const Text(
+                'Enter amount',
+                style: TextStyle(
+                    fontFamily: 'Bold',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFieldWidget(
+                    prefixIcon: null,
+                    inputType: TextInputType.number,
+                    controller: pts,
+                    label: 'Amount',
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                MaterialButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text(
+                    'Close',
+                    style: TextStyle(
+                        fontFamily: 'QRegular', fontWeight: FontWeight.bold),
+                  ),
+                ),
+                MaterialButton(
+                  onPressed: () async {
+                    scanQRCode();
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text(
+                    'Continue',
+                    style: TextStyle(
+                        fontFamily: 'QRegular', fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ));
+  }
+
+  String qrCode = 'Unknown';
+
+  Future<void> scanQRCode() async {
+    try {
+      final qrCode = await FlutterBarcodeScanner.scanBarcode(
+        '#ff6666',
+        'Cancel',
+        true,
+        ScanMode.QR,
+      );
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return const AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+              ],
+            ),
+          );
+        },
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        this.qrCode = qrCode;
+      });
+
+      if (qrCode != '-1') {
+        await FirebaseFirestore.instance
+            .collection('Users')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .get()
+            .then((DocumentSnapshot documentSnapshot) async {
+          if (documentSnapshot['pts'] >= int.parse(pts.text)) {
+            DocumentSnapshot doc1 = await FirebaseFirestore.instance
+                .collection('Users')
+                .doc(qrCode)
+                .get();
+
+            if (doc1.exists) {
+              await FirebaseFirestore.instance
+                  .collection('Users')
+                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                  .update({
+                'pts': FieldValue.increment(-int.parse(pts.text)),
+              });
+              await FirebaseFirestore.instance
+                  .collection(selected)
+                  .doc(qrCode)
+                  .update({
+                'pts': FieldValue.increment(int.parse(pts.text)),
+              }).whenComplete(
+                () {
+                  addPoints(
+                      int.parse(pts.text),
+                      qrCode,
+                      FirebaseAuth.instance.currentUser!.uid,
+                      'Receive & Transfers');
+                  Navigator.of(context).pop();
+
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => QRScannedPage(
+                            fromWallet: true,
+                            inuser: true,
+                            pts: pts.text,
+                            store: FirebaseAuth.instance.currentUser!.uid,
+                          )));
+                },
+              );
+            } else {
+              await FirebaseFirestore.instance
+                  .collection('Users')
+                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                  .update({
+                'wallet': FieldValue.increment(-int.parse(pts.text)),
+              });
+              await FirebaseFirestore.instance
+                  .collection(selected)
+                  .doc(qrCode)
+                  .update({
+                'wallet': FieldValue.increment(int.parse(pts.text)),
+              }).whenComplete(
+                () {
+                  addPoints(
+                      int.parse(pts.text),
+                      qrCode,
+                      FirebaseAuth.instance.currentUser!.uid,
+                      'Receive & Transfers');
+                  Navigator.of(context).pop();
+
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => QRScannedPage(
+                            fromWallet: true,
+                            inuser: true,
+                            pts: pts.text,
+                            store: FirebaseAuth.instance.currentUser!.uid,
+                          )));
+                },
+              );
+            }
+          } else {
+            Navigator.pop(context);
+            showToast('Your points is not enough to proceed!');
+          }
+        });
+      } else {
+        Navigator.pop(context);
+      }
+    } on PlatformException {
+      qrCode = 'Failed to get platform version.';
+    }
   }
 }

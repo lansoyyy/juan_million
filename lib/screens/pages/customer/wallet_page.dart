@@ -97,29 +97,11 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
                                 context: context,
                                 builder: (context) {
                                   return SizedBox(
-                                    height: 150,
+                                    height: 100,
                                     child: Padding(
                                       padding: const EdgeInsets.all(10.0),
                                       child: Column(
                                         children: [
-                                          ListTile(
-                                            onTap: () {
-                                              setState(() {
-                                                selected = 'Users';
-                                              });
-                                              Navigator.pop(context);
-                                              showAmountDialog();
-                                            },
-                                            leading: const Icon(
-                                              Icons.person,
-                                            ),
-                                            title: TextWidget(
-                                              text: 'To member',
-                                              fontSize: 14,
-                                              fontFamily: 'Bold',
-                                            ),
-                                          ),
-                                          const Divider(),
                                           ListTile(
                                             onTap: () {
                                               setState(() {
@@ -395,7 +377,7 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
             .doc(FirebaseAuth.instance.currentUser!.uid)
             .get()
             .then((DocumentSnapshot documentSnapshot) async {
-          if (documentSnapshot['wallet'] >= int.parse(pts.text)) {
+          if (documentSnapshot['pts'] >= int.parse(pts.text)) {
             DocumentSnapshot doc1 = await FirebaseFirestore.instance
                 .collection('Users')
                 .doc(qrCode)
@@ -464,7 +446,7 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
             }
           } else {
             Navigator.pop(context);
-            showToast('Wallet balance for this user is not enough!');
+            showToast('Your points is not enough to proceed!');
           }
         });
       } else {
