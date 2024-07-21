@@ -371,7 +371,7 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
         .get()
         .then((snapshot) async {
       int currentSlots = snapshot.docs.length;
-      int slotsLeft = 10 - currentSlots;
+      int slotsLeft = 5 - currentSlots;
 
       if (slotsLeft >= widget.item['slots'].round() * qty) {
         if (data['wallet'] >=

@@ -224,7 +224,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                                   fontFamily: 'Bold',
                                 ),
                                 TextWidget(
-                                  text: '${data.docs.length}/10 slots per day',
+                                  text: '${data.docs.length}/5 slots per day',
                                   fontSize: 14,
                                   color: Colors.white,
                                   fontFamily: 'Regular',

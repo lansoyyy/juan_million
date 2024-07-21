@@ -143,7 +143,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
           int slotsFromPoints = documentSnapshot['pts'].toInt() ~/ limit;
           int currentSlots = snapshot.docs.length;
-          int slotsLeft = 10 - currentSlots;
+          int slotsLeft = 5 - currentSlots;
 
           if (slotsLeft > 0) {
             print('slot here called');
