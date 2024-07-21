@@ -401,7 +401,8 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
                       int.parse(pts.text),
                       qrCode,
                       FirebaseAuth.instance.currentUser!.uid,
-                      'Receive & Transfers');
+                      'Receive & Transfers',
+                      '');
                   Navigator.of(context).pop();
 
                   Navigator.of(context).push(MaterialPageRoute(
@@ -431,7 +432,8 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
                       int.parse(pts.text),
                       qrCode,
                       FirebaseAuth.instance.currentUser!.uid,
-                      'Receive & Transfers');
+                      'Receive & Transfers',
+                      '');
                   Navigator.of(context).pop();
 
                   Navigator.of(context).push(MaterialPageRoute(

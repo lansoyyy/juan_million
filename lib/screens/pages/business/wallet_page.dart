@@ -119,7 +119,72 @@ class _WalletPageState extends State<WalletPage> {
                                                   selected = 'Users';
                                                 });
                                                 Navigator.pop(context);
-                                                showAmountDialog();
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return Dialog(
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(20.0),
+                                                        child: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: [
+                                                            TextFieldWidget(
+                                                              showEye: true,
+                                                              isObscure: true,
+                                                              fontStyle:
+                                                                  FontStyle
+                                                                      .normal,
+                                                              hint: 'PIN Code',
+                                                              borderColor: blue,
+                                                              radius: 12,
+                                                              width: 350,
+                                                              prefixIcon:
+                                                                  Icons.lock,
+                                                              isRequred: false,
+                                                              controller: pin,
+                                                              label: 'PIN Code',
+                                                            ),
+                                                            const SizedBox(
+                                                              height: 20,
+                                                            ),
+                                                            ButtonWidget(
+                                                              label: 'Confirm',
+                                                              onPressed:
+                                                                  () async {
+                                                                Navigator.pop(
+                                                                    context);
+
+                                                                DocumentSnapshot
+                                                                    doc =
+                                                                    await FirebaseFirestore
+                                                                        .instance
+                                                                        .collection(
+                                                                            'Cashiers')
+                                                                        .doc(pin
+                                                                            .text)
+                                                                        .get();
+
+                                                                if (doc
+                                                                    .exists) {
+                                                                  showAmountDialog(
+                                                                      doc['name']);
+                                                                } else {
+                                                                  showToast(
+                                                                      'PIN Code does not exist!');
+                                                                }
+
+                                                                pin.clear();
+                                                              },
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                );
                                               },
                                               leading: const Icon(
                                                 Icons.person,
@@ -137,7 +202,73 @@ class _WalletPageState extends State<WalletPage> {
                                                   selected = 'Business';
                                                 });
                                                 Navigator.pop(context);
-                                                showAmountDialog();
+
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return Dialog(
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(20.0),
+                                                        child: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: [
+                                                            TextFieldWidget(
+                                                              showEye: true,
+                                                              isObscure: true,
+                                                              fontStyle:
+                                                                  FontStyle
+                                                                      .normal,
+                                                              hint: 'PIN Code',
+                                                              borderColor: blue,
+                                                              radius: 12,
+                                                              width: 350,
+                                                              prefixIcon:
+                                                                  Icons.lock,
+                                                              isRequred: false,
+                                                              controller: pin,
+                                                              label: 'PIN Code',
+                                                            ),
+                                                            const SizedBox(
+                                                              height: 20,
+                                                            ),
+                                                            ButtonWidget(
+                                                              label: 'Confirm',
+                                                              onPressed:
+                                                                  () async {
+                                                                Navigator.pop(
+                                                                    context);
+
+                                                                DocumentSnapshot
+                                                                    doc =
+                                                                    await FirebaseFirestore
+                                                                        .instance
+                                                                        .collection(
+                                                                            'Cashiers')
+                                                                        .doc(pin
+                                                                            .text)
+                                                                        .get();
+
+                                                                if (doc
+                                                                    .exists) {
+                                                                  showAmountDialog(
+                                                                      doc['name']);
+                                                                } else {
+                                                                  showToast(
+                                                                      'PIN Code does not exist!');
+                                                                }
+
+                                                                pin.clear();
+                                                              },
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                );
                                               },
                                               leading: const Icon(
                                                 Icons.business,
@@ -370,6 +501,13 @@ class _WalletPageState extends State<WalletPage> {
                                               color: Colors.black,
                                               fontFamily: 'Medium',
                                             ),
+                                            TextWidget(
+                                              text:
+                                                  'By: ${data.docs[index]['cashier']}',
+                                              fontSize: 11,
+                                              color: Colors.grey,
+                                              fontFamily: 'Medium',
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -504,7 +642,7 @@ class _WalletPageState extends State<WalletPage> {
     );
   }
 
-  showAmountDialog() {
+  showAmountDialog(String cashier) {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -537,7 +675,7 @@ class _WalletPageState extends State<WalletPage> {
                 ),
                 MaterialButton(
                   onPressed: () async {
-                    scanQRCode();
+                    scanQRCode(cashier);
                     Navigator.of(context).pop();
                   },
                   child: const Text(
@@ -552,7 +690,7 @@ class _WalletPageState extends State<WalletPage> {
 
   String qrCode = 'Unknown';
 
-  Future<void> scanQRCode() async {
+  Future<void> scanQRCode(String cashier) async {
     try {
       final qrCode = await FlutterBarcodeScanner.scanBarcode(
         '#ff6666',
@@ -607,8 +745,12 @@ class _WalletPageState extends State<WalletPage> {
         }).whenComplete(() {
           // Add transaction
 
-          addWallet(int.parse(pts.text), qrCode,
-              FirebaseAuth.instance.currentUser!.uid, 'Receive & Transfers');
+          addWallet(
+              int.parse(pts.text),
+              qrCode,
+              FirebaseAuth.instance.currentUser!.uid,
+              'Receive & Transfers',
+              cashier);
           Navigator.of(context).pop();
         });
       } else {
