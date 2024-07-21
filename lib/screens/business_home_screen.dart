@@ -146,77 +146,87 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                             content: StatefulBuilder(
                                                                 builder: (context,
                                                                     setState) {
-                                                              return Column(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .min,
-                                                                children: [
-                                                                  TextWidget(
-                                                                    text:
-                                                                        'Input Amount Purchased',
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontFamily:
-                                                                        'Regular',
-                                                                    color: Colors
-                                                                        .grey,
-                                                                  ),
-                                                                  const SizedBox(
-                                                                    height: 10,
-                                                                  ),
-                                                                  TextFieldWidget(
-                                                                    controller:
-                                                                        amount,
-                                                                    label:
-                                                                        'Amount',
-                                                                    inputType:
-                                                                        TextInputType
-                                                                            .number,
-                                                                  ),
-                                                                  const SizedBox(
-                                                                    height: 10,
-                                                                  ),
-                                                                  Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .end,
-                                                                    children: [
-                                                                      MaterialButton(
-                                                                        onPressed:
-                                                                            () =>
-                                                                                Navigator.of(context).pop(true),
-                                                                        child:
-                                                                            const Text(
-                                                                          'Close',
-                                                                          style: TextStyle(
-                                                                              color: Colors.grey,
-                                                                              fontFamily: 'Medium',
-                                                                              fontWeight: FontWeight.bold),
+                                                              return Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        top: 20,
+                                                                        bottom:
+                                                                            20),
+                                                                child: Column(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .min,
+                                                                  children: [
+                                                                    TextWidget(
+                                                                      text:
+                                                                          'Input Amount Purchased',
+                                                                      fontSize:
+                                                                          18,
+                                                                      fontFamily:
+                                                                          'Regular',
+                                                                      color: Colors
+                                                                          .grey,
+                                                                    ),
+                                                                    const SizedBox(
+                                                                      height:
+                                                                          20,
+                                                                    ),
+                                                                    TextFieldWidget(
+                                                                      controller:
+                                                                          amount,
+                                                                      label:
+                                                                          'Amount',
+                                                                      inputType:
+                                                                          TextInputType
+                                                                              .number,
+                                                                    ),
+                                                                    const SizedBox(
+                                                                      height:
+                                                                          10,
+                                                                    ),
+                                                                    Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .end,
+                                                                      children: [
+                                                                        MaterialButton(
+                                                                          onPressed: () =>
+                                                                              Navigator.of(context).pop(true),
+                                                                          child:
+                                                                              const Text(
+                                                                            'Close',
+                                                                            style: TextStyle(
+                                                                                fontSize: 16,
+                                                                                color: Colors.grey,
+                                                                                fontFamily: 'Medium',
+                                                                                fontWeight: FontWeight.bold),
+                                                                          ),
                                                                         ),
-                                                                      ),
-                                                                      MaterialButton(
-                                                                        onPressed:
-                                                                            () async {
-                                                                          addPoints(((int.parse(amount.text) * mydata['ptsconversion']) * 0.01).toInt(), qty, doc['name'], 'Points received by member')
-                                                                              .then((value) {
-                                                                            Navigator.of(context).pop(true);
-                                                                            Navigator.of(context).push(MaterialPageRoute(
-                                                                                builder: (context) => QRPage(
-                                                                                      id: value,
-                                                                                    )));
-                                                                          });
-                                                                        },
-                                                                        child:
-                                                                            const Text(
-                                                                          'Continue',
-                                                                          style: TextStyle(
-                                                                              fontFamily: 'Bold',
-                                                                              fontWeight: FontWeight.bold),
+                                                                        MaterialButton(
+                                                                          onPressed:
+                                                                              () async {
+                                                                            addPoints(((int.parse(amount.text) * mydata['ptsconversion']) * 0.01).toInt(), qty, doc['name'], 'Points received by member').then((value) {
+                                                                              Navigator.of(context).pop(true);
+                                                                              Navigator.of(context).push(MaterialPageRoute(
+                                                                                  builder: (context) => QRPage(
+                                                                                        id: value,
+                                                                                      )));
+                                                                            });
+                                                                          },
+                                                                          child:
+                                                                              const Text(
+                                                                            'Continue',
+                                                                            style: TextStyle(
+                                                                                fontFamily: 'Bold',
+                                                                                fontSize: 16,
+                                                                                fontWeight: FontWeight.bold),
+                                                                          ),
                                                                         ),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                ],
+                                                                      ],
+                                                                    ),
+                                                                  ],
+                                                                ),
                                                               );
                                                             }),
                                                           );
@@ -230,6 +240,8 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                     showToast(
                                                         'PIN Code does not exist!');
                                                   }
+
+                                                  pin.clear();
                                                 },
                                               )
                                             ],
@@ -594,6 +606,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                                   showToast(
                                                                       'PIN Code does not exist!');
                                                                 }
+                                                                pin.clear();
                                                               },
                                                             )
                                                           ],

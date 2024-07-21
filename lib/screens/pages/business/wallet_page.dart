@@ -243,6 +243,8 @@ class _WalletPageState extends State<WalletPage> {
                                                   showToast(
                                                       'PIN Code does not exist!');
                                                 }
+
+                                                pin.clear();
                                               },
                                             )
                                           ],
