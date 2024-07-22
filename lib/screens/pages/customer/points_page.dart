@@ -203,9 +203,9 @@ class _CustomerPointsPageState extends State<CustomerPointsPage> {
                         StreamBuilder<QuerySnapshot>(
                             stream: FirebaseFirestore.instance
                                 .collection('Points')
-                                .where('uid',
-                                    isEqualTo:
-                                        FirebaseAuth.instance.currentUser!.uid)
+                                // .where('uid',
+                                //     isEqualTo:
+                                //         FirebaseAuth.instance.currentUser!.uid)
                                 .snapshots(),
                             builder: (BuildContext context,
                                 AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -231,7 +231,8 @@ class _CustomerPointsPageState extends State<CustomerPointsPage> {
                                 child: ListView.builder(
                                   itemCount: data.docs.length,
                                   itemBuilder: (context, index) {
-                                    double points = data.docs[index]['pts'];
+                                    double points =
+                                        data.docs[index]['pts'].toDouble();
                                     return Padding(
                                       padding: const EdgeInsets.all(5.0),
                                       child: ListTile(
@@ -264,7 +265,7 @@ class _CustomerPointsPageState extends State<CustomerPointsPage> {
                                             ),
                                             TextWidget(
                                               text:
-                                                  '${points.toStringAsFixed(0)} points',
+                                                  '${incrementIfEndsWith49Or99(points)} points',
                                               fontSize: 16,
                                               color: Colors.black,
                                               fontFamily: 'Medium',
@@ -378,13 +379,13 @@ class _CustomerPointsPageState extends State<CustomerPointsPage> {
             .doc(FirebaseAuth.instance.currentUser!.uid)
             .get()
             .then((DocumentSnapshot documentSnapshot) async {
-          if (documentSnapshot['pts'] >= int.parse(pts.text)) {
-            DocumentSnapshot doc1 = await FirebaseFirestore.instance
-                .collection('Users')
-                .doc(qrCode)
-                .get();
+          DocumentSnapshot doc1 = await FirebaseFirestore.instance
+              .collection('Users')
+              .doc(qrCode)
+              .get();
 
-            if (doc1.exists) {
+          if (doc1.exists) {
+            if (documentSnapshot['pts'] >= int.parse(pts.text)) {
               await FirebaseFirestore.instance
                   .collection('Users')
                   .doc(FirebaseAuth.instance.currentUser!.uid)
@@ -398,11 +399,12 @@ class _CustomerPointsPageState extends State<CustomerPointsPage> {
                 'pts': FieldValue.increment(int.parse(pts.text)),
               }).whenComplete(
                 () {
-                  addPoints(
+                  addWallet(
                       int.parse(pts.text),
                       qrCode,
                       FirebaseAuth.instance.currentUser!.uid,
-                      'Receive & Transfers');
+                      'Receive & Transfers',
+                      '');
                   Navigator.of(context).pop();
 
                   Navigator.of(context).push(MaterialPageRoute(
@@ -415,6 +417,11 @@ class _CustomerPointsPageState extends State<CustomerPointsPage> {
                 },
               );
             } else {
+              Navigator.pop(context);
+              showToast('Your points is not enough to proceed!');
+            }
+          } else {
+            if (documentSnapshot['pts'] >= int.parse(pts.text)) {
               await FirebaseFirestore.instance
                   .collection('Users')
                   .doc(FirebaseAuth.instance.currentUser!.uid)
@@ -428,11 +435,12 @@ class _CustomerPointsPageState extends State<CustomerPointsPage> {
                 'wallet': FieldValue.increment(int.parse(pts.text)),
               }).whenComplete(
                 () {
-                  addPoints(
+                  addWallet(
                       int.parse(pts.text),
                       qrCode,
                       FirebaseAuth.instance.currentUser!.uid,
-                      'Receive & Transfers');
+                      'Receive & Transfers',
+                      '');
                   Navigator.of(context).pop();
 
                   Navigator.of(context).push(MaterialPageRoute(
@@ -444,10 +452,10 @@ class _CustomerPointsPageState extends State<CustomerPointsPage> {
                           )));
                 },
               );
+            } else {
+              Navigator.pop(context);
+              showToast('Your cash wallet is not enough to proceed!');
             }
-          } else {
-            Navigator.pop(context);
-            showToast('Your points is not enough to proceed!');
           }
         });
       } else {
@@ -456,5 +464,13 @@ class _CustomerPointsPageState extends State<CustomerPointsPage> {
     } on PlatformException {
       qrCode = 'Failed to get platform version.';
     }
+  }
+
+  String incrementIfEndsWith49Or99(double number) {
+    int wholeNumberPart = number.round();
+    if (wholeNumberPart % 100 == 99 || wholeNumberPart % 100 == 49) {
+      return (number + 1).toStringAsFixed(0);
+    }
+    return number.toStringAsFixed(0);
   }
 }

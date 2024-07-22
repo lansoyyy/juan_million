@@ -384,71 +384,78 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
                 .get();
 
             if (doc1.exists) {
-              await FirebaseFirestore.instance
-                  .collection('Users')
-                  .doc(FirebaseAuth.instance.currentUser!.uid)
-                  .update({
-                'pts': FieldValue.increment(-int.parse(pts.text)),
-              });
-              await FirebaseFirestore.instance
-                  .collection(selected)
-                  .doc(qrCode)
-                  .update({
-                'pts': FieldValue.increment(int.parse(pts.text)),
-              }).whenComplete(
-                () {
-                  addWallet(
-                      int.parse(pts.text),
-                      qrCode,
-                      FirebaseAuth.instance.currentUser!.uid,
-                      'Receive & Transfers',
-                      '');
-                  Navigator.of(context).pop();
+              if (documentSnapshot['pts'] >= int.parse(pts.text)) {
+                await FirebaseFirestore.instance
+                    .collection('Users')
+                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                    .update({
+                  'pts': FieldValue.increment(-int.parse(pts.text)),
+                });
+                await FirebaseFirestore.instance
+                    .collection(selected)
+                    .doc(qrCode)
+                    .update({
+                  'pts': FieldValue.increment(int.parse(pts.text)),
+                }).whenComplete(
+                  () {
+                    addWallet(
+                        int.parse(pts.text),
+                        qrCode,
+                        FirebaseAuth.instance.currentUser!.uid,
+                        'Receive & Transfers',
+                        '');
+                    Navigator.of(context).pop();
 
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => QRScannedPage(
-                            fromWallet: true,
-                            inuser: true,
-                            pts: pts.text,
-                            store: FirebaseAuth.instance.currentUser!.uid,
-                          )));
-                },
-              );
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => QRScannedPage(
+                              fromWallet: true,
+                              inuser: true,
+                              pts: pts.text,
+                              store: FirebaseAuth.instance.currentUser!.uid,
+                            )));
+                  },
+                );
+              } else {
+                Navigator.pop(context);
+                showToast('Your points is not enough to proceed!');
+              }
             } else {
-              await FirebaseFirestore.instance
-                  .collection('Users')
-                  .doc(FirebaseAuth.instance.currentUser!.uid)
-                  .update({
-                'wallet': FieldValue.increment(-int.parse(pts.text)),
-              });
-              await FirebaseFirestore.instance
-                  .collection(selected)
-                  .doc(qrCode)
-                  .update({
-                'wallet': FieldValue.increment(int.parse(pts.text)),
-              }).whenComplete(
-                () {
-                  addWallet(
-                      int.parse(pts.text),
-                      qrCode,
-                      FirebaseAuth.instance.currentUser!.uid,
-                      'Receive & Transfers',
-                      '');
-                  Navigator.of(context).pop();
+              if (documentSnapshot['pts'] >= int.parse(pts.text)) {
+                await FirebaseFirestore.instance
+                    .collection('Users')
+                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                    .update({
+                  'wallet': FieldValue.increment(-int.parse(pts.text)),
+                });
+                await FirebaseFirestore.instance
+                    .collection(selected)
+                    .doc(qrCode)
+                    .update({
+                  'wallet': FieldValue.increment(int.parse(pts.text)),
+                }).whenComplete(
+                  () {
+                    addWallet(
+                        int.parse(pts.text),
+                        qrCode,
+                        FirebaseAuth.instance.currentUser!.uid,
+                        'Receive & Transfers',
+                        '');
+                    Navigator.of(context).pop();
 
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => QRScannedPage(
-                            fromWallet: true,
-                            inuser: true,
-                            pts: pts.text,
-                            store: FirebaseAuth.instance.currentUser!.uid,
-                          )));
-                },
-              );
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => QRScannedPage(
+                              fromWallet: true,
+                              inuser: true,
+                              pts: pts.text,
+                              store: FirebaseAuth.instance.currentUser!.uid,
+                            )));
+                  },
+                );
+              } else {
+                Navigator.pop(context);
+                showToast('Your cash wallet is not enough to proceed!');
+              }
             }
-          } else {
-            Navigator.pop(context);
-            showToast('Your points is not enough to proceed!');
           }
         });
       } else {

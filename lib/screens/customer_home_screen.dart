@@ -145,17 +145,14 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           int currentSlots = snapshot.docs.length;
           int slotsLeft = 5 - currentSlots;
 
-          if (slotsLeft > 0) {
-            print('slot here called');
+          if (slotsFromPoints > slotsLeft) {
             FirebaseFirestore.instance
                 .collection('Users')
                 .doc(FirebaseAuth.instance.currentUser!.uid)
                 .update({
               // 'wallet': FieldValue.increment(total),
-              'pts': FieldValue.increment(-slotsFromPoints * limit),
+              'pts': FieldValue.increment(-slotsLeft * limit),
             });
-          }
-          if (slotsFromPoints > slotsLeft) {
             for (int i = 0; i < slotsLeft; i++) {
               addSlots();
 
@@ -176,6 +173,13 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               // });
             }
           } else {
+            FirebaseFirestore.instance
+                .collection('Users')
+                .doc(FirebaseAuth.instance.currentUser!.uid)
+                .update({
+              // 'wallet': FieldValue.increment(total),
+              'pts': FieldValue.increment(-slotsFromPoints * limit),
+            });
             for (int i = 0; i < slotsFromPoints; i++) {
               addSlots();
 
