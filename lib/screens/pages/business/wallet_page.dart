@@ -745,12 +745,8 @@ class _WalletPageState extends State<WalletPage> {
         }).whenComplete(() {
           // Add transaction
 
-          addWallet(
-              int.parse(pts.text),
-              qrCode,
-              FirebaseAuth.instance.currentUser!.uid,
-              'Receive & Transfers',
-              cashier);
+          addWallet(int.parse(pts.text), FirebaseAuth.instance.currentUser!.uid,
+              qrCode, 'Receive & Transfers', cashier);
           Navigator.of(context).pop();
         });
       } else {
