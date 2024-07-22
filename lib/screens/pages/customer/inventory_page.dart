@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:juan_million/services/add_history.dart';
+import 'package:juan_million/services/add_points.dart';
 import 'package:juan_million/services/add_wallet.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
@@ -74,6 +75,8 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
         });
 
         addWallet(5500, '', uid, 'REWARDS 5,500', '');
+
+        addPoints(5500, 1, '', 'REWARDS 5,500');
 
         addHistory(snapshot.data()!['name'], uid);
       });
