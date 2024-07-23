@@ -190,7 +190,7 @@ class _WalletPageState extends State<WalletPage> {
                                                 Icons.person,
                                               ),
                                               title: TextWidget(
-                                                text: 'From member',
+                                                text: 'To member',
                                                 fontSize: 14,
                                                 fontFamily: 'Bold',
                                               ),
@@ -274,7 +274,7 @@ class _WalletPageState extends State<WalletPage> {
                                                 Icons.business,
                                               ),
                                               title: TextWidget(
-                                                text: 'From affiliate',
+                                                text: 'To affiliate',
                                                 fontSize: 14,
                                                 fontFamily: 'Bold',
                                               ),

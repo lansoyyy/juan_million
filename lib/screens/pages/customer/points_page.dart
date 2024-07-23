@@ -203,9 +203,9 @@ class _CustomerPointsPageState extends State<CustomerPointsPage> {
                         StreamBuilder<QuerySnapshot>(
                             stream: FirebaseFirestore.instance
                                 .collection('Points')
-                                // .where('uid',
-                                //     isEqualTo:
-                                //         FirebaseAuth.instance.currentUser!.uid)
+                                .where('uid',
+                                    isEqualTo:
+                                        FirebaseAuth.instance.currentUser!.uid)
                                 .snapshots(),
                             builder: (BuildContext context,
                                 AsyncSnapshot<QuerySnapshot> snapshot) {

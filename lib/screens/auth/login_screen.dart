@@ -414,16 +414,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
       print(googleSignInAccount!.email);
 
-      FirebaseFirestore.instance
-          .collection('Users')
-          .where('email', isEqualTo: googleSignInAccount.email)
-          .get()
-          .then(
-        (value) {
-          print(value);
-        },
-      );
-
       await FirebaseFirestore.instance
           .collection('Users')
           .where('email', isEqualTo: googleSignInAccount.email)
@@ -487,6 +477,7 @@ class _LoginScreenState extends State<LoginScreen> {
         },
       );
     } catch (e) {
+      print('123');
       print(e);
     }
   }
