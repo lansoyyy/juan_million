@@ -94,6 +94,14 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               'scanned': true,
               'scannedId': FirebaseAuth.instance.currentUser!.uid,
             });
+
+            await FirebaseFirestore.instance
+                .collection('Community Wallet')
+                .doc('wallet')
+                .update({
+              // 'wallet': FieldValue.increment(total),
+              'pts': FieldValue.increment(documentSnapshot['pts']),
+            });
             // Update my points
             // Update business points
           }
