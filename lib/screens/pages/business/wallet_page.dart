@@ -722,25 +722,25 @@ class _WalletPageState extends State<WalletPage> {
 
       if (qrCode != '-1') {
         await FirebaseFirestore.instance
-            .collection(selected)
-            .doc(qrCode)
+            .collection('Business')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
             .get()
             .then((DocumentSnapshot documentSnapshot) async {
           if (documentSnapshot['wallet'] > int.parse(pts.text)) {
             await FirebaseFirestore.instance
-                .collection('Business')
-                .doc(FirebaseAuth.instance.currentUser!.uid)
+                .collection(selected)
+                .doc(qrCode)
                 .update({
               'wallet': FieldValue.increment(int.parse(pts.text)),
             });
             await FirebaseFirestore.instance
-                .collection(selected)
-                .doc(qrCode)
+                .collection('Business')
+                .doc(FirebaseAuth.instance.currentUser!.uid)
                 .update({
               'wallet': FieldValue.increment(-int.parse(pts.text)),
             });
           } else {
-            showToast('Wallet balance for this user is not enough!');
+            showToast('Your wallet balance is not enough!');
           }
         }).whenComplete(() {
           // Add transaction
