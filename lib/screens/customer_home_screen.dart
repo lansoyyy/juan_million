@@ -12,6 +12,7 @@ import 'package:juan_million/screens/pages/business/points_page.dart';
 import 'package:juan_million/screens/pages/business/settings_page.dart';
 import 'package:juan_million/screens/pages/business/wallet_page.dart';
 import 'package:juan_million/screens/pages/customer/inventory_page.dart';
+import 'package:juan_million/screens/pages/customer/myqr_page.dart';
 import 'package:juan_million/screens/pages/customer/notif_page.dart';
 import 'package:juan_million/screens/pages/customer/points_page.dart';
 import 'package:juan_million/screens/pages/customer/qr_scanned_page.dart';
@@ -278,7 +279,10 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                             ),
                             IconButton(
                               onPressed: () {
-                                scanQRCode();
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => MyQRPage(
+                                          isPoints: true,
+                                        )));
                               },
                               icon: const Icon(
                                 Icons.qr_code,

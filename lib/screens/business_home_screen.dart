@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:intl/intl.dart';
 import 'package:juan_million/screens/auth/payment_screen.dart';
 import 'package:juan_million/screens/pages/business/inventory_page.dart';
@@ -52,6 +54,92 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
     } on FirebaseAuthException catch (e) {
       showToast('Unauthorized to access this feature!');
       print("Error: ${e.message}");
+    }
+  }
+
+  String qrCode = 'Unknown';
+
+  Future<void> scanQRCode(int transferredPts, String cashier) async {
+    try {
+      final qrCode = await FlutterBarcodeScanner.scanBarcode(
+        '#ff6666',
+        'Cancel',
+        true,
+        ScanMode.QR,
+      );
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return const AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+              ],
+            ),
+          );
+        },
+      );
+
+      if (!mounted) return;
+
+      Navigator.pop(context);
+      setState(() {
+        this.qrCode = qrCode;
+      });
+
+      if (qrCode != '-1') {
+        await FirebaseFirestore.instance
+            .collection('Business')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .get()
+            .then((DocumentSnapshot documentSnapshot) async {
+          print('Pts ${documentSnapshot['pts']}');
+          print('Pts $qrCode');
+          if (documentSnapshot['pts'] >= transferredPts) {
+            await FirebaseFirestore.instance
+                .collection('Users')
+                .doc(qrCode)
+                .update({
+              'pts': FieldValue.increment(transferredPts),
+            });
+            await FirebaseFirestore.instance
+                .collection('Business')
+                .doc(FirebaseAuth.instance.currentUser!.uid)
+                .update({
+              'pts': FieldValue.increment(-transferredPts),
+            });
+
+            await FirebaseFirestore.instance
+                .collection('Community Wallet')
+                .doc('wallet')
+                .update({
+              // 'wallet': FieldValue.increment(total),
+              'pts': FieldValue.increment(transferredPts),
+            });
+            // Update my points
+            // Update business points
+          } else {
+            showToast('Your wallet balance is not enough');
+          }
+        }).whenComplete(() {
+          addPoints(transferredPts, 1, cashier, 'Points received by member');
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => QRScannedPage(
+                    fromScan: true,
+                    inuser: false,
+                    fromWallet: true,
+                    pts: transferredPts.toString(),
+                    store: qrCode,
+                  )));
+        });
+      } else {
+        Navigator.pop(context);
+      }
+    } on PlatformException {
+      qrCode = 'Failed to get platform version.';
     }
   }
 
@@ -137,8 +225,6 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
 
                                                   if (doc.exists) {
                                                     if (mydata['pts'] > 1) {
-                                                      int qty = 1;
-
                                                       showDialog(
                                                         context: context,
                                                         builder: (context) {
@@ -205,14 +291,11 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                                         ),
                                                                         MaterialButton(
                                                                           onPressed:
-                                                                              () async {
-                                                                            addPoints(((int.parse(amount.text) * mydata['ptsconversion']) * 0.01).toInt(), qty, doc['name'], 'Points received by member').then((value) {
-                                                                              Navigator.of(context).pop(true);
-                                                                              Navigator.of(context).push(MaterialPageRoute(
-                                                                                  builder: (context) => QRPage(
-                                                                                        id: value,
-                                                                                      )));
-                                                                            });
+                                                                              () {
+                                                                            Navigator.of(context).pop(true);
+
+                                                                            scanQRCode(((int.parse(amount.text) * mydata['ptsconversion']) * 0.01).toInt(),
+                                                                                doc['name']);
                                                                           },
                                                                           child:
                                                                               const Text(

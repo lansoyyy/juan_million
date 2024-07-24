@@ -17,10 +17,12 @@ class QRScannedPage extends StatefulWidget {
 
   bool? inuser;
   bool? fromWallet;
+  bool? fromScan;
 
   QRScannedPage({
     super.key,
     this.fromWallet = false,
+    this.fromScan = false,
     this.inuser = true,
     required this.pts,
     required this.store,
@@ -160,7 +162,9 @@ class _QRScannedPageState extends State<QRScannedPage> {
                       Center(
                         child: TextWidget(
                           text: widget.fromWallet!
-                              ? 'Wallet Transfer'
+                              ? widget.fromScan!
+                                  ? 'Points Transfer'
+                                  : 'Wallet Transfer'
                               : 'Points Added',
                           fontSize: 24,
                           color: Colors.black,
@@ -291,6 +295,59 @@ class _QRScannedPageState extends State<QRScannedPage> {
                                       ),
                                     );
                                   }),
+                      widget.fromScan!
+                          ? StreamBuilder<DocumentSnapshot>(
+                              stream: FirebaseFirestore.instance
+                                  .collection('Users')
+                                  .doc(widget.store)
+                                  .snapshots(),
+                              builder: (context,
+                                  AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                if (!snapshot.hasData) {
+                                  return const Center(child: Text('Loading'));
+                                } else if (snapshot.hasError) {
+                                  return const Center(
+                                      child: Text('Something went wrong'));
+                                } else if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Center(
+                                      child: CircularProgressIndicator());
+                                }
+                                dynamic data = snapshot.data;
+                                return SizedBox(
+                                  width: 300,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(5.0),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        CircleAvatar(
+                                          maxRadius: 40,
+                                          minRadius: 40,
+                                          backgroundImage:
+                                              NetworkImage(data['pic']),
+                                        ),
+                                        TextWidget(
+                                          text: data['name'],
+                                          fontSize: 18,
+                                          color: Colors.black,
+                                          fontFamily: 'Bold',
+                                        ),
+                                        TextWidget(
+                                          text: DateFormat.yMMMd()
+                                              .add_jm()
+                                              .format(DateTime.now()),
+                                          fontSize: 12,
+                                          color: Colors.grey,
+                                          fontFamily: 'Regular',
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              })
+                          : const SizedBox(),
                       const Expanded(
                         child: SizedBox(
                           height: 10,

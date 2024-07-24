@@ -8,7 +8,12 @@ import 'package:juan_million/widgets/text_widget.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class MyQRPage extends StatefulWidget {
-  const MyQRPage({super.key});
+  bool? isPoints;
+
+  MyQRPage({
+    super.key,
+    this.isPoints = false,
+  });
 
   @override
   State<MyQRPage> createState() => _MyQRPageState();
@@ -94,7 +99,9 @@ class _MyQRPageState extends State<MyQRPage> {
                         ),
                         Center(
                           child: TextWidget(
-                            text: 'P${mydata['wallet'].toString()}.00',
+                            text: widget.isPoints!
+                                ? 'P${mydata['pts'].toString()}'
+                                : 'P${mydata['wallet'].toString()}.00',
                             fontSize: 18,
                             color: Colors.white,
                             fontFamily: 'Bold',
@@ -102,7 +109,9 @@ class _MyQRPageState extends State<MyQRPage> {
                         ),
                         Center(
                           child: TextWidget(
-                            text: 'Wallet Balance',
+                            text: widget.isPoints!
+                                ? "Points Balance"
+                                : 'Wallet Balance',
                             fontSize: 9,
                             color: Colors.white,
                             fontFamily: 'Medium',
@@ -126,53 +135,5 @@ class _MyQRPageState extends State<MyQRPage> {
             );
           }),
     );
-  }
-
-  String qrCode = 'Unknown';
-  String store = '';
-  String pts = '';
-
-  Future<void> scanQRCode() async {
-    try {
-      final qrCode = await FlutterBarcodeScanner.scanBarcode(
-        '#ff6666',
-        'Cancel',
-        true,
-        ScanMode.QR,
-      );
-
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return const AlertDialog(
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CircularProgressIndicator(),
-              ],
-            ),
-          );
-        },
-      );
-
-      if (!mounted) return;
-
-      setState(() {
-        this.qrCode = qrCode;
-      });
-
-      await FirebaseFirestore.instance
-          .collection('Users')
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .update({
-        'pts': FieldValue.increment(int.parse(qrCode)),
-      }).whenComplete(() {
-        // Add transaction
-        Navigator.pop(context);
-      });
-    } on PlatformException {
-      qrCode = 'Failed to get platform version.';
-    }
   }
 }
