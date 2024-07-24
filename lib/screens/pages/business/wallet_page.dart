@@ -108,7 +108,7 @@ class _WalletPageState extends State<WalletPage> {
                                   context: context,
                                   builder: (context) {
                                     return SizedBox(
-                                      height: 150,
+                                      height: 230,
                                       child: Padding(
                                         padding: const EdgeInsets.all(10.0),
                                         child: Column(
@@ -275,6 +275,89 @@ class _WalletPageState extends State<WalletPage> {
                                               ),
                                               title: TextWidget(
                                                 text: 'To affiliate',
+                                                fontSize: 14,
+                                                fontFamily: 'Bold',
+                                              ),
+                                            ),
+                                            const Divider(),
+                                            ListTile(
+                                              onTap: () {
+                                                setState(() {
+                                                  selected = 'Coordinator';
+                                                });
+                                                Navigator.pop(context);
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return Dialog(
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(20.0),
+                                                        child: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: [
+                                                            TextFieldWidget(
+                                                              showEye: true,
+                                                              isObscure: true,
+                                                              fontStyle:
+                                                                  FontStyle
+                                                                      .normal,
+                                                              hint: 'PIN Code',
+                                                              borderColor: blue,
+                                                              radius: 12,
+                                                              width: 350,
+                                                              prefixIcon:
+                                                                  Icons.lock,
+                                                              isRequred: false,
+                                                              controller: pin,
+                                                              label: 'PIN Code',
+                                                            ),
+                                                            const SizedBox(
+                                                              height: 20,
+                                                            ),
+                                                            ButtonWidget(
+                                                              label: 'Confirm',
+                                                              onPressed:
+                                                                  () async {
+                                                                Navigator.pop(
+                                                                    context);
+
+                                                                DocumentSnapshot
+                                                                    doc =
+                                                                    await FirebaseFirestore
+                                                                        .instance
+                                                                        .collection(
+                                                                            'Cashiers')
+                                                                        .doc(pin
+                                                                            .text)
+                                                                        .get();
+
+                                                                if (doc
+                                                                    .exists) {
+                                                                  showAmountDialog(
+                                                                      doc['name']);
+                                                                } else {
+                                                                  showToast(
+                                                                      'PIN Code does not exist!');
+                                                                }
+
+                                                                pin.clear();
+                                                              },
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                );
+                                              },
+                                              leading: const Icon(
+                                                Icons.person_4_rounded,
+                                              ),
+                                              title: TextWidget(
+                                                text: 'To coordi=nator',
                                                 fontSize: 14,
                                                 fontFamily: 'Bold',
                                               ),
