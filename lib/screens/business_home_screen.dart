@@ -263,9 +263,10 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                                           amount,
                                                                       label:
                                                                           'Amount',
-                                                                      inputType:
-                                                                          TextInputType
-                                                                              .number,
+                                                                      inputType: const TextInputType
+                                                                          .numberWithOptions(
+                                                                          decimal:
+                                                                              true),
                                                                     ),
                                                                     const SizedBox(
                                                                       height:
@@ -294,8 +295,10 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                                               () {
                                                                             Navigator.of(context).pop(true);
 
-                                                                            scanQRCode(((int.parse(amount.text) * mydata['ptsconversion']) * 0.01).toInt(),
-                                                                                doc['name']);
+                                                                            scanQRCode(
+                                                                              ((double.parse(amount.text) * mydata['ptsconversion']) * 0.01).toInt(),
+                                                                              doc['name'],
+                                                                            );
                                                                           },
                                                                           child:
                                                                               const Text(
@@ -396,7 +399,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                       ? blue
                                       : index == 1
                                           ? primary
-                                          : secondary,
+                                          : Colors.lightBlue,
                                   borderRadius: const BorderRadius.only(
                                     bottomLeft: Radius.circular(1000),
                                     bottomRight: Radius.circular(1000),
@@ -413,10 +416,10 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                         ),
                                         TextWidget(
                                           text: index == 0
-                                              ? 'Total Points'
+                                              ? 'Points Inventory'
                                               : index == 1
                                                   ? 'Cash Wallet'
-                                                  : 'Customers',
+                                                  : 'Customer Slots',
                                           fontSize: 14,
                                           color: Colors.white,
                                         ),

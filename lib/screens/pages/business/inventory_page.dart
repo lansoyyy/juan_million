@@ -18,7 +18,7 @@ class _InventoryPageState extends State<InventoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: secondary,
+      backgroundColor: Colors.lightBlue,
       body: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('Points')
@@ -62,7 +62,7 @@ class _InventoryPageState extends State<InventoryPage> {
                   ),
                   Center(
                     child: TextWidget(
-                      text: 'Inventory',
+                      text: 'Transaction History',
                       fontSize: 14,
                       color: Colors.white,
                     ),
