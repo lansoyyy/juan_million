@@ -179,6 +179,62 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       StreamBuilder<QuerySnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection('Slots')
+                            .snapshots(),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<QuerySnapshot> snapshot) {
+                          if (snapshot.hasError) {
+                            print(snapshot.error);
+                            return const Center(child: Text('Error'));
+                          }
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Padding(
+                              padding: EdgeInsets.only(top: 50),
+                              child: Center(
+                                  child: CircularProgressIndicator(
+                                color: Colors.black,
+                              )),
+                            );
+                          }
+
+                          final data = snapshot.requireData;
+
+                          if (data.docs.isEmpty) {
+                            return const Center(child: Text('No slots found'));
+                          }
+
+                          int myIndex = 0;
+
+                          for (int i = 0; i < data.docs.length; i++) {
+                            if (data.docs[i]['uid'] ==
+                                FirebaseAuth.instance.currentUser!.uid) {
+                              myIndex = i + 1;
+                              break;
+                            }
+                          }
+
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              TextWidget(
+                                text: 'Your current slot no.',
+                                fontSize: 14,
+                                color: Colors.white,
+                                fontFamily: 'Bold',
+                              ),
+                              TextWidget(
+                                text: '#$myIndex',
+                                fontSize: 14,
+                                color: Colors.white,
+                                fontFamily: 'Regular',
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                      StreamBuilder<QuerySnapshot>(
                           stream: FirebaseFirestore.instance
                               .collection('Slots')
                               .where('uid',
@@ -417,9 +473,8 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                             return SizedBox(
                               height: 300,
                               child: ListView.builder(
-                                itemCount: data.docs.length > 10
-                                    ? 10
-                                    : data.docs.length,
+                                itemCount:
+                                    data.docs.length > 9 ? 9 : data.docs.length,
                                 itemBuilder: (context, index) {
                                   return StreamBuilder<DocumentSnapshot>(
                                       stream: FirebaseFirestore.instance
