@@ -245,14 +245,14 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
               ),
               TextFieldWidget(
                 fontStyle: FontStyle.normal,
-                hint: 'Email/Phone Number',
+                hint: 'Email',
                 borderColor: blue,
                 radius: 12,
                 width: 350,
                 isRequred: false,
                 controller: email,
-                prefixIcon: Icons.person_3_outlined,
-                label: 'Email/Phone Number',
+                prefixIcon: Icons.email,
+                label: 'Email',
               ),
               const SizedBox(
                 height: 20,
@@ -394,30 +394,17 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
   register(context) async {
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: isPhoneNumber(email.text)
-              ? '${email.text}@gmail.com'
-              : email.text,
-          password: password.text);
+          email: email.text, password: password.text);
 
-      addUser(
-          '${fname.text} ${lname.text}',
-          isPhoneNumber(email.text) ? '${email.text}@gmail.com' : email.text,
-          nickname.text,
-          imageURL,
-          '${municipality!.name}, ${province!.name}');
+      addUser('${fname.text} ${lname.text}', email.text, nickname.text,
+          imageURL, '${municipality!.name}, ${province!.name}');
 
       await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: isPhoneNumber(email.text)
-              ? '${email.text}@gmail.com'
-              : email.text,
-          password: password.text);
+          email: email.text, password: password.text);
 
-      if (!isPhoneNumber(email.text)) {
-        await FirebaseAuth.instance.currentUser!.sendEmailVerification();
+      await FirebaseAuth.instance.currentUser!.sendEmailVerification();
 
-        showToast(
-            "Registered Successfully! Verification was sent to your email");
-      }
+      showToast("Registered Successfully! Verification was sent to your email");
 
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
@@ -522,17 +509,5 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
     } catch (e) {
       print(e);
     }
-  }
-
-  bool isPhoneNumber(String input) {
-    // Define a regex pattern that matches Philippine phone number formats
-    RegExp phoneRegex = RegExp(
-      r'^(09|\+639)\d{9}$',
-      caseSensitive: false,
-      multiLine: false,
-    );
-
-    // Use RegExp's hasMatch method to check if the input matches the pattern
-    return phoneRegex.hasMatch(input);
   }
 }
