@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:juan_million/screens/pages/customer/myslots_screen.dart';
 import 'package:juan_million/services/add_history.dart';
 import 'package:juan_million/services/add_points.dart';
 import 'package:juan_million/services/add_wallet.dart';
@@ -215,22 +216,28 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                             }
                           }
 
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              TextWidget(
-                                text: 'Your current slot no.',
-                                fontSize: 14,
-                                color: Colors.white,
-                                fontFamily: 'Bold',
-                              ),
-                              TextWidget(
-                                text: '#$myIndex',
-                                fontSize: 14,
-                                color: Colors.white,
-                                fontFamily: 'Regular',
-                              ),
-                            ],
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => const MySlotsScreen()));
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                TextWidget(
+                                  text: 'Your current slot no.',
+                                  fontSize: 14,
+                                  color: Colors.white,
+                                  fontFamily: 'Bold',
+                                ),
+                                TextWidget(
+                                  text: '#$myIndex',
+                                  fontSize: 14,
+                                  color: Colors.white,
+                                  fontFamily: 'Regular',
+                                ),
+                              ],
+                            ),
                           );
                         },
                       ),
