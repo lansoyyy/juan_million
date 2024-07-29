@@ -360,18 +360,23 @@ class _LoginScreenState extends State<LoginScreen> {
           showToast('Cannot proceed! Email not verified');
         }
       } else {
-        var document =
-            FirebaseFirestore.instance.doc('Business/${user.user!.uid}');
-        var snapshot = await document.get();
-        if (snapshot.data()!['verified'] == true) {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => const BusinessHomeScreen()),
-            (route) {
-              return false;
-            },
-          );
+        if (user.user!.emailVerified) {
+          var document =
+              FirebaseFirestore.instance.doc('Business/${user.user!.uid}');
+          var snapshot = await document.get();
+          if (snapshot.data()!['verified'] == true) {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                  builder: (context) => const BusinessHomeScreen()),
+              (route) {
+                return false;
+              },
+            );
+          } else {
+            showToast('Request grant access!');
+          }
         } else {
-          showToast('Request grant access!');
+          showToast('Cannot proceed! Email not verified');
         }
       }
     } on FirebaseAuthException catch (e) {

@@ -188,6 +188,12 @@ class _SignupScreenState extends State<SignupScreen> {
       // addUser(name.text, email.text);
       addBusiness(name.text, email.text, '', '', '', '', '');
 
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: email.text, password: password.text);
+
+      await FirebaseAuth.instance.currentUser!.sendEmailVerification();
+
+      showToast("Registered Successfully! Verification was sent to your email");
       Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (context) => SignupScreen2(
                 id: user.user!.uid,
