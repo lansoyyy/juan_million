@@ -66,7 +66,7 @@ class MySlotsScreen extends StatelessWidget {
                   return SizedBox(
                     height: 500,
                     child: ListView.builder(
-                      itemCount: data.docs.length > 9 ? 9 : data.docs.length,
+                      itemCount: data.docs.length,
                       itemBuilder: (context, index) {
                         return data.docs[index]['uid'] !=
                                 FirebaseAuth.instance.currentUser!.uid
