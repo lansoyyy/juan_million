@@ -216,28 +216,33 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                             }
                           }
 
-                          return GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(MaterialPageRoute(
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              TextWidget(
+                                text: 'Your current slot no.',
+                                fontSize: 14,
+                                color: Colors.white,
+                                fontFamily: 'Bold',
+                              ),
+                              const Expanded(child: SizedBox()),
+                              TextWidget(
+                                text: '#$myIndex',
+                                fontSize: 14,
+                                color: Colors.white,
+                                fontFamily: 'Regular',
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                     Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) => const MySlotsScreen()));
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                TextWidget(
-                                  text: 'Your current slot no.',
-                                  fontSize: 14,
+                                },
+                                icon: const Icon(
+                                  Icons.visibility,
                                   color: Colors.white,
-                                  fontFamily: 'Bold',
                                 ),
-                                TextWidget(
-                                  text: '#$myIndex',
-                                  fontSize: 14,
-                                  color: Colors.white,
-                                  fontFamily: 'Regular',
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           );
                         },
                       ),

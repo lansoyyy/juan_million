@@ -148,7 +148,7 @@ class _StorePageState extends State<StorePage> {
                                               children: [
                                                 TextWidget(
                                                   text:
-                                                      '${finaldata[index]['slots'] * 150} pts',
+                                                      '${finaldata[index]['slots']} slot/s',
                                                   fontSize: 24,
                                                   color: blue,
                                                   fontFamily: 'Bold',
@@ -284,28 +284,53 @@ class _StorePageState extends State<StorePage> {
                                             const SizedBox(
                                               height: 15,
                                             ),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                TextWidget(
-                                                  text:
-                                                      '${double.parse((data.docs[index]['slots'] * 150).toString()).round()}',
-                                                  fontSize: 38,
-                                                  fontFamily: 'Bold',
-                                                  color: blue,
-                                                ),
-                                                const SizedBox(
-                                                  width: 5,
-                                                ),
-                                                TextWidget(
-                                                  text: 'pts',
-                                                  fontSize: 12,
-                                                  fontFamily: 'Bold',
-                                                  color: blue,
-                                                ),
-                                              ],
-                                            ),
+                                            data.docs[index]['slots'] == 0.066
+                                                ? Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      TextWidget(
+                                                        text:
+                                                            '${double.parse((data.docs[index]['slots'] * 150).toString()).round()}',
+                                                        fontSize: 38,
+                                                        fontFamily: 'Bold',
+                                                        color: blue,
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 5,
+                                                      ),
+                                                      TextWidget(
+                                                        text: 'pts',
+                                                        fontSize: 12,
+                                                        fontFamily: 'Bold',
+                                                        color: blue,
+                                                      ),
+                                                    ],
+                                                  )
+                                                : Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      TextWidget(
+                                                        text:
+                                                            '${double.parse((data.docs[index]['slots']).toString()).round()}',
+                                                        fontSize: 38,
+                                                        fontFamily: 'Bold',
+                                                        color: blue,
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 5,
+                                                      ),
+                                                      TextWidget(
+                                                        text: 'slot/s',
+                                                        fontSize: 12,
+                                                        fontFamily: 'Bold',
+                                                        color: blue,
+                                                      ),
+                                                    ],
+                                                  ),
                                             const SizedBox(
                                               height: 15,
                                             ),

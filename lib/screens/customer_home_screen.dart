@@ -299,7 +299,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                 );
                               },
                               icon: const Icon(
-                                Icons.refresh,
+                                Icons.sync,
                                 color: Colors.white,
                               ),
                             ),
