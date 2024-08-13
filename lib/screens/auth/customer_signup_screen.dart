@@ -36,6 +36,8 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
   final lname = TextEditingController();
   final email = TextEditingController();
 
+  final ref = TextEditingController();
+
   final password = TextEditingController();
   final confirmpassword = TextEditingController();
 
@@ -290,24 +292,68 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
                 label: 'Confirm Password',
               ),
               const SizedBox(
+                height: 20,
+              ),
+              TextFieldWidget(
+                fontStyle: FontStyle.normal,
+                hint: 'Referral Code',
+                borderColor: blue,
+                radius: 12,
+                width: 350,
+                isRequred: false,
+                prefixIcon: Icons.card_giftcard,
+                controller: ref,
+                label: 'Referral Code',
+              ),
+              const SizedBox(
                 height: 30,
               ),
               ButtonWidget(
                 width: 350,
                 label: 'Signup',
-                onPressed: () {
-                  if (password.text == confirmpassword.text) {
-                    if (fname.text != '' ||
-                        lname.text != '' ||
-                        nickname.text != '' ||
-                        email.text != '' ||
-                        password.text != '') {
-                      register(context);
+                onPressed: () async {
+                  if (ref.text == '') {
+                    if (password.text == confirmpassword.text) {
+                      if (fname.text != '' ||
+                          lname.text != '' ||
+                          nickname.text != '' ||
+                          email.text != '' ||
+                          password.text != '') {
+                        register(context);
+                      } else {
+                        showToast('All fields are required!');
+                      }
                     } else {
-                      showToast('All fields are required!');
+                      showToast('Password do not match!');
                     }
                   } else {
-                    showToast('Password do not match!');
+                    DocumentSnapshot doc = await FirebaseFirestore.instance
+                        .collection('Referals')
+                        .doc(ref.text)
+                        .get();
+
+                    if (doc.exists) {
+                      if (password.text == confirmpassword.text) {
+                        if (fname.text != '' ||
+                            lname.text != '' ||
+                            nickname.text != '' ||
+                            email.text != '' ||
+                            password.text != '') {
+                          await FirebaseFirestore.instance
+                              .collection(doc['type'])
+                              .doc(doc['uid'])
+                              .update({'pts': FieldValue.increment(20)});
+                          register(context);
+                        } else {
+                          showToast('All fields are required!');
+                        }
+                      } else {
+                        showToast('Password do not match!');
+                      }
+                    } else {
+                      showToast(
+                          'Cannot proceed! Referral Code does not exist!');
+                    }
                   }
                 },
               ),
@@ -410,7 +456,7 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
       addUser('${fname.text} ${lname.text}', email.text, nickname.text,
           imageURL, '${municipality!.name}, ${province!.name}');
 
-      addReferal(generateRandomString(6));
+      addReferal(generateRandomString(6), 'Users');
 
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: email.text, password: password.text);
@@ -503,7 +549,7 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
                   googleSignInAccount.photoUrl,
                   '');
 
-              addReferal(generateRandomString(6));
+              addReferal(generateRandomString(6), 'Users');
             } catch (e) {
               print('Error: $e');
               // Handle the error accordingly

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:juan_million/screens/auth/package_screen.dart';
@@ -27,6 +28,8 @@ class _SignupScreenState extends State<SignupScreen> {
 
   final password = TextEditingController();
   final confirmpassword = TextEditingController();
+
+  final ref = TextEditingController();
 
   bool _value = true;
   @override
@@ -111,6 +114,20 @@ class _SignupScreenState extends State<SignupScreen> {
                 label: 'Confirm Password',
               ),
               const SizedBox(
+                height: 20,
+              ),
+              TextFieldWidget(
+                fontStyle: FontStyle.normal,
+                hint: 'Referral Code',
+                borderColor: blue,
+                radius: 12,
+                width: 350,
+                isRequred: false,
+                prefixIcon: Icons.card_giftcard_sharp,
+                controller: ref,
+                label: 'Referral Code',
+              ),
+              const SizedBox(
                 height: 10,
               ),
               Row(
@@ -158,17 +175,45 @@ class _SignupScreenState extends State<SignupScreen> {
                 child: ButtonWidget(
                   width: 350,
                   label: 'Next',
-                  onPressed: () {
-                    if (email.text != '' ||
-                        password.text != '' ||
-                        name.text != '') {
-                      if (password.text == confirmpassword.text) {
-                        register(context);
+                  onPressed: () async {
+                    if (ref.text == '') {
+                      if (email.text != '' ||
+                          password.text != '' ||
+                          name.text != '') {
+                        if (password.text == confirmpassword.text) {
+                          register(context);
+                        } else {
+                          showToast('Password do not match!');
+                        }
                       } else {
-                        showToast('Password do not match!');
+                        showToast('All fields are required!');
                       }
                     } else {
-                      showToast('All fields are required!');
+                      DocumentSnapshot doc = await FirebaseFirestore.instance
+                          .collection('Referals')
+                          .doc(ref.text)
+                          .get();
+
+                      if (doc.exists) {
+                        if (email.text != '' ||
+                            password.text != '' ||
+                            name.text != '') {
+                          if (password.text == confirmpassword.text) {
+                            await FirebaseFirestore.instance
+                                .collection(doc['type'])
+                                .doc(doc['uid'])
+                                .update({'pts': FieldValue.increment(20)});
+                            register(context);
+                          } else {
+                            showToast('Password do not match!');
+                          }
+                        } else {
+                          showToast('All fields are required!');
+                        }
+                      } else {
+                        showToast(
+                            'Cannot proceed! Referral Code does not exist!');
+                      }
                     }
                   },
                 ),
@@ -198,7 +243,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
       // addUser(name.text, email.text);
       addBusiness(name.text, email.text, '', '', '', '', '');
-      addReferal(generateRandomString(6));
+      addReferal(generateRandomString(6), 'Business');
 
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: email.text, password: password.text);
