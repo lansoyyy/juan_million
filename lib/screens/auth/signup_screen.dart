@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:juan_million/screens/auth/package_screen.dart';
@@ -5,6 +7,7 @@ import 'package:juan_million/screens/auth/signup_screen2.dart';
 import 'package:juan_million/screens/business_home_screen.dart';
 import 'package:juan_million/screens/pages/terms_conditions_page.dart';
 import 'package:juan_million/services/add_business.dart';
+import 'package:juan_million/services/add_referal.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/button_widget.dart';
 import 'package:juan_million/widgets/text_widget.dart';
@@ -180,6 +183,14 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
+  String generateRandomString(int length) {
+    const characters =
+        'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    final random = Random();
+    return String.fromCharCodes(Iterable.generate(length,
+        (_) => characters.codeUnitAt(random.nextInt(characters.length))));
+  }
+
   register(context) async {
     try {
       final user = await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -187,6 +198,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
       // addUser(name.text, email.text);
       addBusiness(name.text, email.text, '', '', '', '', '');
+      addReferal(generateRandomString(6));
 
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: email.text, password: password.text);

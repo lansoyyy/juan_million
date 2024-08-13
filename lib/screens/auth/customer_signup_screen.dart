@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +10,7 @@ import 'package:juan_million/models/region_model.dart';
 import 'package:juan_million/screens/auth/login_screen.dart';
 import 'package:juan_million/screens/auth/package_screen.dart';
 import 'package:juan_million/screens/customer_home_screen.dart';
+import 'package:juan_million/services/add_referal.dart';
 import 'package:juan_million/services/add_user.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/address_widget.dart';
@@ -391,6 +394,14 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
     );
   }
 
+  String generateRandomString(int length) {
+    const characters =
+        'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    final random = Random();
+    return String.fromCharCodes(Iterable.generate(length,
+        (_) => characters.codeUnitAt(random.nextInt(characters.length))));
+  }
+
   register(context) async {
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -398,6 +409,8 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
 
       addUser('${fname.text} ${lname.text}', email.text, nickname.text,
           imageURL, '${municipality!.name}, ${province!.name}');
+
+      addReferal(generateRandomString(6));
 
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: email.text, password: password.text);
@@ -489,6 +502,8 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
                   googleSignInAccount.displayName,
                   googleSignInAccount.photoUrl,
                   '');
+
+              addReferal(generateRandomString(6));
             } catch (e) {
               print('Error: $e');
               // Handle the error accordingly
