@@ -172,6 +172,44 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                     ),
                     const SizedBox(
+                      height: 20,
+                    ),
+                    StreamBuilder<DocumentSnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection('Referals')
+                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .snapshots(),
+                        builder: (context,
+                            AsyncSnapshot<DocumentSnapshot> snapshot) {
+                          if (!snapshot.hasData) {
+                            return const Center(child: Text('Loading'));
+                          } else if (snapshot.hasError) {
+                            return const Center(
+                                child: Text('Something went wrong'));
+                          } else if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
+                          dynamic data = snapshot.data;
+                          return Center(
+                            child: TextFieldWidget(
+                              isEnabled: false,
+                              fontStyle: FontStyle.normal,
+                              hint: 'Last Name',
+                              borderColor: blue,
+                              radius: 12,
+                              width: 350,
+                              isRequred: false,
+                              prefixIcon: Icons.card_giftcard_sharp,
+                              controller: TextEditingController(
+                                text: '${data['ref']} (Referral Code)',
+                              ),
+                              label: 'Business Name',
+                            ),
+                          );
+                        }),
+                    const SizedBox(
                       height: 30,
                     ),
                     Center(
