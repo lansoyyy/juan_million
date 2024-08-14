@@ -2,8 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:juan_million/models/municipality_model.dart';
+import 'package:juan_million/models/province_model.dart';
+import 'package:juan_million/models/region_model.dart';
 import 'package:juan_million/utlis/app_constants.dart';
 import 'package:juan_million/utlis/colors.dart';
+import 'package:juan_million/widgets/address_widget.dart';
 import 'package:juan_million/widgets/button_widget.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:intl/intl.dart' show DateFormat, toBeginningOfSentenceCase;
@@ -19,164 +23,350 @@ class AffiliateLocatorPage extends StatefulWidget {
 class _AffiliateLocatorPageState extends State<AffiliateLocatorPage> {
   final searchController = TextEditingController();
   String nameSearched = '';
+
+  Region? region;
+  Province? province;
+  Municipality? municipality;
+
+  String? _selectedCategory;
+  String? _selectedSubCategory;
+
+  final Map<String, List<String>> _categoryOptions = {
+    'Retail': [
+      'Grocery Store',
+      'Electronic & Gadgets',
+      'Apparel & Fashion',
+      'Cosmetics & Beauty',
+      'Toys & Games',
+      'Books & Stationary',
+      'Sports & Fitness',
+      'Home Improvement',
+      'Pet Supplies',
+      'Agri- Products',
+      'Crafts & Hobbies',
+      'Specialty Retail',
+      'Others'
+    ],
+    'Services': [
+      'Personal Care',
+      'Professional Services',
+      'Health & Wellness',
+      'Educational Services',
+      'Home Services',
+      'Automobile',
+      'Laundry',
+      'Fuel Station',
+      'Transportation',
+      'Others'
+    ],
+    'Cafe and Resto': [
+      'Coffee Shops',
+      'Casual Dining',
+      'Fine Dining',
+      'Bakeries & Dessert Shops',
+      'Others'
+    ],
+  };
+
   @override
   Widget build(BuildContext context) {
-    final Stream<DocumentSnapshot> userData = FirebaseFirestore.instance
-        .collection('Coordinator')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .snapshots();
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
         backgroundColor: blue,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 0, right: 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      body: Column(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ExpansionTile(
+                title: TextWidget(
+                  text: 'Filters',
+                  fontSize: 18,
+                  fontFamily: 'Bold',
+                ),
+                leading: const Icon(
+                  Icons.sort,
+                ),
                 children: [
+                  SizedBox(
+                    width: double.infinity,
+                    child: CustomRegionDropdownView(
+                        onChanged: (Region? value) {
+                          setState(() {
+                            if (region != value) {
+                              province = null;
+                              municipality = null;
+                            }
+                            region = value;
+                          });
+                        },
+                        value: region),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: CustomProvinceDropdownView(
+                      provinces: region?.provinces ?? [],
+                      onChanged: (Province? value) {
+                        setState(() {
+                          if (province != value) {
+                            municipality = null;
+                          }
+                          province = value;
+                        });
+                      },
+                      value: province,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: CustomMunicipalityDropdownView(
+                      municipalities: province?.municipalities ?? [],
+                      onChanged: (value) {
+                        setState(() {
+                          municipality = value;
+                        });
+                      },
+                      value: municipality,
+                    ),
+                  ),
                   const SizedBox(
                     height: 10,
                   ),
-                  StreamBuilder<QuerySnapshot>(
-                      stream: FirebaseFirestore.instance
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        top: 10, bottom: 10, left: 20, right: 20),
+                    child: Column(
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12.5),
+                            border: Border.all(
+                              color: blue,
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+                            child: DropdownButton<String>(
+                              underline: const SizedBox(),
+                              hint: Text(
+                                'Select Business Classification',
+                                style: TextStyle(
+                                  color: blue,
+                                ),
+                              ),
+                              value: _selectedCategory,
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  _selectedCategory = newValue;
+                                  _selectedSubCategory = null;
+                                });
+                              },
+                              items:
+                                  _categoryOptions.keys.map((String category) {
+                                return DropdownMenuItem<String>(
+                                  value: category,
+                                  child: TextWidget(
+                                    text: category,
+                                    fontSize: 14,
+                                    color: blue,
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        if (_selectedCategory != null)
+                          Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12.5),
+                              border: Border.all(
+                                color: blue,
+                              ),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+                              child: DropdownButton<String>(
+                                underline: const SizedBox(),
+                                hint: Text(
+                                  'Select Clarification Type',
+                                  style: TextStyle(
+                                    color: blue,
+                                  ),
+                                ),
+                                value: _selectedSubCategory,
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    _selectedSubCategory = newValue;
+                                  });
+                                },
+                                items: _categoryOptions[_selectedCategory]!
+                                    .map((String subCategory) {
+                                  return DropdownMenuItem<String>(
+                                    value: subCategory,
+                                    child: TextWidget(
+                                      text: subCategory,
+                                      fontSize: 14,
+                                      color: blue,
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              StreamBuilder<QuerySnapshot>(
+                  stream: municipality == null
+                      ? FirebaseFirestore.instance
                           .collection('Business')
-                          .where('verified', isEqualTo: false)
-                          .where('name',
-                              isGreaterThanOrEqualTo:
-                                  toBeginningOfSentenceCase(nameSearched))
-                          .where('name',
-                              isLessThan:
-                                  '${toBeginningOfSentenceCase(nameSearched)}z')
+                          .where('clarification',
+                              isEqualTo: _selectedSubCategory)
+                          .snapshots()
+                      : FirebaseFirestore.instance
+                          .collection('Business')
+                          .where('clarification',
+                              isEqualTo: _selectedSubCategory)
+                          .where('address',
+                              isEqualTo:
+                                  '${municipality!.name}, ${province!.name}')
                           .snapshots(),
-                      builder: (BuildContext context,
-                          AsyncSnapshot<QuerySnapshot> snapshot) {
-                        if (snapshot.hasError) {
-                          print(snapshot.error);
-                          return const Center(child: Text('Error'));
-                        }
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Padding(
-                            padding: EdgeInsets.only(top: 50),
-                            child: Center(
-                                child: CircularProgressIndicator(
-                              color: Colors.black,
-                            )),
-                          );
-                        }
+                  builder: (BuildContext context,
+                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.hasError) {
+                      print(snapshot.error);
+                      return const Center(child: Text('Error'));
+                    }
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Padding(
+                        padding: EdgeInsets.only(top: 50),
+                        child: Center(
+                            child: CircularProgressIndicator(
+                          color: Colors.black,
+                        )),
+                      );
+                    }
 
-                        final data = snapshot.requireData;
+                    final data = snapshot.requireData;
 
-                        return SizedBox(
-                          height: 580,
-                          child: ListView.builder(
-                            itemCount: data.docs.length,
-                            itemBuilder: (context, index) {
-                              return Padding(
-                                padding: const EdgeInsets.all(5.0),
-                                child: GestureDetector(
-                                  child: Card(
-                                    elevation: 5,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(
-                                          15,
+                    return SizedBox(
+                      height: 500,
+                      child: ListView.builder(
+                        itemCount: data.docs.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: GestureDetector(
+                              child: Card(
+                                elevation: 5,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(
+                                      15,
+                                    ),
+                                  ),
+                                  width: double.infinity,
+                                  height: 150,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 10, right: 10),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          width: 150,
+                                          height: 120,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[200],
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(10.0),
+                                            child: Center(
+                                              child: Image.network(
+                                                data.docs[index]['logo'],
+                                              ),
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                      width: double.infinity,
-                                      height: 150,
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 10, right: 10),
-                                        child: Row(
+                                        const SizedBox(
+                                          width: 20,
+                                        ),
+                                        Column(
                                           mainAxisAlignment:
-                                              MainAxisAlignment.start,
+                                              MainAxisAlignment.center,
                                           crossAxisAlignment:
-                                              CrossAxisAlignment.center,
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            Container(
-                                              width: 150,
-                                              height: 120,
-                                              decoration: BoxDecoration(
-                                                color: Colors.grey[200],
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                  10,
-                                                ),
+                                            SizedBox(
+                                              width: 100,
+                                              child: TextWidget(
+                                                text: data.docs[index]['name'],
+                                                fontSize: 24,
+                                                color: blue,
+                                                fontFamily: 'Bold',
                                               ),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(10.0),
-                                                child: Center(
-                                                  child: Image.network(
-                                                    data.docs[index]['logo'],
-                                                  ),
-                                                ),
-                                              ),
+                                            ),
+                                            TextWidget(
+                                              text:
+                                                  'Classification: ${data.docs[index]['clarification']}',
+                                              fontSize: 11,
+                                              color: blue,
+                                              fontFamily: 'Regular',
+                                            ),
+                                            TextWidget(
+                                              text:
+                                                  'Email: ${data.docs[index]['email']}',
+                                              fontSize: 11,
+                                              color: blue,
+                                              fontFamily: 'Regular',
                                             ),
                                             const SizedBox(
-                                              width: 20,
-                                            ),
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                SizedBox(
-                                                  width: 100,
-                                                  child: TextWidget(
-                                                    text: data.docs[index]
-                                                        ['name'],
-                                                    fontSize: 24,
-                                                    color: blue,
-                                                    fontFamily: 'Bold',
-                                                  ),
-                                                ),
-                                                TextWidget(
-                                                  text:
-                                                      'Classification: ${data.docs[index]['clarification']}',
-                                                  fontSize: 11,
-                                                  color: blue,
-                                                  fontFamily: 'Regular',
-                                                ),
-                                                TextWidget(
-                                                  text:
-                                                      'Email: ${data.docs[index]['email']}',
-                                                  fontSize: 11,
-                                                  color: blue,
-                                                  fontFamily: 'Regular',
-                                                ),
-                                                const SizedBox(
-                                                  height: 5,
-                                                ),
-                                              ],
+                                              height: 5,
                                             ),
                                           ],
                                         ),
-                                      ),
+                                      ],
                                     ),
                                   ),
                                 ),
-                              );
-                            },
-                          ),
-                        );
-                      }),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-          ],
-        ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  }),
+            ],
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+        ],
       ),
     );
   }
