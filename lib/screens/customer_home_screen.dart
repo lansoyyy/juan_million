@@ -11,6 +11,7 @@ import 'package:juan_million/screens/pages/business/inventory_page.dart';
 import 'package:juan_million/screens/pages/business/points_page.dart';
 import 'package:juan_million/screens/pages/business/settings_page.dart';
 import 'package:juan_million/screens/pages/business/wallet_page.dart';
+import 'package:juan_million/screens/pages/customer/affiliates_locator_page.dart';
 import 'package:juan_million/screens/pages/customer/inventory_page.dart';
 import 'package:juan_million/screens/pages/customer/myqr_page.dart';
 import 'package:juan_million/screens/pages/customer/notif_page.dart';
@@ -300,6 +301,17 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                               },
                               icon: const Icon(
                                 Icons.sync,
+                                color: Colors.white,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) =>
+                                        const AffiliateLocatorPage()));
+                              },
+                              icon: const Icon(
+                                Icons.business,
                                 color: Colors.white,
                               ),
                             ),
