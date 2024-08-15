@@ -43,6 +43,8 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
 
   final nickname = TextEditingController();
 
+  final number = TextEditingController();
+
   late String fileName = '';
 
   late File imageFile;
@@ -197,6 +199,23 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
                 prefixIcon: Icons.person_3_outlined,
                 controller: nickname,
                 label: 'Nickname',
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              TextFieldWidget(
+                fontStyle: FontStyle.normal,
+                hint: 'Mobile Number',
+                borderColor: blue,
+                radius: 12,
+                width: 350,
+                isRequred: true,
+                inputType: TextInputType.number,
+                maxLength: 11,
+                height: 70,
+                prefixIcon: Icons.phone,
+                controller: number,
+                label: 'Mobile Number',
               ),
               const SizedBox(
                 height: 20,
@@ -454,7 +473,7 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
           email: email.text, password: password.text);
 
       addUser('${fname.text} ${lname.text}', email.text, nickname.text,
-          imageURL, '${municipality!.name}, ${province!.name}');
+          imageURL, '${municipality!.name}, ${province!.name}', number.text);
 
       addReferal(generateRandomString(6), 'Users');
 
@@ -547,6 +566,7 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
                   googleSignInAccount.email,
                   googleSignInAccount.displayName,
                   googleSignInAccount.photoUrl,
+                  '',
                   '');
 
               addReferal(generateRandomString(6), 'Users');

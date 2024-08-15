@@ -78,14 +78,14 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             TextFieldWidget(
               fontStyle: FontStyle.normal,
-              hint: 'Email',
+              hint: 'Email/Mobile Number',
               borderColor: blue,
               radius: 12,
               width: 350,
-              prefixIcon: Icons.email,
+              prefixIcon: Icons.person,
               isRequred: false,
               controller: username,
-              label: 'Email',
+              label: 'Email/Mobile Number',
             ),
             const SizedBox(
               height: 20,
@@ -129,10 +129,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 TextFieldWidget(
-                                  hint: 'Email',
+                                  hint: 'Email/Mobile Number',
                                   textCapitalization: TextCapitalization.none,
-                                  inputType: TextInputType.emailAddress,
-                                  label: 'Email',
+                                  label: 'Email/Mobile Number',
                                   controller: emailController,
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
@@ -163,37 +162,83 @@ class _LoginScreenState extends State<LoginScreen> {
                             TextButton(
                               onPressed: (() async {
                                 if (formKey.currentState!.validate()) {
-                                  try {
-                                    Navigator.pop(context);
-                                    await FirebaseAuth.instance
-                                        .sendPasswordResetEmail(
-                                            email: emailController.text);
-                                    showToast(
-                                        'Password reset link sent to ${emailController.text}');
-                                  } catch (e) {
-                                    String errorMessage = '';
+                                  if (isPhoneNumber(emailController.text)) {
+                                    var querySnapshot = await FirebaseFirestore
+                                        .instance
+                                        .collection('Users')
+                                        .where('number',
+                                            isEqualTo: username.text)
+                                        .get();
 
-                                    if (e is FirebaseException) {
-                                      switch (e.code) {
-                                        case 'invalid-email':
-                                          errorMessage =
-                                              'The email address is invalid.';
-                                          break;
-                                        case 'user-not-found':
-                                          errorMessage =
-                                              'The user associated with the email address is not found.';
-                                          break;
-                                        default:
+                                    if (querySnapshot.docs.isNotEmpty) {
+                                      try {
+                                        Navigator.pop(context);
+                                        await FirebaseAuth.instance
+                                            .sendPasswordResetEmail(
+                                                email: querySnapshot
+                                                    .docs.first['email']);
+                                        showToast(
+                                            'Password reset link sent to ${querySnapshot.docs.first['email']}');
+                                      } catch (e) {
+                                        String errorMessage = '';
+
+                                        if (e is FirebaseException) {
+                                          switch (e.code) {
+                                            case 'invalid-email':
+                                              errorMessage =
+                                                  'The email address is invalid.';
+                                              break;
+                                            case 'user-not-found':
+                                              errorMessage =
+                                                  'The user associated with the email address is not found.';
+                                              break;
+                                            default:
+                                              errorMessage =
+                                                  'An error occurred while resetting the password.';
+                                          }
+                                        } else {
                                           errorMessage =
                                               'An error occurred while resetting the password.';
+                                        }
                                       }
                                     } else {
-                                      errorMessage =
-                                          'An error occurred while resetting the password.';
+                                      showToast(
+                                          'Cannot proceed! Mobile Number not found');
+                                      Navigator.pop(context);
                                     }
+                                  } else {
+                                    try {
+                                      Navigator.pop(context);
+                                      await FirebaseAuth.instance
+                                          .sendPasswordResetEmail(
+                                              email: emailController.text);
+                                      showToast(
+                                          'Password reset link sent to ${emailController.text}');
+                                    } catch (e) {
+                                      String errorMessage = '';
 
-                                    showToast(errorMessage);
-                                    Navigator.pop(context);
+                                      if (e is FirebaseException) {
+                                        switch (e.code) {
+                                          case 'invalid-email':
+                                            errorMessage =
+                                                'The email address is invalid.';
+                                            break;
+                                          case 'user-not-found':
+                                            errorMessage =
+                                                'The user associated with the email address is not found.';
+                                            break;
+                                          default:
+                                            errorMessage =
+                                                'An error occurred while resetting the password.';
+                                        }
+                                      } else {
+                                        errorMessage =
+                                            'An error occurred while resetting the password.';
+                                      }
+
+                                      showToast(errorMessage);
+                                      Navigator.pop(context);
+                                    }
                                   }
                                 }
                               }),
@@ -344,55 +389,120 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   login(context) async {
-    try {
-      final user = await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: username.text, password: password.text);
+    if (isPhoneNumber(username.text)) {
+      var querySnapshot = await FirebaseFirestore.instance
+          .collection('Users')
+          .where('number', isEqualTo: username.text)
+          .get();
 
-      if (widget.inCustomer) {
-        if (user.user!.emailVerified) {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => const CustomerHomeScreen()),
-            (route) {
-              return false;
-            },
-          );
-        } else {
-          showToast('Cannot proceed! Email not verified');
+      if (querySnapshot.docs.isNotEmpty) {
+        try {
+          final user = await FirebaseAuth.instance.signInWithEmailAndPassword(
+              email: querySnapshot.docs.first['email'],
+              password: password.text);
+
+          if (widget.inCustomer) {
+            if (user.user!.emailVerified) {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                    builder: (context) => const CustomerHomeScreen()),
+                (route) {
+                  return false;
+                },
+              );
+            } else {
+              showToast('Cannot proceed! Email not verified');
+            }
+          } else {
+            if (user.user!.emailVerified) {
+              var document =
+                  FirebaseFirestore.instance.doc('Business/${user.user!.uid}');
+              var snapshot = await document.get();
+              if (snapshot.data()!['verified'] == true) {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (context) => const BusinessHomeScreen()),
+                  (route) {
+                    return false;
+                  },
+                );
+              } else {
+                showToast('Request grant access!');
+              }
+            } else {
+              showToast('Cannot proceed! Email not verified');
+            }
+          }
+        } on FirebaseAuthException catch (e) {
+          if (e.code == 'user-not-found') {
+            showToast("No user found with that email.");
+          } else if (e.code == 'wrong-password') {
+            showToast("Wrong password provided for that user.");
+          } else if (e.code == 'invalid-email') {
+            showToast("Invalid email provided.");
+          } else if (e.code == 'user-disabled') {
+            showToast("User account has been disabled.");
+          } else {
+            showToast("An error occurred: ${e.message}");
+          }
+        } on Exception catch (e) {
+          showToast("An error occurred: $e");
         }
       } else {
-        if (user.user!.emailVerified) {
-          var document =
-              FirebaseFirestore.instance.doc('Business/${user.user!.uid}');
-          var snapshot = await document.get();
-          if (snapshot.data()!['verified'] == true) {
+        showToast('Cannot proceed! Mobile Number not found');
+      }
+    } else {
+      try {
+        final user = await FirebaseAuth.instance.signInWithEmailAndPassword(
+            email: username.text, password: password.text);
+
+        if (widget.inCustomer) {
+          if (user.user!.emailVerified) {
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
-                  builder: (context) => const BusinessHomeScreen()),
+                  builder: (context) => const CustomerHomeScreen()),
               (route) {
                 return false;
               },
             );
           } else {
-            showToast('Request grant access!');
+            showToast('Cannot proceed! Email not verified');
           }
         } else {
-          showToast('Cannot proceed! Email not verified');
+          if (user.user!.emailVerified) {
+            var document =
+                FirebaseFirestore.instance.doc('Business/${user.user!.uid}');
+            var snapshot = await document.get();
+            if (snapshot.data()!['verified'] == true) {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                    builder: (context) => const BusinessHomeScreen()),
+                (route) {
+                  return false;
+                },
+              );
+            } else {
+              showToast('Request grant access!');
+            }
+          } else {
+            showToast('Cannot proceed! Email not verified');
+          }
         }
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'user-not-found') {
+          showToast("No user found with that email.");
+        } else if (e.code == 'wrong-password') {
+          showToast("Wrong password provided for that user.");
+        } else if (e.code == 'invalid-email') {
+          showToast("Invalid email provided.");
+        } else if (e.code == 'user-disabled') {
+          showToast("User account has been disabled.");
+        } else {
+          showToast("An error occurred: ${e.message}");
+        }
+      } on Exception catch (e) {
+        showToast("An error occurred: $e");
       }
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        showToast("No user found with that email.");
-      } else if (e.code == 'wrong-password') {
-        showToast("Wrong password provided for that user.");
-      } else if (e.code == 'invalid-email') {
-        showToast("Invalid email provided.");
-      } else if (e.code == 'user-disabled') {
-        showToast("User account has been disabled.");
-      } else {
-        showToast("An error occurred: ${e.message}");
-      }
-    } on Exception catch (e) {
-      showToast("An error occurred: $e");
     }
   }
 
@@ -452,6 +562,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   googleSignInAccount.email,
                   googleSignInAccount.displayName,
                   googleSignInAccount.photoUrl,
+                  '',
                   '');
             } catch (e) {
               print('Error: $e');
@@ -472,5 +583,17 @@ class _LoginScreenState extends State<LoginScreen> {
       print('123');
       print(e);
     }
+  }
+
+  bool isPhoneNumber(String input) {
+    // Define a regex pattern that matches Philippine phone number formats
+    RegExp phoneRegex = RegExp(
+      r'^(09|\+639)\d{9}$',
+      caseSensitive: false,
+      multiLine: false,
+    );
+
+    // Use RegExp's hasMatch method to check if the input matches the pattern
+    return phoneRegex.hasMatch(input);
   }
 }
