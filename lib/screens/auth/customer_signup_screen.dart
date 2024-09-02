@@ -12,6 +12,7 @@ import 'package:juan_million/screens/auth/package_screen.dart';
 import 'package:juan_million/screens/customer_home_screen.dart';
 import 'package:juan_million/services/add_referal.dart';
 import 'package:juan_million/services/add_user.dart';
+import 'package:juan_million/utlis/app_common.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/address_widget.dart';
 import 'package:juan_million/widgets/button_widget.dart';
@@ -468,14 +469,21 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
   }
 
   register(context) async {
+    String key = generateUniqueKey(6);
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: email.text, password: password.text);
 
-      addUser('${fname.text} ${lname.text}', email.text, nickname.text,
-          imageURL, '${municipality!.name}, ${province!.name}', number.text);
+      addUser(
+          '${fname.text} ${lname.text}',
+          email.text,
+          nickname.text,
+          imageURL,
+          '${municipality!.name}, ${province!.name}',
+          number.text,
+          key);
 
-      addReferal(generateRandomString(6), 'Users');
+      addReferal(key, 'Users');
 
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: email.text, password: password.text);
@@ -542,6 +550,7 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
         }
       }).whenComplete(
         () async {
+          String key = generateUniqueKey(6);
           if (userExist) {
             Navigator.pop(context);
 
@@ -567,7 +576,8 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
                   googleSignInAccount.displayName,
                   googleSignInAccount.photoUrl,
                   '',
-                  '');
+                  '',
+                  key);
 
               addReferal(generateRandomString(6), 'Users');
             } catch (e) {

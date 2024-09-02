@@ -8,6 +8,7 @@ import 'package:juan_million/screens/auth/signup_screen.dart';
 import 'package:juan_million/screens/business_home_screen.dart';
 import 'package:juan_million/screens/customer_home_screen.dart';
 import 'package:juan_million/services/add_user.dart';
+import 'package:juan_million/utlis/app_common.dart';
 import 'package:juan_million/utlis/app_constants.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/button_widget.dart';
@@ -563,7 +564,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   googleSignInAccount.displayName,
                   googleSignInAccount.photoUrl,
                   '',
-                  '');
+                  '',
+                  generateUniqueKey(6));
             } catch (e) {
               print('Error: $e');
               // Handle the error accordingly

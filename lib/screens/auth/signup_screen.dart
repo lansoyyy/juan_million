@@ -9,6 +9,7 @@ import 'package:juan_million/screens/business_home_screen.dart';
 import 'package:juan_million/screens/pages/terms_conditions_page.dart';
 import 'package:juan_million/services/add_business.dart';
 import 'package:juan_million/services/add_referal.dart';
+import 'package:juan_million/utlis/app_common.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/button_widget.dart';
 import 'package:juan_million/widgets/text_widget.dart';
@@ -237,13 +238,14 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   register(context) async {
+    String key = generateUniqueKey(6);
     try {
       final user = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: email.text, password: password.text);
 
       // addUser(name.text, email.text);
-      addBusiness(name.text, email.text, '', '', '', '', '');
-      addReferal(generateRandomString(6), 'Business');
+      addBusiness(name.text, email.text, '', '', '', '', '', key);
+      addReferal(key, 'Business');
 
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: email.text, password: password.text);

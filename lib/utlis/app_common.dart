@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -16,6 +17,15 @@ TextStyle headerTextStyle(
       fontWeight: weight ?? FontWeight.bold,
       decoration: textDecoration ?? TextDecoration.none,
       letterSpacing: letterSpacing ?? 0);
+}
+
+String generateUniqueKey(int length) {
+  const String chars =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  Random random = Random();
+
+  return List.generate(length, (index) => chars[random.nextInt(chars.length)])
+      .join();
 }
 
 TextStyle boldTextStyle(

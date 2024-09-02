@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-Future addBusiness(
-    name, email, logo, address, desc, clarification, representative) async {
+Future addBusiness(name, email, logo, address, desc, clarification,
+    representative, ref) async {
   final docUser = FirebaseFirestore.instance
       .collection('Business')
       .doc(FirebaseAuth.instance.currentUser!.uid);
@@ -25,6 +25,7 @@ Future addBusiness(
     'verified': false,
     'packagePayment': 0,
     'packageWallet': 0,
+    'ref': ref,
   };
 
   await docUser.set(json);
