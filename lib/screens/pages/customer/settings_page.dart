@@ -246,7 +246,7 @@ class _CustomerSettingsPageState extends State<CustomerSettingsPage> {
                             child: TextFieldWidget(
                               isEnabled: false,
                               fontStyle: FontStyle.normal,
-                              hint: 'Last Name',
+                              hint: 'Referral Code',
                               borderColor: blue,
                               radius: 12,
                               width: 350,
@@ -255,7 +255,7 @@ class _CustomerSettingsPageState extends State<CustomerSettingsPage> {
                               controller: TextEditingController(
                                 text: '${data['ref']} (Referral Code)',
                               ),
-                              label: 'Business Name',
+                              label: 'Referral Code',
                             ),
                           );
                         }),

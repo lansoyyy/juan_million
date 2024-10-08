@@ -579,7 +579,7 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
                   '',
                   key);
 
-              addReferal(generateRandomString(6), 'Users');
+              addReferal(key, 'Users');
             } catch (e) {
               print('Error: $e');
               // Handle the error accordingly
