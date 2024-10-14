@@ -58,42 +58,42 @@ class _PackagesPaymentPageState extends State<PackagesPaymentPage> {
               ),
             ],
           ),
-          const SizedBox(
-            height: 20,
-          ),
-          GestureDetector(
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const PaymentScreen()));
-            },
-            child: Card(
-              elevation: 3,
-              child: SizedBox(
-                height: 200,
-                width: 300,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.payment,
-                      size: 150,
-                      color: blue,
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    TextWidget(
-                      text: 'Payment Gateway',
-                      fontSize: 14,
-                      fontFamily: 'Regular',
-                      color: blue,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          // const SizedBox(
+          //   height: 20,
+          // ),
+          // GestureDetector(
+          //   onTap: () {
+          //     Navigator.of(context).push(MaterialPageRoute(
+          //         builder: (context) => const PaymentScreen()));
+          //   },
+          //   child: Card(
+          //     elevation: 3,
+          //     child: SizedBox(
+          //       height: 200,
+          //       width: 300,
+          //       child: Column(
+          //         mainAxisAlignment: MainAxisAlignment.center,
+          //         crossAxisAlignment: CrossAxisAlignment.center,
+          //         children: [
+          //           Icon(
+          //             Icons.payment,
+          //             size: 150,
+          //             color: blue,
+          //           ),
+          //           const SizedBox(
+          //             height: 5,
+          //           ),
+          //           TextWidget(
+          //             text: 'Payment Gateway',
+          //             fontSize: 14,
+          //             fontFamily: 'Regular',
+          //             color: blue,
+          //           ),
+          //         ],
+          //       ),
+          //     ),
+          //   ),
+          // ),
           const SizedBox(
             height: 25,
           ),
