@@ -497,7 +497,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                   StreamBuilder<QuerySnapshot>(
                       stream: FirebaseFirestore.instance
                           .collection('Points')
-                          .where('scannedId',
+                          .where('uid',
                               isEqualTo: FirebaseAuth.instance.currentUser!.uid)
                           .snapshots(),
                       builder: (BuildContext context,
@@ -600,17 +600,17 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                                                 CrossAxisAlignment
                                                                     .start,
                                                             children: [
-                                                              Center(
-                                                                child:
-                                                                    TextWidget(
-                                                                  text: businessdata[
-                                                                      'name'],
-                                                                  fontSize: 12,
-                                                                  fontFamily:
-                                                                      'Medium',
-                                                                  color: blue,
-                                                                ),
-                                                              ),
+                                                              // Center(
+                                                              //   child:
+                                                              //       TextWidget(
+                                                              //     text: businessdata[
+                                                              //         'name'],
+                                                              //     fontSize: 12,
+                                                              //     fontFamily:
+                                                              //         'Medium',
+                                                              //     color: blue,
+                                                              //   ),
+                                                              // ),
                                                               const SizedBox(
                                                                 height: 15,
                                                               ),

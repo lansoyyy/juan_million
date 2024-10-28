@@ -150,793 +150,769 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .snapshots();
     return Scaffold(
-      body: Column(
-        children: [
-          StreamBuilder<DocumentSnapshot>(
-              stream: userData,
-              builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                if (!snapshot.hasData) {
-                  return const Center(child: Text('Loading'));
-                } else if (snapshot.hasError) {
-                  return const Center(child: Text('Something went wrong'));
-                } else if (snapshot.connectionState ==
-                    ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                dynamic mydata = snapshot.data;
-                return Column(
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      color: blue,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 20, right: 20),
-                        child: SafeArea(
-                          child: Row(
-                            children: [
-                              TextWidget(
-                                text: 'Hello ka-Juan!',
-                                fontSize: 18,
-                                color: Colors.white,
-                              ),
-                              const Expanded(
-                                child: SizedBox(),
-                              ),
-                              IconButton(
-                                onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return Dialog(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(20.0),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              TextFieldWidget(
-                                                showEye: true,
-                                                isObscure: true,
-                                                fontStyle: FontStyle.normal,
-                                                hint: 'PIN Code',
-                                                borderColor: blue,
-                                                radius: 12,
-                                                width: 350,
-                                                prefixIcon: Icons.lock,
-                                                isRequred: false,
-                                                controller: pin,
-                                                label: 'PIN Code',
-                                              ),
-                                              const SizedBox(
-                                                height: 20,
-                                              ),
-                                              ButtonWidget(
-                                                label: 'Confirm',
-                                                onPressed: () async {
-                                                  DocumentSnapshot doc =
-                                                      await FirebaseFirestore
-                                                          .instance
-                                                          .collection(
-                                                              'Cashiers')
-                                                          .doc(pin.text)
-                                                          .get()
-                                                          .whenComplete(() {
-                                                    Navigator.pop(context);
-                                                  });
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            StreamBuilder<DocumentSnapshot>(
+                stream: userData,
+                builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(child: Text('Loading'));
+                  } else if (snapshot.hasError) {
+                    return const Center(child: Text('Something went wrong'));
+                  } else if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  dynamic mydata = snapshot.data;
+                  return Column(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        color: blue,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20, right: 20),
+                          child: SafeArea(
+                            child: Row(
+                              children: [
+                                TextWidget(
+                                  text: 'Hello ka-Juan!',
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                ),
+                                const Expanded(
+                                  child: SizedBox(),
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return Dialog(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(20.0),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                TextFieldWidget(
+                                                  showEye: true,
+                                                  isObscure: true,
+                                                  fontStyle: FontStyle.normal,
+                                                  hint: 'PIN Code',
+                                                  borderColor: blue,
+                                                  radius: 12,
+                                                  width: 350,
+                                                  prefixIcon: Icons.lock,
+                                                  isRequred: false,
+                                                  controller: pin,
+                                                  label: 'PIN Code',
+                                                ),
+                                                const SizedBox(
+                                                  height: 20,
+                                                ),
+                                                ButtonWidget(
+                                                  label: 'Confirm',
+                                                  onPressed: () async {
+                                                    DocumentSnapshot doc =
+                                                        await FirebaseFirestore
+                                                            .instance
+                                                            .collection(
+                                                                'Cashiers')
+                                                            .doc(pin.text)
+                                                            .get()
+                                                            .whenComplete(() {
+                                                      Navigator.pop(context);
+                                                    });
 
-                                                  if (doc.exists) {
-                                                    if (mydata['pts'] > 1) {
-                                                      showDialog(
-                                                        context: context,
-                                                        builder: (context) {
-                                                          return AlertDialog(
-                                                            content: StatefulBuilder(
-                                                                builder: (context,
-                                                                    setState) {
-                                                              return Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .only(
-                                                                        top: 20,
-                                                                        bottom:
-                                                                            20),
-                                                                child: Column(
-                                                                  mainAxisSize:
-                                                                      MainAxisSize
-                                                                          .min,
-                                                                  children: [
-                                                                    TextWidget(
-                                                                      text:
-                                                                          'Input Amount Purchased',
-                                                                      fontSize:
-                                                                          18,
-                                                                      fontFamily:
-                                                                          'Regular',
-                                                                      color: Colors
-                                                                          .grey,
-                                                                    ),
-                                                                    const SizedBox(
-                                                                      height:
-                                                                          20,
-                                                                    ),
-                                                                    TextFieldWidget(
-                                                                      controller:
-                                                                          amount,
-                                                                      label:
-                                                                          'Amount',
-                                                                      inputType: const TextInputType
-                                                                          .numberWithOptions(
-                                                                          decimal:
-                                                                              true),
-                                                                    ),
-                                                                    const SizedBox(
-                                                                      height:
-                                                                          10,
-                                                                    ),
-                                                                    Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .end,
-                                                                      children: [
-                                                                        MaterialButton(
-                                                                          onPressed: () =>
-                                                                              Navigator.of(context).pop(true),
-                                                                          child:
-                                                                              const Text(
-                                                                            'Close',
-                                                                            style: TextStyle(
-                                                                                fontSize: 16,
-                                                                                color: Colors.grey,
-                                                                                fontFamily: 'Medium',
-                                                                                fontWeight: FontWeight.bold),
+                                                    if (doc.exists) {
+                                                      if (mydata['pts'] > 1) {
+                                                        showDialog(
+                                                          context: context,
+                                                          builder: (context) {
+                                                            return AlertDialog(
+                                                              content: StatefulBuilder(
+                                                                  builder: (context,
+                                                                      setState) {
+                                                                return Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .only(
+                                                                          top:
+                                                                              20,
+                                                                          bottom:
+                                                                              20),
+                                                                  child: Column(
+                                                                    mainAxisSize:
+                                                                        MainAxisSize
+                                                                            .min,
+                                                                    children: [
+                                                                      TextWidget(
+                                                                        text:
+                                                                            'Input Amount Purchased',
+                                                                        fontSize:
+                                                                            18,
+                                                                        fontFamily:
+                                                                            'Regular',
+                                                                        color: Colors
+                                                                            .grey,
+                                                                      ),
+                                                                      const SizedBox(
+                                                                        height:
+                                                                            20,
+                                                                      ),
+                                                                      TextFieldWidget(
+                                                                        controller:
+                                                                            amount,
+                                                                        label:
+                                                                            'Amount',
+                                                                        inputType: const TextInputType
+                                                                            .numberWithOptions(
+                                                                            decimal:
+                                                                                true),
+                                                                      ),
+                                                                      const SizedBox(
+                                                                        height:
+                                                                            10,
+                                                                      ),
+                                                                      Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.end,
+                                                                        children: [
+                                                                          MaterialButton(
+                                                                            onPressed: () =>
+                                                                                Navigator.of(context).pop(true),
+                                                                            child:
+                                                                                const Text(
+                                                                              'Close',
+                                                                              style: TextStyle(fontSize: 16, color: Colors.grey, fontFamily: 'Medium', fontWeight: FontWeight.bold),
+                                                                            ),
                                                                           ),
-                                                                        ),
-                                                                        MaterialButton(
-                                                                          onPressed:
-                                                                              () {
-                                                                            Navigator.of(context).pop(true);
+                                                                          MaterialButton(
+                                                                            onPressed:
+                                                                                () {
+                                                                              Navigator.of(context).pop(true);
 
-                                                                            scanQRCode(
-                                                                              ((double.parse(amount.text) * mydata['ptsconversion']) * 0.01).toInt(),
-                                                                              doc['name'],
-                                                                            );
-                                                                          },
-                                                                          child:
-                                                                              const Text(
-                                                                            'Continue',
-                                                                            style: TextStyle(
-                                                                                fontFamily: 'Bold',
-                                                                                fontSize: 16,
-                                                                                fontWeight: FontWeight.bold),
+                                                                              scanQRCode(
+                                                                                ((double.parse(amount.text) * mydata['ptsconversion']) * 0.01).toInt(),
+                                                                                doc['name'],
+                                                                              );
+                                                                            },
+                                                                            child:
+                                                                                const Text(
+                                                                              'Continue',
+                                                                              style: TextStyle(fontFamily: 'Bold', fontSize: 16, fontWeight: FontWeight.bold),
+                                                                            ),
                                                                           ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              );
-                                                            }),
-                                                          );
-                                                        },
-                                                      );
+                                                                        ],
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                );
+                                                              }),
+                                                            );
+                                                          },
+                                                        );
+                                                      } else {
+                                                        showToast(
+                                                            "You don't have enough points.");
+                                                      }
                                                     } else {
                                                       showToast(
-                                                          "You don't have enough points.");
+                                                          'PIN Code does not exist!');
                                                     }
-                                                  } else {
-                                                    showToast(
-                                                        'PIN Code does not exist!');
-                                                  }
 
-                                                  pin.clear();
-                                                },
-                                              )
-                                            ],
+                                                    pin.clear();
+                                                  },
+                                                )
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
-                                icon: const Icon(
-                                  Icons.qr_code,
-                                  color: Colors.white,
+                                        );
+                                      },
+                                    );
+                                  },
+                                  icon: const Icon(
+                                    Icons.qr_code,
+                                    color: Colors.white,
+                                  ),
                                 ),
-                              ),
-                              IconButton(
-                                onPressed: () {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) =>
-                                          const CashiersScreen()));
-                                },
-                                icon: const Icon(
-                                  Icons.groups_2_outlined,
-                                  color: Colors.white,
+                                IconButton(
+                                  onPressed: () {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const CashiersScreen()));
+                                  },
+                                  icon: const Icon(
+                                    Icons.groups_2_outlined,
+                                    color: Colors.white,
+                                  ),
                                 ),
-                              ),
-                              IconButton(
-                                onPressed: () {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) =>
-                                          const SettingsPage()));
-                                },
-                                icon: const Icon(
-                                  Icons.settings,
-                                  color: Colors.white,
+                                IconButton(
+                                  onPressed: () {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const SettingsPage()));
+                                  },
+                                  icon: const Icon(
+                                    Icons.settings,
+                                    color: Colors.white,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      height: 200,
-                      width: 500,
-                      child: ListView.builder(
-                        itemCount: 3,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) {
-                          return GestureDetector(
-                            onTap: () {
-                              if (index == 0) {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => const PointsPage()));
-                              } else if (index == 1) {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => const WalletPage()));
-                              } else {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        const InventoryPage()));
-                              }
-                            },
-                            child: Center(
-                              child: Container(
-                                width: 425,
-                                height: 250,
-                                decoration: BoxDecoration(
-                                  color: index == 0
-                                      ? blue
-                                      : index == 1
-                                          ? primary
-                                          : Colors.lightBlue,
-                                  borderRadius: const BorderRadius.only(
-                                    bottomLeft: Radius.circular(1000),
-                                    bottomRight: Radius.circular(1000),
-                                  ),
-                                ),
-                                child: SafeArea(
-                                  child: Padding(
-                                    padding: const EdgeInsets.fromLTRB(
-                                        20, 10, 20, 5),
-                                    child: Column(
-                                      children: [
-                                        const SizedBox(
-                                          height: 20,
-                                        ),
-                                        TextWidget(
-                                          text: index == 0
-                                              ? 'Points Inventory'
-                                              : index == 1
-                                                  ? 'Cash Wallet'
-                                                  : 'Customer Slots',
-                                          fontSize: 14,
-                                          color: Colors.white,
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 50, right: 50),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              index != 0
-                                                  ? const Icon(
-                                                      Icons
-                                                          .keyboard_arrow_left_rounded,
-                                                      color: Colors.white60,
-                                                      size: 50,
-                                                    )
-                                                  : const SizedBox(
-                                                      width: 50,
-                                                    ),
-                                              StreamBuilder<QuerySnapshot>(
-                                                  stream: FirebaseFirestore
-                                                      .instance
-                                                      .collection('Points')
-                                                      .where('uid',
-                                                          isEqualTo: mydata.id)
-                                                      .where('scanned',
-                                                          isEqualTo: true)
-                                                      .snapshots(),
-                                                  builder:
-                                                      (BuildContext context,
-                                                          AsyncSnapshot<
-                                                                  QuerySnapshot>
-                                                              snapshot) {
-                                                    if (snapshot.hasError) {
-                                                      print(snapshot.error);
-                                                      return const Center(
-                                                          child: Text('Error'));
-                                                    }
-                                                    if (snapshot
-                                                            .connectionState ==
-                                                        ConnectionState
-                                                            .waiting) {
-                                                      return const Padding(
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                                top: 50),
-                                                        child: Center(
-                                                            child:
-                                                                CircularProgressIndicator(
-                                                          color: Colors.black,
-                                                        )),
-                                                      );
-                                                    }
-
-                                                    final data =
-                                                        snapshot.requireData;
-                                                    return Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        TextWidget(
-                                                          text: index == 0
-                                                              ? '${mydata['pts']}'
-                                                              : index == 1
-                                                                  ? AppConstants
-                                                                      .formatNumberWithPeso(
-                                                                          mydata[
-                                                                              'wallet'])
-                                                                  : data.docs
-                                                                      .length
-                                                                      .toString(),
-                                                          fontFamily: 'Bold',
-                                                          fontSize: 50,
-                                                          color: Colors.white,
-                                                        ),
-                                                      ],
-                                                    );
-                                                  }),
-                                              index == 2
-                                                  ? const SizedBox(
-                                                      width: 50,
-                                                    )
-                                                  : const Icon(
-                                                      Icons
-                                                          .keyboard_arrow_right_rounded,
-                                                      color: Colors.white60,
-                                                      size: 50,
-                                                    ),
-                                            ],
-                                          ),
-                                        ),
-                                        index == 2
-                                            ? TextWidget(
-                                                text: '0 Slots',
-                                                fontSize: 14,
-                                                color: Colors.white,
-                                              )
-                                            : const SizedBox(),
-                                      ],
+                      SizedBox(
+                        height: 200,
+                        width: 500,
+                        child: ListView.builder(
+                          itemCount: 3,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) {
+                            return GestureDetector(
+                              onTap: () {
+                                if (index == 0) {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          const PointsPage()));
+                                } else if (index == 1) {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          const WalletPage()));
+                                } else {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          const InventoryPage()));
+                                }
+                              },
+                              child: Center(
+                                child: Container(
+                                  width: 425,
+                                  height: 250,
+                                  decoration: BoxDecoration(
+                                    color: index == 0
+                                        ? blue
+                                        : index == 1
+                                            ? primary
+                                            : Colors.lightBlue,
+                                    borderRadius: const BorderRadius.only(
+                                      bottomLeft: Radius.circular(1000),
+                                      bottomRight: Radius.circular(1000),
                                     ),
                                   ),
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20, right: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              TextWidget(
-                                text: 'Reload',
-                                fontSize: 18,
-                                fontFamily: 'Bold',
-                              ),
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          GestureDetector(
-                            child: Card(
-                              elevation: 5,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(
-                                    15,
-                                  ),
-                                ),
-                                width: double.infinity,
-                                height: 150,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 10, right: 10),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        width: 130,
-                                        height: 120,
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey[200],
-                                          borderRadius: BorderRadius.circular(
-                                            10,
-                                          ),
-                                        ),
-                                        child: Center(
-                                          child: Image.asset(
-                                            'assets/images/Juan4All 2.png',
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        width: 20,
-                                      ),
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                  child: SafeArea(
+                                    child: Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          20, 10, 20, 5),
+                                      child: Column(
                                         children: [
-                                          TextWidget(
-                                            align: TextAlign.start,
-                                            maxLines: 2,
-                                            text: 'Reload your\nPOINTS!',
-                                            fontSize: 18,
-                                            color: blue,
-                                            fontFamily: 'Bold',
-                                          ),
-                                          TextWidget(
-                                            text: 'P1.00 per 1 Point',
-                                            fontSize: 12,
-                                            color: grey,
-                                            fontFamily: 'Medium',
-                                          ),
                                           const SizedBox(
-                                            height: 5,
+                                            height: 20,
                                           ),
-                                          ButtonWidget(
-                                            radius: 100,
-                                            height: 30,
-                                            width: 75,
-                                            fontSize: 12,
-                                            label: 'Reload',
-                                            onPressed: () async {
-                                              QuerySnapshot snapshot =
-                                                  await FirebaseFirestore
-                                                      .instance
-                                                      .collection('Cashiers')
-                                                      .where('uid',
-                                                          isEqualTo:
-                                                              FirebaseAuth
-                                                                  .instance
-                                                                  .currentUser!
-                                                                  .uid)
-                                                      .get();
-
-                                              if (snapshot.docs.isNotEmpty) {
-                                                showDialog(
-                                                  context: context,
-                                                  builder: (context) {
-                                                    return Dialog(
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(20.0),
-                                                        child: Column(
-                                                          mainAxisSize:
-                                                              MainAxisSize.min,
-                                                          children: [
-                                                            TextFieldWidget(
-                                                              showEye: true,
-                                                              isObscure: true,
-                                                              fontStyle:
-                                                                  FontStyle
-                                                                      .normal,
-                                                              hint: 'PIN Code',
-                                                              borderColor: blue,
-                                                              radius: 12,
-                                                              width: 350,
-                                                              prefixIcon:
-                                                                  Icons.lock,
-                                                              isRequred: false,
-                                                              controller: pin,
-                                                              label: 'PIN Code',
-                                                            ),
-                                                            const SizedBox(
-                                                              height: 20,
-                                                            ),
-                                                            ButtonWidget(
-                                                              label: 'Confirm',
-                                                              onPressed:
-                                                                  () async {
-                                                                Navigator.pop(
-                                                                    context);
-
-                                                                DocumentSnapshot
-                                                                    doc =
-                                                                    await FirebaseFirestore
-                                                                        .instance
-                                                                        .collection(
-                                                                            'Cashiers')
-                                                                        .doc(pin
-                                                                            .text)
-                                                                        .get();
-
-                                                                if (doc
-                                                                    .exists) {
-                                                                  reloadPointsDialog(
-                                                                      doc['name']);
-                                                                } else {
-                                                                  showToast(
-                                                                      'PIN Code does not exist!');
-                                                                }
-                                                                pin.clear();
-                                                              },
-                                                            )
-                                                          ],
-                                                        ),
+                                          TextWidget(
+                                            text: index == 0
+                                                ? 'Points Inventory'
+                                                : index == 1
+                                                    ? 'Cash Wallet'
+                                                    : 'Customer Slots',
+                                            fontSize: 14,
+                                            color: Colors.white,
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 50, right: 50),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                index != 0
+                                                    ? const Icon(
+                                                        Icons
+                                                            .keyboard_arrow_left_rounded,
+                                                        color: Colors.white60,
+                                                        size: 50,
+                                                      )
+                                                    : const SizedBox(
+                                                        width: 50,
                                                       ),
-                                                    );
-                                                  },
-                                                );
-                                              } else {
-                                                showToast(
-                                                    'Please register your authorized user account');
-                                              }
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance
-                                .collection('Points')
-                                .where('uid',
-                                    isEqualTo:
-                                        FirebaseAuth.instance.currentUser!.uid)
-                                .where('scanned', isEqualTo: true)
-                                .snapshots(),
-                            builder: (BuildContext context,
-                                AsyncSnapshot<QuerySnapshot> snapshot) {
-                              if (snapshot.hasError) {
-                                print(snapshot.error);
-                                return const Center(child: Text('Error'));
-                              }
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return const Padding(
-                                  padding: EdgeInsets.only(top: 50),
-                                  child: Center(
-                                      child: CircularProgressIndicator(
-                                    color: Colors.black,
-                                  )),
-                                );
-                              }
-
-                              final data = snapshot.requireData;
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 20, right: 20),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        TextWidget(
-                                          text: 'Recent Activity',
-                                          fontSize: 18,
-                                          fontFamily: 'Bold',
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    data.docs.isEmpty
-                                        ? Center(
-                                            child: TextWidget(
-                                              text: 'No Recent Activity',
-                                              fontSize: 14,
-                                              fontFamily: 'Regular',
-                                              color: Colors.grey,
-                                            ),
-                                          )
-                                        : SizedBox(
-                                            height: 150,
-                                            width: 500,
-                                            child: ListView.builder(
-                                              itemCount: data.docs.length,
-                                              scrollDirection: Axis.horizontal,
-                                              itemBuilder: (context, index) {
-                                                return StreamBuilder<
-                                                        DocumentSnapshot>(
+                                                StreamBuilder<QuerySnapshot>(
                                                     stream: FirebaseFirestore
                                                         .instance
-                                                        .collection('Users')
-                                                        .doc(data.docs[index]
-                                                            ['scannedId'])
+                                                        .collection('Points')
+                                                        .where('uid',
+                                                            isEqualTo:
+                                                                mydata.id)
+                                                        .where('scanned',
+                                                            isEqualTo: true)
                                                         .snapshots(),
-                                                    builder: (context,
+                                                    builder: (BuildContext
+                                                            context,
                                                         AsyncSnapshot<
-                                                                DocumentSnapshot>
+                                                                QuerySnapshot>
                                                             snapshot) {
-                                                      if (!snapshot.hasData) {
+                                                      if (snapshot.hasError) {
+                                                        print(snapshot.error);
                                                         return const Center(
-                                                            child: Text(
-                                                                'Loading'));
-                                                      } else if (snapshot
-                                                          .hasError) {
-                                                        return const Center(
-                                                            child: Text(
-                                                                'Something went wrong'));
-                                                      } else if (snapshot
+                                                            child:
+                                                                Text('Error'));
+                                                      }
+                                                      if (snapshot
                                                               .connectionState ==
                                                           ConnectionState
                                                               .waiting) {
-                                                        return const Center(
-                                                            child:
-                                                                CircularProgressIndicator());
+                                                        return const Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  top: 50),
+                                                          child: Center(
+                                                              child:
+                                                                  CircularProgressIndicator(
+                                                            color: Colors.black,
+                                                          )),
+                                                        );
                                                       }
-                                                      dynamic businessdata =
-                                                          snapshot.data;
-                                                      return Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(
-                                                                left: 5,
-                                                                right: 5),
-                                                        child: GestureDetector(
-                                                          child: Card(
-                                                            elevation: 5,
+
+                                                      final data =
+                                                          snapshot.requireData;
+                                                      return Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          TextWidget(
+                                                            text: index == 0
+                                                                ? '${mydata['pts']}'
+                                                                : index == 1
+                                                                    ? AppConstants
+                                                                        .formatNumberWithPeso(mydata[
+                                                                            'wallet'])
+                                                                    : data.docs
+                                                                        .length
+                                                                        .toString(),
+                                                            fontFamily: 'Bold',
+                                                            fontSize: 50,
                                                             color: Colors.white,
-                                                            child: SizedBox(
-                                                              height: 150,
-                                                              width: 150,
-                                                              child: Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .all(
-                                                                        10.0),
-                                                                child: Column(
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    Center(
-                                                                      child:
-                                                                          TextWidget(
-                                                                        text: businessdata[
-                                                                            'name'],
-                                                                        fontSize:
-                                                                            12,
-                                                                        fontFamily:
-                                                                            'Medium',
-                                                                        color:
-                                                                            blue,
-                                                                      ),
-                                                                    ),
-                                                                    const SizedBox(
-                                                                      height:
-                                                                          15,
-                                                                    ),
-                                                                    Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .center,
-                                                                      children: [
-                                                                        TextWidget(
-                                                                          text: data
-                                                                              .docs[index]['pts']
-                                                                              .toString(),
-                                                                          fontSize:
-                                                                              38,
-                                                                          fontFamily:
-                                                                              'Bold',
-                                                                          color:
-                                                                              blue,
-                                                                        ),
-                                                                        const SizedBox(
-                                                                          width:
-                                                                              5,
-                                                                        ),
-                                                                        TextWidget(
-                                                                          text:
-                                                                              'pts',
-                                                                          fontSize:
-                                                                              12,
-                                                                          fontFamily:
-                                                                              'Bold',
-                                                                          color:
-                                                                              blue,
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                    const SizedBox(
-                                                                      height:
-                                                                          15,
-                                                                    ),
-                                                                    Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .center,
-                                                                      children: [
-                                                                        TextWidget(
-                                                                          text: DateFormat.yMMMd()
-                                                                              .add_jm()
-                                                                              .format(data.docs[index]['dateTime'].toDate()),
-                                                                          fontSize:
-                                                                              10,
-                                                                          fontFamily:
-                                                                              'Bold',
-                                                                          color:
-                                                                              Colors.grey,
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ],
-                                                                ),
+                                                          ),
+                                                        ],
+                                                      );
+                                                    }),
+                                                index == 2
+                                                    ? const SizedBox(
+                                                        width: 50,
+                                                      )
+                                                    : const Icon(
+                                                        Icons
+                                                            .keyboard_arrow_right_rounded,
+                                                        color: Colors.white60,
+                                                        size: 50,
+                                                      ),
+                                              ],
+                                            ),
+                                          ),
+                                          index == 2
+                                              ? TextWidget(
+                                                  text: '0 Slots',
+                                                  fontSize: 14,
+                                                  color: Colors.white,
+                                                )
+                                              : const SizedBox(),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20, right: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                TextWidget(
+                                  text: 'Reload',
+                                  fontSize: 18,
+                                  fontFamily: 'Bold',
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            GestureDetector(
+                              child: Card(
+                                elevation: 5,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(
+                                      15,
+                                    ),
+                                  ),
+                                  width: double.infinity,
+                                  height: 150,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 10, right: 10),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          width: 130,
+                                          height: 120,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[200],
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                          child: Center(
+                                            child: Image.asset(
+                                              'assets/images/Juan4All 2.png',
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: 20,
+                                        ),
+                                        Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            TextWidget(
+                                              align: TextAlign.start,
+                                              maxLines: 2,
+                                              text: 'Reload your\nPOINTS!',
+                                              fontSize: 18,
+                                              color: blue,
+                                              fontFamily: 'Bold',
+                                            ),
+                                            TextWidget(
+                                              text: 'P1.00 per 1 Point',
+                                              fontSize: 12,
+                                              color: grey,
+                                              fontFamily: 'Medium',
+                                            ),
+                                            const SizedBox(
+                                              height: 5,
+                                            ),
+                                            ButtonWidget(
+                                              radius: 100,
+                                              height: 30,
+                                              width: 75,
+                                              fontSize: 12,
+                                              label: 'Reload',
+                                              onPressed: () async {
+                                                QuerySnapshot snapshot =
+                                                    await FirebaseFirestore
+                                                        .instance
+                                                        .collection('Cashiers')
+                                                        .where('uid',
+                                                            isEqualTo:
+                                                                FirebaseAuth
+                                                                    .instance
+                                                                    .currentUser!
+                                                                    .uid)
+                                                        .get();
+
+                                                if (snapshot.docs.isNotEmpty) {
+                                                  showDialog(
+                                                    context: context,
+                                                    builder: (context) {
+                                                      return Dialog(
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(20.0),
+                                                          child: Column(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                            children: [
+                                                              TextFieldWidget(
+                                                                showEye: true,
+                                                                isObscure: true,
+                                                                fontStyle:
+                                                                    FontStyle
+                                                                        .normal,
+                                                                hint:
+                                                                    'PIN Code',
+                                                                borderColor:
+                                                                    blue,
+                                                                radius: 12,
+                                                                width: 350,
+                                                                prefixIcon:
+                                                                    Icons.lock,
+                                                                isRequred:
+                                                                    false,
+                                                                controller: pin,
+                                                                label:
+                                                                    'PIN Code',
                                                               ),
-                                                            ),
+                                                              const SizedBox(
+                                                                height: 20,
+                                                              ),
+                                                              ButtonWidget(
+                                                                label:
+                                                                    'Confirm',
+                                                                onPressed:
+                                                                    () async {
+                                                                  Navigator.pop(
+                                                                      context);
+
+                                                                  DocumentSnapshot doc = await FirebaseFirestore
+                                                                      .instance
+                                                                      .collection(
+                                                                          'Cashiers')
+                                                                      .doc(pin
+                                                                          .text)
+                                                                      .get();
+
+                                                                  if (doc
+                                                                      .exists) {
+                                                                    reloadPointsDialog(
+                                                                        doc['name']);
+                                                                  } else {
+                                                                    showToast(
+                                                                        'PIN Code does not exist!');
+                                                                  }
+                                                                  pin.clear();
+                                                                },
+                                                              )
+                                                            ],
                                                           ),
                                                         ),
                                                       );
-                                                    });
+                                                    },
+                                                  );
+                                                } else {
+                                                  showToast(
+                                                      'Please register your authorized user account');
+                                                }
                                               },
                                             ),
-                                          ),
-                                    const SizedBox(
-                                      height: 20,
+                                          ],
+                                        ),
+                                      ],
                                     ),
-                                  ],
+                                  ),
                                 ),
-                              );
-                            }),
-                      ],
-                    ),
-                  ],
-                );
-              }),
-        ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          StreamBuilder<QuerySnapshot>(
+                              stream: FirebaseFirestore.instance
+                                  .collection('Points')
+                                  .where('uid',
+                                      isEqualTo: FirebaseAuth
+                                          .instance.currentUser!.uid)
+                                  // .where('scanned', isEqualTo: true)
+                                  .snapshots(),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                                if (snapshot.hasError) {
+                                  print(snapshot.error);
+                                  return const Center(child: Text('Error'));
+                                }
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Padding(
+                                    padding: EdgeInsets.only(top: 50),
+                                    child: Center(
+                                        child: CircularProgressIndicator(
+                                      color: Colors.black,
+                                    )),
+                                  );
+                                }
+
+                                final data = snapshot.requireData;
+                                return Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 20, right: 20),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          TextWidget(
+                                            text: 'Recent Activity',
+                                            fontSize: 18,
+                                            fontFamily: 'Bold',
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      data.docs.isEmpty
+                                          ? Center(
+                                              child: TextWidget(
+                                                text: 'No Recent Activity',
+                                                fontSize: 14,
+                                                fontFamily: 'Regular',
+                                                color: Colors.grey,
+                                              ),
+                                            )
+                                          : SizedBox(
+                                              height: 150,
+                                              width: 500,
+                                              child: ListView.builder(
+                                                itemCount: data.docs.length,
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                itemBuilder: (context, index) {
+                                                  return Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 5, right: 5),
+                                                    child: GestureDetector(
+                                                      child: Card(
+                                                        elevation: 5,
+                                                        color: Colors.white,
+                                                        child: SizedBox(
+                                                          height: 150,
+                                                          width: 150,
+                                                          child: Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(10.0),
+                                                            child: Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                // Center(
+                                                                //   child:
+                                                                //       TextWidget(
+                                                                //     text: businessdata[
+                                                                //         'name'],
+                                                                //     fontSize:
+                                                                //         12,
+                                                                //     fontFamily:
+                                                                //         'Medium',
+                                                                //     color:
+                                                                //         blue,
+                                                                //   ),
+                                                                // ),
+                                                                const SizedBox(
+                                                                  height: 15,
+                                                                ),
+                                                                Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                    TextWidget(
+                                                                      text: data
+                                                                          .docs[
+                                                                              index]
+                                                                              [
+                                                                              'pts']
+                                                                          .toString(),
+                                                                      fontSize:
+                                                                          38,
+                                                                      fontFamily:
+                                                                          'Bold',
+                                                                      color:
+                                                                          blue,
+                                                                    ),
+                                                                    const SizedBox(
+                                                                      width: 5,
+                                                                    ),
+                                                                    TextWidget(
+                                                                      text:
+                                                                          'pts',
+                                                                      fontSize:
+                                                                          12,
+                                                                      fontFamily:
+                                                                          'Bold',
+                                                                      color:
+                                                                          blue,
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 15,
+                                                                ),
+                                                                Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                    TextWidget(
+                                                                      text: DateFormat
+                                                                              .yMMMd()
+                                                                          .add_jm()
+                                                                          .format(data
+                                                                              .docs[index]['dateTime']
+                                                                              .toDate()),
+                                                                      fontSize:
+                                                                          10,
+                                                                      fontFamily:
+                                                                          'Bold',
+                                                                      color: Colors
+                                                                          .grey,
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }),
+                        ],
+                      ),
+                    ],
+                  );
+                }),
+          ],
+        ),
       ),
     );
   }

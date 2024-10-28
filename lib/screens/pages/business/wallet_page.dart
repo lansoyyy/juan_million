@@ -195,90 +195,90 @@ class _WalletPageState extends State<WalletPage> {
                                                 fontFamily: 'Bold',
                                               ),
                                             ),
-                                            const Divider(),
-                                            ListTile(
-                                              onTap: () {
-                                                setState(() {
-                                                  selected = 'Business';
-                                                });
-                                                Navigator.pop(context);
+                                            // const Divider(),
+                                            // ListTile(
+                                            //   onTap: () {
+                                            //     setState(() {
+                                            //       selected = 'Business';
+                                            //     });
+                                            //     Navigator.pop(context);
 
-                                                showDialog(
-                                                  context: context,
-                                                  builder: (context) {
-                                                    return Dialog(
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(20.0),
-                                                        child: Column(
-                                                          mainAxisSize:
-                                                              MainAxisSize.min,
-                                                          children: [
-                                                            TextFieldWidget(
-                                                              showEye: true,
-                                                              isObscure: true,
-                                                              fontStyle:
-                                                                  FontStyle
-                                                                      .normal,
-                                                              hint: 'PIN Code',
-                                                              borderColor: blue,
-                                                              radius: 12,
-                                                              width: 350,
-                                                              prefixIcon:
-                                                                  Icons.lock,
-                                                              isRequred: false,
-                                                              controller: pin,
-                                                              label: 'PIN Code',
-                                                            ),
-                                                            const SizedBox(
-                                                              height: 20,
-                                                            ),
-                                                            ButtonWidget(
-                                                              label: 'Confirm',
-                                                              onPressed:
-                                                                  () async {
-                                                                Navigator.pop(
-                                                                    context);
+                                            //     showDialog(
+                                            //       context: context,
+                                            //       builder: (context) {
+                                            //         return Dialog(
+                                            //           child: Padding(
+                                            //             padding:
+                                            //                 const EdgeInsets
+                                            //                     .all(20.0),
+                                            //             child: Column(
+                                            //               mainAxisSize:
+                                            //                   MainAxisSize.min,
+                                            //               children: [
+                                            //                 TextFieldWidget(
+                                            //                   showEye: true,
+                                            //                   isObscure: true,
+                                            //                   fontStyle:
+                                            //                       FontStyle
+                                            //                           .normal,
+                                            //                   hint: 'PIN Code',
+                                            //                   borderColor: blue,
+                                            //                   radius: 12,
+                                            //                   width: 350,
+                                            //                   prefixIcon:
+                                            //                       Icons.lock,
+                                            //                   isRequred: false,
+                                            //                   controller: pin,
+                                            //                   label: 'PIN Code',
+                                            //                 ),
+                                            //                 const SizedBox(
+                                            //                   height: 20,
+                                            //                 ),
+                                            //                 ButtonWidget(
+                                            //                   label: 'Confirm',
+                                            //                   onPressed:
+                                            //                       () async {
+                                            //                     Navigator.pop(
+                                            //                         context);
 
-                                                                DocumentSnapshot
-                                                                    doc =
-                                                                    await FirebaseFirestore
-                                                                        .instance
-                                                                        .collection(
-                                                                            'Cashiers')
-                                                                        .doc(pin
-                                                                            .text)
-                                                                        .get();
+                                            //                     DocumentSnapshot
+                                            //                         doc =
+                                            //                         await FirebaseFirestore
+                                            //                             .instance
+                                            //                             .collection(
+                                            //                                 'Cashiers')
+                                            //                             .doc(pin
+                                            //                                 .text)
+                                            //                             .get();
 
-                                                                if (doc
-                                                                    .exists) {
-                                                                  showAmountDialog(
-                                                                      doc['name']);
-                                                                } else {
-                                                                  showToast(
-                                                                      'PIN Code does not exist!');
-                                                                }
+                                            //                     if (doc
+                                            //                         .exists) {
+                                            //                       showAmountDialog(
+                                            //                           doc['name']);
+                                            //                     } else {
+                                            //                       showToast(
+                                            //                           'PIN Code does not exist!');
+                                            //                     }
 
-                                                                pin.clear();
-                                                              },
-                                                            )
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                              leading: const Icon(
-                                                Icons.business,
-                                              ),
-                                              title: TextWidget(
-                                                text: 'To affiliate',
-                                                fontSize: 14,
-                                                fontFamily: 'Bold',
-                                              ),
-                                            ),
+                                            //                     pin.clear();
+                                            //                   },
+                                            //                 )
+                                            //               ],
+                                            //             ),
+                                            //           ),
+                                            //         );
+                                            //       },
+                                            //     );
+                                            //   },
+                                            //   leading: const Icon(
+                                            //     Icons.business,
+                                            //   ),
+                                            //   title: TextWidget(
+                                            //     text: 'To affiliate',
+                                            //     fontSize: 14,
+                                            //     fontFamily: 'Bold',
+                                            //   ),
+                                            // ),
                                             const Divider(),
                                             ListTile(
                                               onTap: () {
@@ -357,7 +357,7 @@ class _WalletPageState extends State<WalletPage> {
                                                 Icons.person_4_rounded,
                                               ),
                                               title: TextWidget(
-                                                text: 'To coordi=nator',
+                                                text: 'To coordinator',
                                                 fontSize: 14,
                                                 fontFamily: 'Bold',
                                               ),
