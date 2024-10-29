@@ -23,7 +23,7 @@ class _InventoryPageState extends State<InventoryPage> {
           stream: FirebaseFirestore.instance
               .collection('Points')
               .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-              // .where('scanned', isEqualTo: true)
+              .where('scanned', isEqualTo: true)
               .snapshots(),
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -104,12 +104,12 @@ class _InventoryPageState extends State<InventoryPage> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              // TextWidget(
-                              //   text: 'Name',
-                              //   fontSize: 12,
-                              //   color: Colors.black,
-                              //   fontFamily: 'Bold',
-                              // ),
+                              TextWidget(
+                                text: 'Name',
+                                fontSize: 12,
+                                color: Colors.black,
+                                fontFamily: 'Bold',
+                              ),
                               Padding(
                                 padding: const EdgeInsets.only(left: 30),
                                 child: TextWidget(
@@ -136,49 +136,70 @@ class _InventoryPageState extends State<InventoryPage> {
                           child: ListView.builder(
                             itemCount: data.docs.length,
                             itemBuilder: (context, index) {
-                              return Padding(
-                                padding: const EdgeInsets.all(5.0),
-                                child: ListTile(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      15,
-                                    ),
-                                  ),
-                                  tileColor: Colors.white,
-                                  leading: SizedBox(
-                                    height: 50,
-                                    width: 300,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        // TextWidget(
-                                        //   text: userData['name'],
-                                        //   fontSize: 11,
-                                        //   color: Colors.black,
-                                        //   fontFamily: 'Medium',
-                                        // ),
-                                        TextWidget(
-                                          text: data.docs[index]['pts']
-                                              .toString(),
-                                          fontSize: 11,
-                                          color: Colors.black,
-                                          fontFamily: 'Medium',
+                              return StreamBuilder<DocumentSnapshot>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection('Users')
+                                      .doc(data.docs[index]['scannedId'])
+                                      .snapshots(),
+                                  builder: (context,
+                                      AsyncSnapshot<DocumentSnapshot>
+                                          snapshot) {
+                                    if (!snapshot.hasData) {
+                                      return const Center(
+                                          child: Text('Loading'));
+                                    } else if (snapshot.hasError) {
+                                      return const Center(
+                                          child: Text('Something went wrong'));
+                                    } else if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const Center(
+                                          child: CircularProgressIndicator());
+                                    }
+                                    dynamic userData = snapshot.data;
+                                    return Padding(
+                                      padding: const EdgeInsets.all(5.0),
+                                      child: ListTile(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            15,
+                                          ),
                                         ),
-                                        TextWidget(
-                                          text: data.docs[index]['pts']
-                                              .toString(),
-                                          fontSize: 11,
-                                          color: Colors.black,
-                                          fontFamily: 'Medium',
+                                        tileColor: Colors.white,
+                                        leading: SizedBox(
+                                          height: 50,
+                                          width: 300,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              TextWidget(
+                                                text: userData['name'],
+                                                fontSize: 11,
+                                                color: Colors.black,
+                                                fontFamily: 'Medium',
+                                              ),
+                                              TextWidget(
+                                                text:
+                                                    userData['pts'].toString(),
+                                                fontSize: 11,
+                                                color: Colors.black,
+                                                fontFamily: 'Medium',
+                                              ),
+                                              TextWidget(
+                                                text: data.docs[index]['pts']
+                                                    .toString(),
+                                                fontSize: 11,
+                                                color: Colors.black,
+                                                fontFamily: 'Medium',
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
+                                      ),
+                                    );
+                                  });
                             },
                           ),
                         ),
