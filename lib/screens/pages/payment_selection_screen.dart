@@ -424,7 +424,7 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
           showToast('Succesfully purchased!');
 
           addPoints((widget.item['slots'] * 150) * qty, qty, '',
-              'Points converted to Slots');
+              'Points converted to Slots', '');
           Navigator.of(context).pop();
         } else {
           showToast('Not enough balance on wallet!');

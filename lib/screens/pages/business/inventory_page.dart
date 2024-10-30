@@ -158,43 +158,48 @@ class _InventoryPageState extends State<InventoryPage> {
                                     dynamic userData = snapshot.data;
                                     return Padding(
                                       padding: const EdgeInsets.all(5.0),
-                                      child: ListTile(
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            15,
+                                      child: SizedBox(
+                                        height: 60,
+                                        width: 500,
+                                        child: ListTile(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              15,
+                                            ),
                                           ),
-                                        ),
-                                        tileColor: Colors.white,
-                                        leading: SizedBox(
-                                          height: 50,
-                                          width: 300,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              TextWidget(
-                                                text: userData['name'],
-                                                fontSize: 11,
-                                                color: Colors.black,
-                                                fontFamily: 'Medium',
-                                              ),
-                                              TextWidget(
-                                                text:
-                                                    userData['pts'].toString(),
-                                                fontSize: 11,
-                                                color: Colors.black,
-                                                fontFamily: 'Medium',
-                                              ),
-                                              TextWidget(
-                                                text: data.docs[index]['pts']
-                                                    .toString(),
-                                                fontSize: 11,
-                                                color: Colors.black,
-                                                fontFamily: 'Medium',
-                                              ),
-                                            ],
+                                          tileColor: Colors.white,
+                                          leading: SizedBox(
+                                            height: 50,
+                                            width: 250,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                TextWidget(
+                                                  text: userData['name'],
+                                                  fontSize: 11,
+                                                  color: Colors.black,
+                                                  fontFamily: 'Medium',
+                                                ),
+                                                TextWidget(
+                                                  text: userData['pts']
+                                                      .toString(),
+                                                  fontSize: 11,
+                                                  color: Colors.black,
+                                                  fontFamily: 'Medium',
+                                                ),
+                                                TextWidget(
+                                                  text: data.docs[index]['pts']
+                                                      .toString(),
+                                                  fontSize: 11,
+                                                  color: Colors.black,
+                                                  fontFamily: 'Medium',
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),

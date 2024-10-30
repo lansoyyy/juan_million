@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-Future<String> addPoints(pts, qty, cashier, String type) async {
+Future<String> addPoints(
+    pts, qty, cashier, String type, String scannedId) async {
   final docUser = FirebaseFirestore.instance.collection('Points').doc();
 
   final json = {
@@ -10,8 +11,8 @@ Future<String> addPoints(pts, qty, cashier, String type) async {
     'cashier': cashier,
     'uid': FirebaseAuth.instance.currentUser!.uid,
     'id': docUser.id,
-    'scanned': false,
-    'scannedId': '',
+    'scanned': true,
+    'scannedId': scannedId,
     'dateTime': DateTime.now(),
     'type': type,
   };

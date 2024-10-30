@@ -91,6 +91,10 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
       });
 
       if (qrCode != '-1') {
+        DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
+            .collection('Users')
+            .doc(qrCode)
+            .get();
         await FirebaseFirestore.instance
             .collection('Business')
             .doc(FirebaseAuth.instance.currentUser!.uid)
@@ -125,7 +129,8 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
             showToast('Your wallet balance is not enough');
           }
         }).whenComplete(() {
-          addPoints(transferredPts, 1, cashier, 'Points received by member');
+          addPoints(transferredPts, 1, cashier, 'Points received by member',
+              documentSnapshot.id);
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => QRScannedPage(
                     fromScan: true,
@@ -516,13 +521,6 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                               ],
                                             ),
                                           ),
-                                          index == 2
-                                              ? TextWidget(
-                                                  text: '0 Slots',
-                                                  fontSize: 14,
-                                                  color: Colors.white,
-                                                )
-                                              : const SizedBox(),
                                         ],
                                       ),
                                     ),
@@ -993,7 +991,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                 showToast('Transaction was succesfull!');
 
                                 addPoints(int.parse(pts.text), 1, name,
-                                    'Points from reload');
+                                    'Points from reload', '');
 
                                 DocumentSnapshot doc1 = await FirebaseFirestore
                                     .instance

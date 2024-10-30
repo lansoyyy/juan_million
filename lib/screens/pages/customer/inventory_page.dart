@@ -77,7 +77,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
 
         addWallet(5500, '', uid, 'REWARDS 5,500', '');
 
-        addPoints(5500, 1, '', 'REWARDS 5,500');
+        addPoints(5500, 1, '', 'REWARDS 5,500', '');
 
         addHistory(snapshot.data()!['name'], uid);
       });
@@ -234,8 +234,9 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                               ),
                               IconButton(
                                 onPressed: () {
-                                     Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => const MySlotsScreen()));
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          const MySlotsScreen()));
                                 },
                                 icon: const Icon(
                                   Icons.visibility,

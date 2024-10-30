@@ -705,7 +705,7 @@ class _WalletPageState extends State<WalletPage> {
                                 showToast('Transaction was succesfull!');
 
                                 addPoints(int.parse(pts.text), 1, name,
-                                    'Points from reload');
+                                    'Points from reload', '');
 
                                 DocumentSnapshot doc1 = await FirebaseFirestore
                                     .instance
