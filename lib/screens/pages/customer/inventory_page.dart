@@ -20,7 +20,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
   @override
   void initState() {
     // TODO: implement initState
-    checkPoints(7999);
+    checkPoints(5000);
     super.initState();
   }
 
@@ -48,13 +48,13 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
           .doc('wallet')
           .update({
         // 'wallet': FieldValue.increment(total),
-        'pts': FieldValue.increment(-7999),
+        'pts': FieldValue.increment(-5000),
       }).whenComplete(() async {
         var document = FirebaseFirestore.instance.doc('Users/$uid');
         var snapshot = await document.get();
 
         await FirebaseFirestore.instance.collection('Users').doc(uid).update({
-          'wallet': FieldValue.increment(5500),
+          'wallet': FieldValue.increment(3500),
           // 'pts': FieldValue.increment(-total),
         });
 
@@ -65,19 +65,19 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
             .doc('business')
             .update({
           // 'wallet': FieldValue.increment(total),
-          'pts': FieldValue.increment(2400),
+          'pts': FieldValue.increment(1250),
         });
         await FirebaseFirestore.instance
             .collection('Community Wallet')
             .doc('it')
             .update({
           // 'wallet': FieldValue.increment(total),
-          'pts': FieldValue.increment(100),
+          'pts': FieldValue.increment(250),
         });
 
-        addWallet(5500, '', uid, 'REWARDS 5,500', '');
+        addWallet(3500, '', uid, 'REWARDS 3,500', '');
 
-        addPoints(5500, 1, '', 'REWARDS 5,500', '');
+        addPoints(3500, 1, '', 'REWARDS 3,500', '');
 
         addHistory(snapshot.data()!['name'], uid);
       });
@@ -327,7 +327,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                               minHeight: 12,
                               color: primary,
                               value: double.parse(
-                                      (walletdata['pts'] / 8000).toString()) *
+                                      (walletdata['pts'] / 5000).toString()) *
                                   1,
                               backgroundColor: Colors.grey,
                             );
