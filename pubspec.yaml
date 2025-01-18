@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.9
 
 environment:
-  sdk: '>=3.3.2 <4.0.0'
+  sdk: '>=3.0.0 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -42,7 +42,6 @@ dependencies:
   firebase_storage:
   firebase_auth:
   qr_flutter:
-  qr_code_scanner: ^1.0.0
   flutter_barcode_scanner:
   paymongo_sdk:
   image_picker:
