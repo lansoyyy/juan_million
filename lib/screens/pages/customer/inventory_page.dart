@@ -294,12 +294,35 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                                   color: Colors.white,
                                   fontFamily: 'Bold',
                                 ),
-                                TextWidget(
-                                  text: '${data.docs.length}/5 slots per day',
-                                  fontSize: 14,
-                                  color: Colors.white,
-                                  fontFamily: 'Regular',
-                                ),
+                                StreamBuilder<DocumentSnapshot>(
+                                    stream: FirebaseFirestore.instance
+                                        .collection('Community Wallet')
+                                        .doc('wallet')
+                                        .snapshots(),
+                                    builder: (context,
+                                        AsyncSnapshot<DocumentSnapshot>
+                                            snapshot) {
+                                      if (!snapshot.hasData) {
+                                        return const Center(
+                                            child: Text('Loading'));
+                                      } else if (snapshot.hasError) {
+                                        return const Center(
+                                            child:
+                                                Text('Something went wrong'));
+                                      } else if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return const Center(
+                                            child: CircularProgressIndicator());
+                                      }
+                                      dynamic walletdata = snapshot.data;
+                                      return TextWidget(
+                                        text:
+                                            '${(double.parse((walletdata['pts'] / 4165).toString()) * 100).toStringAsFixed(0)}%',
+                                        fontSize: 14,
+                                        color: Colors.white,
+                                        fontFamily: 'Regular',
+                                      );
+                                    }),
                               ],
                             );
                           }),
@@ -326,7 +349,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                               minHeight: 12,
                               color: primary,
                               value: double.parse(
-                                      (walletdata['pts'] / 5000).toString()) *
+                                      (walletdata['pts'] / 4165).toString()) *
                                   1,
                               backgroundColor: Colors.grey,
                             );
