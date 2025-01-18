@@ -383,7 +383,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                         text: index == 0
                                             ? 'Total Points'
                                             : index == 1
-                                                ? 'e Wallet'
+                                                ? 'E Wallet'
                                                 : 'Community Wallet',
                                         fontSize: 14,
                                         color: Colors.white,
@@ -446,7 +446,10 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                                     text: index == 0
                                                         ? '${data['pts'].toInt()}'
                                                         : index == 1
-                                                            ? '${AppConstants.formatNumberWithPeso(data['wallet'])}.00'
+                                                            ? AppConstants
+                                                                .formatNumberWithPeso(
+                                                                    data[
+                                                                        'wallet'])
                                                             : mydata.docs.length
                                                                 .toString(),
                                                     fontFamily: 'Bold',

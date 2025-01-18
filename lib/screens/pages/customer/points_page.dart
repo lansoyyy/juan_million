@@ -324,13 +324,71 @@ class _CustomerPointsPageState extends State<CustomerPointsPage> {
                 ),
                 MaterialButton(
                   onPressed: () async {
-                    scanQRCode();
-                    Navigator.of(context).pop();
+                    showConfirmDialog(pts.text);
                   },
                   child: const Text(
                     'Continue',
                     style: TextStyle(
                         fontFamily: 'QRegular', fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ));
+  }
+
+  showConfirmDialog(amount) {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Center(
+                    child: CircleAvatar(
+                      maxRadius: 35,
+                      minRadius: 35,
+                      backgroundImage:
+                          AssetImage('assets/images/Juan4All 2.png'),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'Amount - $amount',
+                    style: const TextStyle(
+                        fontFamily: 'Bold',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18),
+                  ),
+                  const Text(
+                    'Sevice Charge (5%)- P 50',
+                    style: TextStyle(
+                        fontFamily: 'Bold',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18),
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                MaterialButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text(
+                    'Change',
+                    style: TextStyle(
+                        fontFamily: 'QRegular', fontWeight: FontWeight.normal),
+                  ),
+                ),
+                MaterialButton(
+                  onPressed: () async {
+                    scanQRCode();
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text(
+                    'Confirm',
+                    style: TextStyle(
+                        fontFamily: 'QRegular', fontWeight: FontWeight.normal),
                   ),
                 ),
               ],
@@ -450,7 +508,7 @@ class _CustomerPointsPageState extends State<CustomerPointsPage> {
               );
             } else {
               Navigator.pop(context);
-              showToast('Your e wallet is not enough to proceed!');
+              showToast('Your E wallet is not enough to proceed!');
             }
           }
         });
