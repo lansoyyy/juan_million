@@ -33,8 +33,8 @@ following terms and conditions:\n
 Affiliates must adhere to the company's discounting and pricing policies for all company
 merchandise. Any deviation from these policies may result in immediate termination of the
 affiliate agreement.\n
-2. Exchange Rate of Reward Points and Cash Wallets
-Affiliates must honor the exchange rate of reward points and cash wallets as determined by the
+2. Exchange Rate of Reward Points and e Wallets
+Affiliates must honor the exchange rate of reward points and e wallets as determined by the
 company. Any changes to these rates will be communicated to affiliates in advance.\n
 3. Extension of Reward Points to Customers
 Affiliates are required to extend reward points to all customers using the company platform. This

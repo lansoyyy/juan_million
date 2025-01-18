@@ -1,21 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:intl/intl.dart';
-import 'package:juan_million/screens/auth/payment_screen.dart';
+import 'package:juan_million/screens/pages/business/cashier_screen.dart';
 import 'package:juan_million/screens/pages/business/inventory_page.dart';
 import 'package:juan_million/screens/pages/business/points_page.dart';
-import 'package:juan_million/screens/pages/business/qr_page.dart';
-import 'package:juan_million/screens/pages/business/cashier_screen.dart';
 import 'package:juan_million/screens/pages/business/settings_page.dart';
 import 'package:juan_million/screens/pages/business/wallet_page.dart';
 import 'package:juan_million/screens/pages/customer/qr_scanned_page.dart';
-import 'package:juan_million/screens/pages/payment_selection_screen.dart';
-import 'package:juan_million/screens/pages/store_page.dart';
 import 'package:juan_million/services/add_points.dart';
 import 'package:juan_million/utlis/app_constants.dart';
 import 'package:juan_million/utlis/colors.dart';
@@ -421,8 +415,8 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                             text: index == 0
                                                 ? 'Points Inventory'
                                                 : index == 1
-                                                    ? 'Cash Wallet'
-                                                    : 'Customer Slots',
+                                                    ? 'E Wallet'
+                                                    : 'Transaction History',
                                             fontSize: 14,
                                             color: Colors.white,
                                           ),
@@ -1009,7 +1003,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                         )));
                               } else {
                                 showToast(
-                                    'Cannot proceed! Insufficient cash wallet');
+                                    'Cannot proceed! Insufficient e wallet');
                               }
 
                               pts.clear();

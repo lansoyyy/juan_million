@@ -1,14 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:intl/intl.dart';
-import 'package:juan_million/screens/pages/business/myqr_page.dart';
 import 'package:juan_million/screens/pages/customer/qr_scanned_page.dart';
-import 'package:juan_million/screens/pages/store_page.dart';
 import 'package:juan_million/services/add_points.dart';
 import 'package:juan_million/services/add_wallet.dart';
 import 'package:juan_million/utlis/colors.dart';
@@ -723,7 +719,7 @@ class _WalletPageState extends State<WalletPage> {
                                         )));
                               } else {
                                 showToast(
-                                    'Cannot proceed! Insufficient cash wallet');
+                                    'Cannot proceed! Insufficient e wallet');
                               }
 
                               pts.clear();

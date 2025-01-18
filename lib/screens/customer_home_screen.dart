@@ -1,16 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:intl/intl.dart';
-import 'package:juan_million/screens/auth/payment_screen.dart';
-import 'package:juan_million/screens/pages/business/inventory_page.dart';
-import 'package:juan_million/screens/pages/business/points_page.dart';
-import 'package:juan_million/screens/pages/business/settings_page.dart';
-import 'package:juan_million/screens/pages/business/wallet_page.dart';
 import 'package:juan_million/screens/pages/customer/affiliates_locator_page.dart';
 import 'package:juan_million/screens/pages/customer/inventory_page.dart';
 import 'package:juan_million/screens/pages/customer/myqr_page.dart';
@@ -390,7 +383,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                         text: index == 0
                                             ? 'Total Points'
                                             : index == 1
-                                                ? 'Cash Wallet'
+                                                ? 'e Wallet'
                                                 : 'Community Wallet',
                                         fontSize: 14,
                                         color: Colors.white,

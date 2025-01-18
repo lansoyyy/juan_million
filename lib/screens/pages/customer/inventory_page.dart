@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:juan_million/screens/pages/customer/myslots_screen.dart';
 import 'package:juan_million/services/add_history.dart';
 import 'package:juan_million/services/add_points.dart';
@@ -20,7 +19,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
   @override
   void initState() {
     // TODO: implement initState
-    checkPoints(5000);
+    checkPoints(4163);
     super.initState();
   }
 
@@ -48,7 +47,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
           .doc('wallet')
           .update({
         // 'wallet': FieldValue.increment(total),
-        'pts': FieldValue.increment(-5000),
+        'pts': FieldValue.increment(-4163),
       }).whenComplete(() async {
         var document = FirebaseFirestore.instance.doc('Users/$uid');
         var snapshot = await document.get();
@@ -65,14 +64,14 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
             .doc('business')
             .update({
           // 'wallet': FieldValue.increment(total),
-          'pts': FieldValue.increment(1250),
+          'pts': FieldValue.increment(478),
         });
         await FirebaseFirestore.instance
             .collection('Community Wallet')
             .doc('it')
             .update({
           // 'wallet': FieldValue.increment(total),
-          'pts': FieldValue.increment(250),
+          'pts': FieldValue.increment(185),
         });
 
         addWallet(3500, '', uid, 'REWARDS 3,500', '');

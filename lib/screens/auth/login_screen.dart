@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:juan_million/screens/auth/customer_signup_screen.dart';
 import 'package:juan_million/screens/auth/signup_screen.dart';
 import 'package:juan_million/screens/business_home_screen.dart';
@@ -15,7 +14,6 @@ import 'package:juan_million/widgets/button_widget.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:juan_million/widgets/textfield_widget.dart';
 import 'package:juan_million/widgets/toast_widget.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends StatefulWidget {
   bool inCustomer;
@@ -79,14 +77,14 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             TextFieldWidget(
               fontStyle: FontStyle.normal,
-              hint: 'Email/Mobile Number',
+              hint: 'Email',
               borderColor: blue,
               radius: 12,
               width: 350,
               prefixIcon: Icons.person,
               isRequred: false,
               controller: username,
-              label: 'Email/Mobile Number',
+              label: 'Email',
             ),
             const SizedBox(
               height: 20,
@@ -130,9 +128,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 TextFieldWidget(
-                                  hint: 'Email/Mobile Number',
+                                  hint: 'Email',
                                   textCapitalization: TextCapitalization.none,
-                                  label: 'Email/Mobile Number',
+                                  label: 'Email',
                                   controller: emailController,
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {

@@ -6,7 +6,6 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:intl/intl.dart';
 import 'package:juan_million/screens/pages/customer/qr_scanned_page.dart';
 import 'package:juan_million/screens/pages/store_page.dart';
-import 'package:juan_million/services/add_points.dart';
 import 'package:juan_million/services/add_wallet.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
@@ -451,7 +450,7 @@ class _CustomerPointsPageState extends State<CustomerPointsPage> {
               );
             } else {
               Navigator.pop(context);
-              showToast('Your cash wallet is not enough to proceed!');
+              showToast('Your e wallet is not enough to proceed!');
             }
           }
         });

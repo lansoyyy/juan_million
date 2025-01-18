@@ -1,9 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:intl/intl.dart';
 import 'package:juan_million/screens/pages/customer/qr_scanned_page.dart';
@@ -453,7 +451,7 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
                 );
               } else {
                 Navigator.pop(context);
-                showToast('Your cash wallet is not enough to proceed!');
+                showToast('Your e wallet is not enough to proceed!');
               }
             }
           }

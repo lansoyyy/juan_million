@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:863618395212:android:3fb62331c3152cfb9fd8e9",
         "android_client_info": {
-          "package_name": "com.algovision.juan4all"
+          "package_name": "com.algovision.juanmillion"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "863618395212-akaosucqeebbm6avnadl174qscruu1ot.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.algovision.juan4all",
+            "package_name": "com.algovision.juanmillion",
             "certificate_hash": "67eb59f105bde4f060264964da36c773186ca9b6"
           }
         },
@@ -25,7 +25,7 @@
           "client_id": "863618395212-jhn8um3ctrnjsuathd14ghm3a3ubvpag.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.algovision.juan4all",
+            "package_name": "com.algovision.juanmillion",
             "certificate_hash": "6f937f6fdc3d77e85b800f722f26559ce656d889"
           }
         },
