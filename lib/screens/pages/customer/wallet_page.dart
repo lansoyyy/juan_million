@@ -44,246 +44,249 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
             }
             dynamic data = snapshot.data;
             return SafeArea(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: IconButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: const Icon(
-                          Icons.arrow_back_ios_rounded,
-                          color: Colors.white,
-                        )),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Center(
-                    child: TextWidget(
-                      text: 'Wallet',
-                      fontSize: 14,
-                      color: Colors.white,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: IconButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          icon: const Icon(
+                            Icons.arrow_back_ios_rounded,
+                            color: Colors.white,
+                          )),
                     ),
-                  ),
-                  Center(
-                    child: TextWidget(
-                      text: AppConstants.formatNumberWithPeso(data['wallet']),
-                      fontFamily: 'Bold',
-                      fontSize: 75,
-                      color: Colors.white,
+                    const SizedBox(
+                      height: 20,
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20, right: 20),
-                    child: Container(
-                      width: double.infinity,
-                      height: 75,
-                      decoration: BoxDecoration(
-                        color: Colors.white54,
-                        borderRadius: BorderRadius.circular(15),
+                    Center(
+                      child: TextWidget(
+                        text: 'Wallet',
+                        fontSize: 14,
+                        color: Colors.white,
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              showModalBottomSheet(
-                                context: context,
-                                builder: (context) {
-                                  return SizedBox(
-                                    height: 100,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(10.0),
-                                      child: Column(
-                                        children: [
-                                          ListTile(
-                                            onTap: () {
-                                              setState(() {
-                                                selected = 'Business';
-                                              });
-                                              Navigator.pop(context);
-                                              showAmountDialog();
-                                            },
-                                            leading: const Icon(
-                                              Icons.business,
+                    ),
+                    Center(
+                      child: TextWidget(
+                        text: AppConstants.formatNumberWithPeso(data['wallet']),
+                        fontFamily: 'Bold',
+                        fontSize: 75,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20, right: 20),
+                      child: Container(
+                        width: double.infinity,
+                        height: 75,
+                        decoration: BoxDecoration(
+                          color: Colors.white54,
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  builder: (context) {
+                                    return SizedBox(
+                                      height: 100,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: Column(
+                                          children: [
+                                            ListTile(
+                                              onTap: () {
+                                                setState(() {
+                                                  selected = 'Business';
+                                                });
+                                                Navigator.pop(context);
+                                                showAmountDialog();
+                                              },
+                                              leading: const Icon(
+                                                Icons.business,
+                                              ),
+                                              title: TextWidget(
+                                                text: 'To affiliate',
+                                                fontSize: 14,
+                                                fontFamily: 'Bold',
+                                              ),
                                             ),
-                                            title: TextWidget(
-                                              text: 'To affiliate',
-                                              fontSize: 14,
-                                              fontFamily: 'Bold',
-                                            ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    ),
+                                    );
+                                  },
+                                );
+                              },
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.sync_alt,
+                                    color: Colors.white,
+                                    size: 30,
+                                  ),
+                                  TextWidget(
+                                    text: 'Transfer',
+                                    fontSize: 12,
+                                    color: Colors.white,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.only(top: 10, bottom: 10),
+                              child: VerticalDivider(
+                                color: Colors.white,
+                                thickness: 0.5,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => StorePage(
+                                          inbusiness: false,
+                                        )));
+                              },
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.wallet,
+                                    color: Colors.white,
+                                    size: 30,
+                                  ),
+                                  TextWidget(
+                                    text: 'Top up',
+                                    fontSize: 12,
+                                    color: Colors.white,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20, right: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextWidget(
+                            text: 'Transactions',
+                            fontSize: 18,
+                            color: Colors.white,
+                            fontFamily: 'Bold',
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          StreamBuilder<QuerySnapshot>(
+                              stream: FirebaseFirestore.instance
+                                  .collection('Wallets')
+                                  .snapshots(),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                                if (snapshot.hasError) {
+                                  print(snapshot.error);
+                                  return const Center(child: Text('Error'));
+                                }
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Padding(
+                                    padding: EdgeInsets.only(top: 50),
+                                    child: Center(
+                                        child: CircularProgressIndicator(
+                                      color: Colors.black,
+                                    )),
                                   );
-                                },
-                              );
-                            },
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.sync_alt,
-                                  color: Colors.white,
-                                  size: 30,
-                                ),
-                                TextWidget(
-                                  text: 'Transfer',
-                                  fontSize: 12,
-                                  color: Colors.white,
-                                ),
-                              ],
-                            ),
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.only(top: 10, bottom: 10),
-                            child: VerticalDivider(
-                              color: Colors.white,
-                              thickness: 0.5,
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => StorePage(
-                                        inbusiness: false,
-                                      )));
-                            },
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.wallet,
-                                  color: Colors.white,
-                                  size: 30,
-                                ),
-                                TextWidget(
-                                  text: 'Top up',
-                                  fontSize: 12,
-                                  color: Colors.white,
-                                ),
-                              ],
-                            ),
-                          ),
+                                }
+
+                                final data = snapshot.requireData;
+                                return Column(
+                                  children: [
+                                    for (int index = 0;
+                                        index < data.docs.length;
+                                        index++)
+                                      data.docs[index]['uid'] ==
+                                                  FirebaseAuth.instance
+                                                      .currentUser!.uid ||
+                                              data.docs[index]['from'] ==
+                                                  FirebaseAuth
+                                                      .instance.currentUser!.uid
+                                          ? Padding(
+                                              padding:
+                                                  const EdgeInsets.all(5.0),
+                                              child: ListTile(
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                    15,
+                                                  ),
+                                                ),
+                                                tileColor: Colors.white,
+                                                leading: Icon(
+                                                  Icons
+                                                      .volunteer_activism_outlined,
+                                                  color: secondary,
+                                                  size: 32,
+                                                ),
+                                                title: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    TextWidget(
+                                                      text: DateFormat.yMMMd()
+                                                          .add_jm()
+                                                          .format(data
+                                                              .docs[index]
+                                                                  ['dateTime']
+                                                              .toDate()),
+                                                      fontSize: 11,
+                                                      color: Colors.grey,
+                                                      fontFamily: 'Medium',
+                                                    ),
+                                                    TextWidget(
+                                                      text:
+                                                          '${data.docs[index]['pts']}',
+                                                      fontSize: 16,
+                                                      color: Colors.black,
+                                                      fontFamily: 'Medium',
+                                                    ),
+                                                    TextWidget(
+                                                      text:
+                                                          '${data.docs[index]['type']}',
+                                                      fontSize: 12,
+                                                      color: Colors.black,
+                                                      fontFamily: 'Medium',
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            )
+                                          : const SizedBox()
+                                  ],
+                                );
+                              }),
                         ],
                       ),
                     ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20, right: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TextWidget(
-                          text: 'Transactions',
-                          fontSize: 18,
-                          color: Colors.white,
-                          fontFamily: 'Bold',
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance
-                                .collection('Wallets')
-                                .snapshots(),
-                            builder: (BuildContext context,
-                                AsyncSnapshot<QuerySnapshot> snapshot) {
-                              if (snapshot.hasError) {
-                                print(snapshot.error);
-                                return const Center(child: Text('Error'));
-                              }
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return const Padding(
-                                  padding: EdgeInsets.only(top: 50),
-                                  child: Center(
-                                      child: CircularProgressIndicator(
-                                    color: Colors.black,
-                                  )),
-                                );
-                              }
-
-                              final data = snapshot.requireData;
-                              return SizedBox(
-                                height: 325,
-                                child: ListView.builder(
-                                  itemCount: data.docs.length,
-                                  itemBuilder: (context, index) {
-                                    return data.docs[index]['uid'] ==
-                                                FirebaseAuth.instance
-                                                    .currentUser!.uid ||
-                                            data.docs[index]['from'] ==
-                                                FirebaseAuth
-                                                    .instance.currentUser!.uid
-                                        ? Padding(
-                                            padding: const EdgeInsets.all(5.0),
-                                            child: ListTile(
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                  15,
-                                                ),
-                                              ),
-                                              tileColor: Colors.white,
-                                              leading: Icon(
-                                                Icons
-                                                    .volunteer_activism_outlined,
-                                                color: secondary,
-                                                size: 32,
-                                              ),
-                                              title: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  TextWidget(
-                                                    text: DateFormat.yMMMd()
-                                                        .add_jm()
-                                                        .format(data.docs[index]
-                                                                ['dateTime']
-                                                            .toDate()),
-                                                    fontSize: 11,
-                                                    color: Colors.grey,
-                                                    fontFamily: 'Medium',
-                                                  ),
-                                                  TextWidget(
-                                                    text:
-                                                        '${data.docs[index]['pts']}',
-                                                    fontSize: 16,
-                                                    color: Colors.black,
-                                                    fontFamily: 'Medium',
-                                                  ),
-                                                  TextWidget(
-                                                    text:
-                                                        '${data.docs[index]['type']}',
-                                                    fontSize: 12,
-                                                    color: Colors.black,
-                                                    fontFamily: 'Medium',
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          )
-                                        : const SizedBox();
-                                  },
-                                ),
-                              );
-                            }),
-                      ],
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           }),

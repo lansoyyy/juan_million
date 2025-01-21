@@ -1,10 +1,9 @@
 import 'dart:io';
 import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
-import '../../../main.dart';
 
 TextStyle headerTextStyle(
     {int? size,
@@ -220,3 +219,11 @@ class DefaultValues {
 }
 
 DefaultValues defaultValues = DefaultValues();
+bool hasSpecialCharacter(String input) {
+  // Regular expression to match special characters
+  final RegExp specialCharRegExp =
+      RegExp(r'[!@#$%^&*(),.?":{}|<>_\[\]\\/\-+=;]');
+
+  // Returns true if a match is found, false otherwise
+  return specialCharRegExp.hasMatch(input);
+}

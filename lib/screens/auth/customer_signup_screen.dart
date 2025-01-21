@@ -1,14 +1,17 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:juan_million/models/municipality_model.dart';
 import 'package:juan_million/models/province_model.dart';
 import 'package:juan_million/models/region_model.dart';
 import 'package:juan_million/screens/auth/login_screen.dart';
-import 'package:juan_million/screens/auth/package_screen.dart';
 import 'package:juan_million/screens/customer_home_screen.dart';
 import 'package:juan_million/services/add_referal.dart';
 import 'package:juan_million/services/add_user.dart';
@@ -19,11 +22,7 @@ import 'package:juan_million/widgets/button_widget.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:juan_million/widgets/textfield_widget.dart';
 import 'package:juan_million/widgets/toast_widget.dart';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:path/path.dart' as path;
-import 'package:image_picker/image_picker.dart';
-import 'package:flutter/foundation.dart';
-import 'dart:io';
 
 class CustomerSignupScreen extends StatefulWidget {
   const CustomerSignupScreen({super.key});
@@ -470,49 +469,54 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
 
   register(context) async {
     String key = generateUniqueKey(6);
-    try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: email.text, password: password.text);
+    if (hasSpecialCharacter(password.text)) {
+      try {
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+            email: email.text, password: password.text);
 
-      addUser(
-          '${fname.text} ${lname.text}',
-          email.text,
-          nickname.text,
-          imageURL,
-          '${municipality!.name}, ${province!.name}',
-          number.text,
-          key);
+        addUser(
+            '${fname.text} ${lname.text}',
+            email.text,
+            nickname.text,
+            imageURL,
+            '${municipality!.name}, ${province!.name}',
+            number.text,
+            key);
 
-      addReferal(key, 'Users');
+        addReferal(key, 'Users');
 
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: email.text, password: password.text);
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+            email: email.text, password: password.text);
 
-      await FirebaseAuth.instance.currentUser!.sendEmailVerification();
+        await FirebaseAuth.instance.currentUser!.sendEmailVerification();
 
-      showToast("Registered Successfully! Verification was sent to your email");
+        showToast(
+            "Registered Successfully! Verification was sent to your email");
 
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-            builder: (context) => LoginScreen(
-                  inCustomer: true,
-                )),
-        (route) {
-          return false;
-        },
-      );
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        showToast('The password provided is too weak.');
-      } else if (e.code == 'email-already-in-use') {
-        showToast('The account already exists for that email.');
-      } else if (e.code == 'invalid-email') {
-        showToast('The email address is not valid.');
-      } else {
-        showToast(e.toString());
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+              builder: (context) => LoginScreen(
+                    inCustomer: true,
+                  )),
+          (route) {
+            return false;
+          },
+        );
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'weak-password') {
+          showToast('The password provided is too weak.');
+        } else if (e.code == 'email-already-in-use') {
+          showToast('The account already exists for that email.');
+        } else if (e.code == 'invalid-email') {
+          showToast('The email address is not valid.');
+        } else {
+          showToast(e.toString());
+        }
+      } on Exception catch (e) {
+        showToast("An error occurred: $e");
       }
-    } on Exception catch (e) {
-      showToast("An error occurred: $e");
+    } else {
+      showToast('Password should have atleast special character!');
     }
   }
 

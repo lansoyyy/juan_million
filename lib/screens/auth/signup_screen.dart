@@ -237,36 +237,41 @@ class _SignupScreenState extends State<SignupScreen> {
 
   register(context) async {
     String key = generateUniqueKey(6);
-    try {
-      final user = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: email.text, password: password.text);
+    if (hasSpecialCharacter(password.text)) {
+      try {
+        final user = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+            email: email.text, password: password.text);
 
-      // addUser(name.text, email.text);
-      addBusiness(name.text, email.text, '', '', '', '', '', key);
-      addReferal(key, 'Business');
+        // addUser(name.text, email.text);
+        addBusiness(name.text, email.text, '', '', '', '', '', key);
+        addReferal(key, 'Business');
 
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: email.text, password: password.text);
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+            email: email.text, password: password.text);
 
-      await FirebaseAuth.instance.currentUser!.sendEmailVerification();
+        await FirebaseAuth.instance.currentUser!.sendEmailVerification();
 
-      showToast("Registered Successfully! Verification was sent to your email");
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => SignupScreen2(
-                id: user.user!.uid,
-              )));
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        showToast('The password provided is too weak.');
-      } else if (e.code == 'email-already-in-use') {
-        showToast('The account already exists for that email.');
-      } else if (e.code == 'invalid-email') {
-        showToast('The email address is not valid.');
-      } else {
-        showToast(e.toString());
+        showToast(
+            "Registered Successfully! Verification was sent to your email");
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (context) => SignupScreen2(
+                  id: user.user!.uid,
+                )));
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'weak-password') {
+          showToast('The password provided is too weak.');
+        } else if (e.code == 'email-already-in-use') {
+          showToast('The account already exists for that email.');
+        } else if (e.code == 'invalid-email') {
+          showToast('The email address is not valid.');
+        } else {
+          showToast(e.toString());
+        }
+      } on Exception catch (e) {
+        showToast("An error occurred: $e");
       }
-    } on Exception catch (e) {
-      showToast("An error occurred: $e");
+    } else {
+      showToast('Password should have atleast special character!');
     }
   }
 }
