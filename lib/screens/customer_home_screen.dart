@@ -616,12 +616,12 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                                                         .center,
                                                                 children: [
                                                                   TextWidget(
-                                                                    text: data
-                                                                        .docs[
-                                                                            index]
-                                                                            [
-                                                                            'pts']
-                                                                        .toString(),
+                                                                    text: (data
+                                                                            .docs[index][
+                                                                                'pts']
+                                                                            .ceilToDouble())
+                                                                        .toStringAsFixed(
+                                                                            0),
                                                                     fontSize:
                                                                         38,
                                                                     fontFamily:
