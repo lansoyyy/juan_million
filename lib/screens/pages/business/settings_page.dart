@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:juan_million/screens/auth/login_screen.dart';
 import 'package:juan_million/screens/landing_screen.dart';
 import 'package:juan_million/screens/pages/business/myqr_page.dart';
 import 'package:juan_million/screens/pages/business/profile_page.dart';
@@ -40,6 +39,7 @@ class _SettingsPageState extends State<SettingsPage> {
           .doc(data.id)
           .update({
         'name': name.text,
+        'ptsconversion': int.parse(pts.text)
         // 'ptsconversion': double.parse(pts.text),
       });
       showToast('Business information updated!');
@@ -70,7 +70,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
             name.text = data['name'].toString();
             email.text = data['email'].toString();
-            pts.text = data['ptsconversion'].toString();
+            pts.text = data['ptsconversion'].toStringAsFixed(0);
 
             password.text = '*******';
             return SafeArea(
@@ -158,7 +158,6 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                     Center(
                       child: TextFieldWidget(
-                        isEnabled: false,
                         inputType: TextInputType.number,
                         fontStyle: FontStyle.normal,
                         hint: 'Points Conversion',
