@@ -364,9 +364,9 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
                         fontWeight: FontWeight.bold,
                         fontSize: 18),
                   ),
-                  const Text(
-                    'Sevice Charge (5%)- P 50',
-                    style: TextStyle(
+                  Text(
+                    'Service Charge (5%)- P ${(int.parse(amount) * 0.05).toStringAsFixed(0)}',
+                    style: const TextStyle(
                         fontFamily: 'Bold',
                         fontWeight: FontWeight.bold,
                         fontSize: 18),

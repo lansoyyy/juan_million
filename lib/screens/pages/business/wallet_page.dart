@@ -171,7 +171,8 @@ class _WalletPageState extends State<WalletPage> {
                                                                   if (doc
                                                                       .exists) {
                                                                     showAmountDialog(
-                                                                        doc['name']);
+                                                                        doc['name'],
+                                                                        false);
                                                                   } else {
                                                                     showToast(
                                                                         'PIN Code does not exist!');
@@ -259,7 +260,8 @@ class _WalletPageState extends State<WalletPage> {
                                                                   if (doc
                                                                       .exists) {
                                                                     showAmountDialog(
-                                                                        doc['name']);
+                                                                        doc['name'],
+                                                                        false);
                                                                   } else {
                                                                     showToast(
                                                                         'PIN Code does not exist!');
@@ -346,7 +348,8 @@ class _WalletPageState extends State<WalletPage> {
                                                                   if (doc
                                                                       .exists) {
                                                                     showAmountDialog(
-                                                                        doc['name']);
+                                                                        doc['name'],
+                                                                        true);
                                                                   } else {
                                                                     showToast(
                                                                         'PIN Code does not exist!');
@@ -738,7 +741,7 @@ class _WalletPageState extends State<WalletPage> {
     );
   }
 
-  showAmountDialog(cashier) {
+  showAmountDialog(cashier, bool toCoor) {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -771,7 +774,12 @@ class _WalletPageState extends State<WalletPage> {
                 ),
                 MaterialButton(
                   onPressed: () async {
-                    showConfirmDialog(pts.text, cashier);
+                    if (toCoor) {
+                      showConfirmDialog(pts.text, cashier);
+                    } else {
+                      Navigator.of(context).pop();
+                      scanQRCode(cashier);
+                    }
                   },
                   child: const Text(
                     'Continue',
@@ -809,9 +817,9 @@ class _WalletPageState extends State<WalletPage> {
                         fontWeight: FontWeight.bold,
                         fontSize: 18),
                   ),
-                  const Text(
-                    'Sevice Charge (5%)- P 50',
-                    style: TextStyle(
+                  Text(
+                    'Service Charge (3%)- P ${(int.parse(amount) * 0.03).toStringAsFixed(0)}',
+                    style: const TextStyle(
                         fontFamily: 'Bold',
                         fontWeight: FontWeight.bold,
                         fontSize: 18),
