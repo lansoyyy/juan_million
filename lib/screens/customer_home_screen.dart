@@ -684,175 +684,175 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                         );
                       }),
                   const SizedBox(
-                    height: 10,
+                    height: 20,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20, right: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            TextWidget(
-                              text: 'Promo & Deals',
-                              fontSize: 18,
-                              fontFamily: 'Bold',
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => StorePage()));
-                              },
-                              child: TextWidget(
-                                text: 'See all',
-                                color: blue,
-                                fontSize: 14,
-                                fontFamily: 'Bold',
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance
-                                .collection('Boosters')
-                                .snapshots(),
-                            builder: (BuildContext context,
-                                AsyncSnapshot<QuerySnapshot> snapshot) {
-                              if (snapshot.hasError) {
-                                print(snapshot.error);
-                                return const Center(child: Text('Error'));
-                              }
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return const Padding(
-                                  padding: EdgeInsets.only(top: 50),
-                                  child: Center(
-                                      child: CircularProgressIndicator(
-                                    color: Colors.black,
-                                  )),
-                                );
-                              }
+                  // Padding(
+                  //   padding: const EdgeInsets.only(left: 20, right: 20),
+                  //   child: Column(
+                  //     crossAxisAlignment: CrossAxisAlignment.start,
+                  //     children: [
+                  //       Row(
+                  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //         crossAxisAlignment: CrossAxisAlignment.end,
+                  //         children: [
+                  //           TextWidget(
+                  //             text: 'Promo & Deals',
+                  //             fontSize: 18,
+                  //             fontFamily: 'Bold',
+                  //           ),
+                  //           GestureDetector(
+                  //             onTap: () {
+                  //               Navigator.of(context).push(MaterialPageRoute(
+                  //                   builder: (context) => StorePage()));
+                  //             },
+                  //             child: TextWidget(
+                  //               text: 'See all',
+                  //               color: blue,
+                  //               fontSize: 14,
+                  //               fontFamily: 'Bold',
+                  //             ),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //       const SizedBox(
+                  //         height: 5,
+                  //       ),
+                  //       StreamBuilder<QuerySnapshot>(
+                  //           stream: FirebaseFirestore.instance
+                  //               .collection('Boosters')
+                  //               .snapshots(),
+                  //           builder: (BuildContext context,
+                  //               AsyncSnapshot<QuerySnapshot> snapshot) {
+                  //             if (snapshot.hasError) {
+                  //               print(snapshot.error);
+                  //               return const Center(child: Text('Error'));
+                  //             }
+                  //             if (snapshot.connectionState ==
+                  //                 ConnectionState.waiting) {
+                  //               return const Padding(
+                  //                 padding: EdgeInsets.only(top: 50),
+                  //                 child: Center(
+                  //                     child: CircularProgressIndicator(
+                  //                   color: Colors.black,
+                  //                 )),
+                  //               );
+                  //             }
 
-                              final data = snapshot.requireData;
-                              return SizedBox(
-                                height: 150,
-                                width: 500,
-                                child: ListView.builder(
-                                  itemCount: data.docs.length,
-                                  scrollDirection: Axis.horizontal,
-                                  itemBuilder: (context, index) {
-                                    return data.docs[index]['price'] == 250 ||
-                                            data.docs[index]['price'] == 20
-                                        ? const SizedBox()
-                                        : Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 5, right: 5),
-                                            child: GestureDetector(
-                                              onTap: () {
-                                                Navigator.of(context).push(
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            PaymentSelectionScreen(
-                                                              item: data
-                                                                  .docs[index],
-                                                            )));
-                                              },
-                                              child: Card(
-                                                elevation: 5,
-                                                color: Colors.white,
-                                                child: SizedBox(
-                                                  height: 150,
-                                                  width: 150,
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            10.0),
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        TextWidget(
-                                                          text:
-                                                              'P${data.docs[index]['price']}',
-                                                          fontSize: 14,
-                                                          fontFamily: 'Medium',
-                                                          color: blue,
-                                                        ),
-                                                        const SizedBox(
-                                                          height: 15,
-                                                        ),
-                                                        Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            TextWidget(
-                                                              text:
-                                                                  '${data.docs[index]['slots'] * 150}',
-                                                              fontSize: 38,
-                                                              fontFamily:
-                                                                  'Bold',
-                                                              color: blue,
-                                                            ),
-                                                            const SizedBox(
-                                                              width: 5,
-                                                            ),
-                                                            TextWidget(
-                                                              text: 'pts',
-                                                              fontSize: 12,
-                                                              fontFamily:
-                                                                  'Bold',
-                                                              color: blue,
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        const SizedBox(
-                                                          height: 15,
-                                                        ),
-                                                        Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Icon(
-                                                              Icons.circle,
-                                                              color: secondary,
-                                                              size: 15,
-                                                            ),
-                                                            const SizedBox(
-                                                              width: 5,
-                                                            ),
-                                                            TextWidget(
-                                                              text:
-                                                                  'Limited offer',
-                                                              fontSize: 10,
-                                                              fontFamily:
-                                                                  'Bold',
-                                                              color:
-                                                                  Colors.black,
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                  },
-                                ),
-                              );
-                            })
-                      ],
-                    ),
-                  ),
+                  //             final data = snapshot.requireData;
+                  //             return SizedBox(
+                  //               height: 150,
+                  //               width: 500,
+                  //               child: ListView.builder(
+                  //                 itemCount: data.docs.length,
+                  //                 scrollDirection: Axis.horizontal,
+                  //                 itemBuilder: (context, index) {
+                  //                   return data.docs[index]['price'] == 250 ||
+                  //                           data.docs[index]['price'] == 20
+                  //                       ? const SizedBox()
+                  //                       : Padding(
+                  //                           padding: const EdgeInsets.only(
+                  //                               left: 5, right: 5),
+                  //                           child: GestureDetector(
+                  //                             onTap: () {
+                  //                               Navigator.of(context).push(
+                  //                                   MaterialPageRoute(
+                  //                                       builder: (context) =>
+                  //                                           PaymentSelectionScreen(
+                  //                                             item: data
+                  //                                                 .docs[index],
+                  //                                           )));
+                  //                             },
+                  //                             child: Card(
+                  //                               elevation: 5,
+                  //                               color: Colors.white,
+                  //                               child: SizedBox(
+                  //                                 height: 150,
+                  //                                 width: 150,
+                  //                                 child: Padding(
+                  //                                   padding:
+                  //                                       const EdgeInsets.all(
+                  //                                           10.0),
+                  //                                   child: Column(
+                  //                                     crossAxisAlignment:
+                  //                                         CrossAxisAlignment
+                  //                                             .start,
+                  //                                     children: [
+                  //                                       TextWidget(
+                  //                                         text:
+                  //                                             'P${data.docs[index]['price']}',
+                  //                                         fontSize: 14,
+                  //                                         fontFamily: 'Medium',
+                  //                                         color: blue,
+                  //                                       ),
+                  //                                       const SizedBox(
+                  //                                         height: 15,
+                  //                                       ),
+                  //                                       Row(
+                  //                                         mainAxisAlignment:
+                  //                                             MainAxisAlignment
+                  //                                                 .center,
+                  //                                         children: [
+                  //                                           TextWidget(
+                  //                                             text:
+                  //                                                 '${data.docs[index]['slots'] * 150}',
+                  //                                             fontSize: 38,
+                  //                                             fontFamily:
+                  //                                                 'Bold',
+                  //                                             color: blue,
+                  //                                           ),
+                  //                                           const SizedBox(
+                  //                                             width: 5,
+                  //                                           ),
+                  //                                           TextWidget(
+                  //                                             text: 'pts',
+                  //                                             fontSize: 12,
+                  //                                             fontFamily:
+                  //                                                 'Bold',
+                  //                                             color: blue,
+                  //                                           ),
+                  //                                         ],
+                  //                                       ),
+                  //                                       const SizedBox(
+                  //                                         height: 15,
+                  //                                       ),
+                  //                                       Row(
+                  //                                         mainAxisAlignment:
+                  //                                             MainAxisAlignment
+                  //                                                 .center,
+                  //                                         children: [
+                  //                                           Icon(
+                  //                                             Icons.circle,
+                  //                                             color: secondary,
+                  //                                             size: 15,
+                  //                                           ),
+                  //                                           const SizedBox(
+                  //                                             width: 5,
+                  //                                           ),
+                  //                                           TextWidget(
+                  //                                             text:
+                  //                                                 'Limited offer',
+                  //                                             fontSize: 10,
+                  //                                             fontFamily:
+                  //                                                 'Bold',
+                  //                                             color:
+                  //                                                 Colors.black,
+                  //                                           ),
+                  //                                         ],
+                  //                                       ),
+                  //                                     ],
+                  //                                   ),
+                  //                                 ),
+                  //                               ),
+                  //                             ),
+                  //                           ),
+                  //                         );
+                  //                 },
+                  //               ),
+                  //             );
+                  //           })
+                  //     ],
+                  //   ),
+                  // ),
                 ],
               );
             }));
