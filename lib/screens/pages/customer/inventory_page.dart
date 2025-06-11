@@ -31,7 +31,24 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                 padding: const EdgeInsets.all(12.0),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: [],
+                  children: [
+                    TextWidget(
+                      text: 'Screen Description:',
+                      fontSize: 16,
+                      fontFamily: 'Bold',
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    TextWidget(
+                      text: '''
+"This screen shows how many bonus slots you have. To check your current position, click the Slots menu. You can also track sequence updates and see who received the bonus prize." 
+
+''',
+                      fontSize: 14,
+                      maxLines: 20,
+                    ),
+                  ],
                 ),
               ),
             );

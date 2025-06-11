@@ -35,7 +35,23 @@ class _CustomerPointsPageState extends State<CustomerPointsPage> {
                 padding: const EdgeInsets.all(12.0),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: [],
+                  children: [
+                    TextWidget(
+                      text: 'Screen Description:',
+                      fontSize: 16,
+                      fontFamily: 'Bold',
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    TextWidget(
+                      text: '''
+"Welcome to your Points screen! Here, you can view your point earnings from purchases. Every 150 points can be converted into 1 bonus slot. You can also transfer or share points with other members by simply scanning their QR codes. To claim a slot, just click the refresh button in the upper-right corner." 
+''',
+                      fontSize: 14,
+                      maxLines: 20,
+                    ),
+                  ],
                 ),
               ),
             );

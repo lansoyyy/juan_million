@@ -36,7 +36,24 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
                 padding: const EdgeInsets.all(12.0),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: [],
+                  children: [
+                    TextWidget(
+                      text: 'Screen Description:',
+                      fontSize: 16,
+                      fontFamily: 'Bold',
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    TextWidget(
+                      text: '''
+"Welcome to your E-Wallet! Use your cash earnings to shop with our affiliate stores, buy booster points, or cash out at the nearest partner store."
+
+''',
+                      fontSize: 14,
+                      maxLines: 20,
+                    ),
+                  ],
                 ),
               ),
             );
