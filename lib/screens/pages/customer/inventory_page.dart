@@ -21,6 +21,24 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
     // TODO: implement initState
     checkPoints(4163);
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return Dialog(
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   final searchController = TextEditingController();

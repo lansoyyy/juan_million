@@ -20,6 +20,31 @@ class CustomerPointsPage extends StatefulWidget {
 }
 
 class _CustomerPointsPageState extends State<CustomerPointsPage> {
+  @override
+  void initState() {
+    // TODO: implement initState
+
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return Dialog(
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   final pts = TextEditingController();
 
   String selected = '';
