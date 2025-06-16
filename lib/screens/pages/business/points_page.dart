@@ -5,8 +5,54 @@ import 'package:intl/intl.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 
-class PointsPage extends StatelessWidget {
+class PointsPage extends StatefulWidget {
   const PointsPage({super.key});
+
+  @override
+  State<PointsPage> createState() => _PointsPageState();
+}
+
+class _PointsPageState extends State<PointsPage> {
+  @override
+  void initState() {
+    // TODO: implement initState
+
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return Dialog(
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextWidget(
+                      text: 'Screen Description:',
+                      fontSize: 16,
+                      fontFamily: 'Bold',
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    TextWidget(
+                      text: '''
+“This is your Loyalty Points Dashboard. View your current balance and reload points anytime to keep rewarding your customers.”
+''',
+                      fontSize: 14,
+                      maxLines: 20,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

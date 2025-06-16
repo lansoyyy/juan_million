@@ -21,6 +21,47 @@ class WalletPage extends StatefulWidget {
 }
 
 class _WalletPageState extends State<WalletPage> {
+  @override
+  void initState() {
+    // TODO: implement initState
+
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return Dialog(
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextWidget(
+                      text: 'Screen Description:',
+                      fontSize: 16,
+                      fontFamily: 'Bold',
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    TextWidget(
+                      text: '''
+“This is your E-Wallet dashboard. Here, you can receive payments from customers and track all your wallet transactions in one place.”
+''',
+                      fontSize: 14,
+                      maxLines: 20,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   final pin = TextEditingController();
 
   String selected = '';
