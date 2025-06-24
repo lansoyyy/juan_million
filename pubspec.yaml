@@ -42,11 +42,14 @@ dependencies:
   firebase_storage:
   firebase_auth:
   qr_flutter:
-  flutter_barcode_scanner:
+  # flutter_barcode_scanner:
+  flutter_barcode_scanner_plus:
   paymongo_sdk:
   image_picker:
   google_sign_in:
   local_auth:
+  crypto:
+  url_launcher:
 
 dev_dependencies:
   flutter_test:
