@@ -4,6 +4,8 @@ import 'package:flutter/widgets.dart';
 import 'package:juan_million/screens/auth/login_screen.dart';
 import 'package:juan_million/screens/auth/signup_screen.dart';
 import 'package:juan_million/utlis/colors.dart';
+import 'package:juan_million/utlis/dragonpay.dart';
+import 'package:juan_million/widgets/dragonpay_screen.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:juan_million/widgets/toast_widget.dart';
 
@@ -34,10 +36,12 @@ class LandingScreen extends StatelessWidget {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => LoginScreen(
-                                  inCustomer: true,
-                                )));
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const DragonPayWebView(),
+                          ),
+                        );
                       },
                       child: Align(
                         alignment: Alignment.topCenter,

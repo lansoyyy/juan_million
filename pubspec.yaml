@@ -50,6 +50,7 @@ dependencies:
   local_auth:
   crypto:
   url_launcher:
+  webview_flutter:
 
 dev_dependencies:
   flutter_test:
