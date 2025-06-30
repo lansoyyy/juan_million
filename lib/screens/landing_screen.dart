@@ -35,13 +35,24 @@ class LandingScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     GestureDetector(
-                      onTap: () {
-                        Navigator.push(
+                      onTap: () async {
+                        final result = await Navigator.push<bool>(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const DragonPayWebView(),
-                          ),
+                              builder: (context) => const DragonPayWebView()),
                         );
+                        if (result != null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(result
+                                  ? 'Payment Successful!'
+                                  : 'Payment Failed or Canceled'),
+                              backgroundColor:
+                                  result ? Colors.green : Colors.red,
+                              duration: const Duration(seconds: 3),
+                            ),
+                          );
+                        }
                       },
                       child: Align(
                         alignment: Alignment.topCenter,
