@@ -13,6 +13,7 @@ import 'package:juan_million/screens/pages/customer/qr_scanned_page.dart';
 import 'package:juan_million/services/add_points.dart';
 import 'package:juan_million/utlis/app_constants.dart';
 import 'package:juan_million/utlis/colors.dart';
+import 'package:juan_million/widgets/dragonpay_screen.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:juan_million/widgets/toast_widget.dart';
 
@@ -973,34 +974,44 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                   .get();
 
                               if (doc['wallet'] >= int.parse(pts.text)) {
-                                await FirebaseFirestore.instance
-                                    .collection('Business')
-                                    .doc(FirebaseAuth.instance.currentUser!.uid)
-                                    .update({
-                                  'wallet': FieldValue.increment(
-                                      -int.parse(pts.text)),
-                                  'pts':
-                                      FieldValue.increment(int.parse(pts.text))
-                                });
-                                showToast('Transaction was succesfull!');
+                                final result = await Navigator.push<bool>(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const DragonPayWebView()),
+                                );
+                                if (result != null) {
+                                  await FirebaseFirestore.instance
+                                      .collection('Business')
+                                      .doc(FirebaseAuth
+                                          .instance.currentUser!.uid)
+                                      .update({
+                                    'wallet': FieldValue.increment(
+                                        -int.parse(pts.text)),
+                                    'pts': FieldValue.increment(
+                                        int.parse(pts.text))
+                                  });
+                                  showToast('Transaction was succesfull!');
 
-                                addPoints(int.parse(pts.text), 1, name,
-                                    'Points from reload', '');
+                                  addPoints(int.parse(pts.text), 1, name,
+                                      'Points from reload', '');
 
-                                DocumentSnapshot doc1 = await FirebaseFirestore
-                                    .instance
-                                    .collection('Business')
-                                    .doc(FirebaseAuth.instance.currentUser!.uid)
-                                    .get();
+                                  DocumentSnapshot doc1 =
+                                      await FirebaseFirestore.instance
+                                          .collection('Business')
+                                          .doc(FirebaseAuth
+                                              .instance.currentUser!.uid)
+                                          .get();
 
-                                Navigator.pop(context);
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => QRScannedPage(
-                                          inuser: false,
-                                          pts: doc1['pts'].toString(),
-                                          store: FirebaseAuth
-                                              .instance.currentUser!.uid,
-                                        )));
+                                  Navigator.pop(context);
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) => QRScannedPage(
+                                            inuser: false,
+                                            pts: doc1['pts'].toString(),
+                                            store: FirebaseAuth
+                                                .instance.currentUser!.uid,
+                                          )));
+                                }
                               } else {
                                 showToast(
                                     'Cannot proceed! Insufficient e wallet');

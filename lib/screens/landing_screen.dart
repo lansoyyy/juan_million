@@ -35,24 +35,28 @@ class LandingScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     GestureDetector(
-                      onTap: () async {
-                        final result = await Navigator.push<bool>(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const DragonPayWebView()),
-                        );
-                        if (result != null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(result
-                                  ? 'Payment Successful!'
-                                  : 'Payment Failed or Canceled'),
-                              backgroundColor:
-                                  result ? Colors.green : Colors.red,
-                              duration: const Duration(seconds: 3),
-                            ),
-                          );
-                        }
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => LoginScreen(
+                                  inCustomer: true,
+                                )));
+                        // final result = await Navigator.push<bool>(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //       builder: (context) => const DragonPayWebView()),
+                        // );
+                        // if (result != null) {
+                        //   ScaffoldMessenger.of(context).showSnackBar(
+                        //     SnackBar(
+                        //       content: Text(result
+                        //           ? 'Payment Successful!'
+                        //           : 'Payment Failed or Canceled'),
+                        //       backgroundColor:
+                        //           result ? Colors.green : Colors.red,
+                        //       duration: const Duration(seconds: 3),
+                        //     ),
+                        //   );
+                        // }
                       },
                       child: Align(
                         alignment: Alignment.topCenter,

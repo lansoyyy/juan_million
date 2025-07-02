@@ -110,23 +110,6 @@ class _PointsPageState extends State<PointsPage> {
                           fontSize: 75,
                           color: Colors.white,
                         ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => const PointsPage()));
-                          },
-                          child: Container(
-                            decoration: const BoxDecoration(
-                                color: Colors.white, shape: BoxShape.circle),
-                            child: Icon(
-                              Icons.add,
-                              color: primary,
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                     const SizedBox(
