@@ -136,75 +136,82 @@ class _InventoryPageState extends State<InventoryPage> {
                           child: ListView.builder(
                             itemCount: data.docs.length,
                             itemBuilder: (context, index) {
-                              return StreamBuilder<DocumentSnapshot>(
-                                  stream: FirebaseFirestore.instance
-                                      .collection('Users')
-                                      .doc(data.docs[index]['scannedId'])
-                                      .snapshots(),
-                                  builder: (context,
-                                      AsyncSnapshot<DocumentSnapshot>
-                                          snapshot) {
-                                    if (!snapshot.hasData) {
-                                      return const Center(
-                                          child: Text('Loading'));
-                                    } else if (snapshot.hasError) {
-                                      return const Center(
-                                          child: Text('Something went wrong'));
-                                    } else if (snapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return const Center(
-                                          child: CircularProgressIndicator());
-                                    }
-                                    dynamic userData = snapshot.data;
-                                    return Padding(
-                                      padding: const EdgeInsets.all(5.0),
-                                      child: SizedBox(
-                                        height: 60,
-                                        width: 500,
-                                        child: ListTile(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              15,
+                              return data.docs[index]['scannedId'] == ''
+                                  ? SizedBox()
+                                  : StreamBuilder<DocumentSnapshot>(
+                                      stream: FirebaseFirestore.instance
+                                          .collection('Users')
+                                          .doc(data.docs[index]['scannedId'])
+                                          .snapshots(),
+                                      builder: (context,
+                                          AsyncSnapshot<DocumentSnapshot>
+                                              snapshot) {
+                                        if (!snapshot.hasData) {
+                                          return const Center(
+                                              child: Text('Loading'));
+                                        } else if (snapshot.hasError) {
+                                          return const Center(
+                                              child:
+                                                  Text('Something went wrong'));
+                                        } else if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return const Center(
+                                              child:
+                                                  CircularProgressIndicator());
+                                        }
+                                        dynamic userData = snapshot.data;
+
+                                        return Padding(
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: SizedBox(
+                                            height: 60,
+                                            width: 500,
+                                            child: ListTile(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                  15,
+                                                ),
+                                              ),
+                                              tileColor: Colors.white,
+                                              leading: SizedBox(
+                                                height: 50,
+                                                width: 250,
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    TextWidget(
+                                                      text: userData['name'],
+                                                      fontSize: 11,
+                                                      color: Colors.black,
+                                                      fontFamily: 'Medium',
+                                                    ),
+                                                    TextWidget(
+                                                      text: userData['pts']
+                                                          .toString(),
+                                                      fontSize: 11,
+                                                      color: Colors.black,
+                                                      fontFamily: 'Medium',
+                                                    ),
+                                                    TextWidget(
+                                                      text: data.docs[index]
+                                                              ['pts']
+                                                          .toString(),
+                                                      fontSize: 11,
+                                                      color: Colors.black,
+                                                      fontFamily: 'Medium',
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
                                             ),
                                           ),
-                                          tileColor: Colors.white,
-                                          leading: SizedBox(
-                                            height: 50,
-                                            width: 250,
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                TextWidget(
-                                                  text: userData['name'],
-                                                  fontSize: 11,
-                                                  color: Colors.black,
-                                                  fontFamily: 'Medium',
-                                                ),
-                                                TextWidget(
-                                                  text: userData['pts']
-                                                      .toString(),
-                                                  fontSize: 11,
-                                                  color: Colors.black,
-                                                  fontFamily: 'Medium',
-                                                ),
-                                                TextWidget(
-                                                  text: data.docs[index]['pts']
-                                                      .toString(),
-                                                  fontSize: 11,
-                                                  color: Colors.black,
-                                                  fontFamily: 'Medium',
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  });
+                                        );
+                                      });
                             },
                           ),
                         ),

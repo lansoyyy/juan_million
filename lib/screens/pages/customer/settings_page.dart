@@ -55,7 +55,7 @@ class _CustomerSettingsPageState extends State<CustomerSettingsPage> {
 
             fname.text = data['name'].toString().split(' ')[0];
             lname.text = data['name'].toString().split(' ')[1];
-            number.text = isPhoneNumber(isNumber) ? isNumber : '';
+            number.text = isPhoneNumber(isNumber) ? isNumber : data['number'];
             email.text = isPhoneNumber(isNumber) ? '' : data['email'];
             password.text = '*******';
 
@@ -272,7 +272,7 @@ class _CustomerSettingsPageState extends State<CustomerSettingsPage> {
                               .doc(data.id)
                               .update({
                             'name': '${fname.text} ${lname.text}',
-                            'phone': number.text,
+                            'number': number.text,
                           });
                           showToast('Profile updated!');
                         },

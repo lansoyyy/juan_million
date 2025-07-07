@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:juan_million/models/municipality_model.dart';
 import 'package:juan_million/models/province_model.dart';
 import 'package:juan_million/models/region_model.dart';
+import 'package:juan_million/screens/pages/store_page.dart';
 import 'package:juan_million/utlis/app_constants.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/address_widget.dart';
@@ -331,19 +332,25 @@ class _AffiliateLocatorPageState extends State<AffiliateLocatorPage> {
                                                 fontFamily: 'Bold',
                                               ),
                                             ),
-                                            TextWidget(
-                                              text:
-                                                  'Classification: ${data.docs[index]['clarification']}',
-                                              fontSize: 11,
-                                              color: blue,
-                                              fontFamily: 'Regular',
+                                            SizedBox(
+                                              width: 180,
+                                              child: TextWidget(
+                                                text:
+                                                    'Classification: ${data.docs[index]['clarification']}',
+                                                fontSize: 11,
+                                                color: blue,
+                                                fontFamily: 'Regular',
+                                              ),
                                             ),
-                                            TextWidget(
-                                              text:
-                                                  'Email: ${data.docs[index]['email']}',
-                                              fontSize: 11,
-                                              color: blue,
-                                              fontFamily: 'Regular',
+                                            SizedBox(
+                                              width: 180,
+                                              child: TextWidget(
+                                                text:
+                                                    'Email: ${data.docs[index]['email']}',
+                                                fontSize: 11,
+                                                color: blue,
+                                                fontFamily: 'Regular',
+                                              ),
                                             ),
                                             const SizedBox(
                                               height: 5,

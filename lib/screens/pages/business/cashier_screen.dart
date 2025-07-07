@@ -23,49 +23,44 @@ class _CashiersScreenState extends State<CashiersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: TextWidget(
+          text: 'Account Users',
+          fontSize: 18,
+        ),
+        centerTitle: true,
         actions: [
           IconButton(
             onPressed: () {
-              @override
-              void initState() {
-                // TODO: implement initState
-
-                super.initState();
-                WidgetsBinding.instance.addPostFrameCallback(
-                  (timeStamp) {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return Dialog(
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                TextWidget(
-                                  text: 'Screen Description:',
-                                  fontSize: 16,
-                                  fontFamily: 'Bold',
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                TextWidget(
-                                  text: '''
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return Dialog(
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextWidget(
+                            text: 'Screen Description:',
+                            fontSize: 16,
+                            fontFamily: 'Bold',
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          TextWidget(
+                            text: '''
 “Enroll users with a personal 4-digit PIN—each transaction will be securely tracked and linked to the right person.”
 ''',
-                                  fontSize: 14,
-                                  maxLines: 20,
-                                ),
-                              ],
-                            ),
+                            fontSize: 14,
+                            maxLines: 20,
                           ),
-                        );
-                      },
-                    );
-                  },
-                );
-              }
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
             },
             icon: Icon(
               Icons.info_outline,
@@ -153,29 +148,6 @@ class _CashiersScreenState extends State<CashiersScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: const Icon(
-                        Icons.arrow_back_ios_rounded,
-                        color: Colors.black,
-                      )),
-                ),
-                TextWidget(
-                  text: 'Account Users',
-                  fontSize: 18,
-                ),
-                const SizedBox(
-                  width: 50,
-                ),
-              ],
-            ),
             const SizedBox(
               height: 20,
             ),
