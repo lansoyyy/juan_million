@@ -9,6 +9,7 @@ import 'package:juan_million/screens/pages/business/inventory_page.dart';
 import 'package:juan_million/screens/pages/business/points_page.dart';
 import 'package:juan_million/screens/pages/business/settings_page.dart';
 import 'package:juan_million/screens/pages/business/wallet_page.dart';
+import 'package:juan_million/screens/pages/business/payments_page.dart';
 import 'package:juan_million/screens/pages/customer/qr_scanned_page.dart';
 import 'package:juan_million/services/add_points.dart';
 import 'package:juan_million/utlis/app_constants.dart';
@@ -543,6 +544,22 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                   fontSize: 18,
                                   fontFamily: 'Bold',
                                 ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) => const PaymentsPage(),
+                                      ),
+                                    );
+                                  },
+                                  child: const Text(
+                                    'View Status',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontFamily: 'Medium',
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                             const SizedBox(
@@ -974,26 +991,67 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                   .get();
 
                               if (doc['wallet'] >= int.parse(pts.text)) {
+                                // Prepare payment parameters
+                                final uid = FirebaseAuth.instance.currentUser!.uid;
+                                final email = FirebaseAuth.instance.currentUser!.email ?? 'noemail@example.com';
+                                final int ptsToReload = int.parse(pts.text);
+                                final String amountStr = (ptsToReload.toDouble()).toStringAsFixed(2); // PHP equals points
+                                final String txnId = 'TXN${DateTime.now().millisecondsSinceEpoch}';
+                                final String description = 'Points Reload $ptsToReload pts';
+
+                                // Create a Payments doc with Pending status
+                                await FirebaseFirestore.instance
+                                    .collection('Payments')
+                                    .doc(txnId)
+                                    .set({
+                                  'txnId': txnId,
+                                  'userId': uid,
+                                  'email': email,
+                                  'amount': amountStr,
+                                  'currency': 'PHP',
+                                  'description': description,
+                                  'type': 'points_reload',
+                                  'pts': ptsToReload,
+                                  'status': 'Pending',
+                                  'createdAt': Timestamp.now(),
+                                });
+
+                                // Launch payment
                                 final result = await Navigator.push<bool>(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) =>
-                                          const DragonPayWebView()),
+                                    builder: (context) => DragonPayWebView(
+                                      txnId: txnId,
+                                      amount: amountStr,
+                                      description: description,
+                                      email: email,
+                                    ),
+                                  ),
                                 );
-                                if (result != null) {
+
+                                // Update Payments doc based on result
+                                final bool success = (result == true);
+                                await FirebaseFirestore.instance
+                                    .collection('Payments')
+                                    .doc(txnId)
+                                    .update({
+                                  'status': success ? 'Successful' : 'Failed',
+                                  'updatedAt': Timestamp.now(),
+                                });
+
+                                if (success) {
                                   await FirebaseFirestore.instance
                                       .collection('Business')
                                       .doc(FirebaseAuth
                                           .instance.currentUser!.uid)
                                       .update({
-                                    'wallet': FieldValue.increment(
-                                        -int.parse(pts.text)),
-                                    'pts': FieldValue.increment(
-                                        int.parse(pts.text))
+                                    'wallet': FieldValue.increment(-ptsToReload),
+                                    'pts': FieldValue.increment(ptsToReload),
                                   });
+
                                   showToast('Transaction was succesfull!');
 
-                                  addPoints(int.parse(pts.text), 1, name,
+                                  addPoints(ptsToReload, 1, name,
                                       'Points from reload', '');
 
                                   DocumentSnapshot doc1 =
@@ -1011,6 +1069,9 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                             store: FirebaseAuth
                                                 .instance.currentUser!.uid,
                                           )));
+                                } else {
+                                  showToast('Payment failed or canceled.');
+                                  Navigator.pop(context);
                                 }
                               } else {
                                 showToast(
