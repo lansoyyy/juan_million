@@ -39,6 +39,37 @@ class _CustomerSettingsPageState extends State<CustomerSettingsPage> {
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .snapshots();
     return Scaffold(
+      appBar: AppBar(
+        title: TextWidget(
+          text: 'Profile Settings',
+          fontSize: 18,
+          fontFamily: 'Bold',
+          color: Colors.white,
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.blue,
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back_ios_rounded,
+            color: Colors.white,
+          ),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              // Add save functionality
+            },
+            icon: const Icon(
+              Icons.save,
+              color: Colors.white,
+            ),
+          ),
+        ],
+      ),
       body: StreamBuilder<DocumentSnapshot>(
           stream: userData,
           builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
@@ -64,300 +95,455 @@ class _CustomerSettingsPageState extends State<CustomerSettingsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Align(
-                          alignment: Alignment.topLeft,
-                          child: IconButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              icon: const Icon(
-                                Icons.arrow_back_ios_rounded,
-                                color: Colors.black,
-                              )),
+                    // Enhanced profile section
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.blue, Colors.blue.shade700],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                        TextWidget(
-                          text: 'Profile',
-                          fontSize: 18,
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(30),
+                          bottomRight: Radius.circular(30),
                         ),
-                        const SizedBox(
-                          width: 50,
-                        ),
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20, right: 20),
-                      child: Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: blue,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        height: 100,
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 20, right: 20),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  uploadPicture('gallery');
-                                },
-                                child: CircleAvatar(
-                                  maxRadius: 40,
-                                  minRadius: 40,
-                                  backgroundImage: NetworkImage(data['pic']),
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  TextWidget(
-                                      text: data['name'],
-                                      fontSize: 18,
-                                      fontFamily: 'Bold',
-                                      color: Colors.white),
-                                  TextWidget(
-                                      text: data['email'],
-                                      fontSize: 11,
-                                      fontFamily: 'Medium',
-                                      color: Colors.white54),
-                                ],
-                              ),
-                            ],
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            spreadRadius: 1,
+                            blurRadius: 10,
+                            offset: const Offset(0, 3),
                           ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            top: 20, bottom: 30, left: 20, right: 20),
+                        child: Column(
+                          children: [
+                            // Profile picture with edit button
+                            Stack(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    uploadPicture('gallery');
+                                  },
+                                  child: Container(
+                                    width: 100,
+                                    height: 100,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Colors.white,
+                                        width: 3,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.2),
+                                          spreadRadius: 2,
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 3),
+                                        ),
+                                      ],
+                                    ),
+                                    child: CircleAvatar(
+                                      radius: 50,
+                                      backgroundImage:
+                                          NetworkImage(data['pic']),
+                                      onBackgroundImageError:
+                                          (exception, stackTrace) {
+                                        // Handle error
+                                      },
+                                      child: data['pic'] == null ||
+                                              data['pic'].toString().isEmpty
+                                          ? const Icon(
+                                              Icons.person,
+                                              size: 50,
+                                              color: Colors.white,
+                                            )
+                                          : null,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(5),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.2),
+                                          spreadRadius: 1,
+                                          blurRadius: 3,
+                                          offset: const Offset(0, 1),
+                                        ),
+                                      ],
+                                    ),
+                                    child: const Icon(
+                                      Icons.camera_alt,
+                                      color: Colors.blue,
+                                      size: 20,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 15),
+
+                            // User info
+                            TextWidget(
+                              text: data['name'],
+                              fontSize: 22,
+                              fontFamily: 'Bold',
+                              color: Colors.white,
+                            ),
+                            const SizedBox(height: 5),
+                            TextWidget(
+                              text: data['email'],
+                              fontSize: 14,
+                              fontFamily: 'Medium',
+                              color: Colors.white70,
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Center(
-                      child: TextFieldWidget(
-                        fontStyle: FontStyle.normal,
-                        hint: 'First Name',
-                        borderColor: blue,
-                        radius: 12,
-                        width: 350,
-                        isRequred: false,
-                        prefixIcon: Icons.person_3_outlined,
-                        controller: fname,
-                        label: 'Business Name',
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Center(
-                      child: TextFieldWidget(
-                        fontStyle: FontStyle.normal,
-                        hint: 'Last Name',
-                        borderColor: blue,
-                        radius: 12,
-                        width: 350,
-                        isRequred: false,
-                        prefixIcon: Icons.person_3_outlined,
-                        controller: lname,
-                        label: 'Business Name',
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Center(
-                      child: TextFieldWidget(
-                        inputType: TextInputType.number,
-                        fontStyle: FontStyle.normal,
-                        hint: 'Contact Number',
-                        borderColor: blue,
-                        radius: 12,
-                        width: 350,
-                        isRequred: false,
-                        controller: number,
-                        prefixIcon: Icons.phone,
-                        label: 'Business Email',
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Center(
-                      child: TextFieldWidget(
-                        isEnabled: false,
-                        fontStyle: FontStyle.normal,
-                        hint: 'Email',
-                        borderColor: blue,
-                        radius: 12,
-                        width: 350,
-                        isRequred: false,
-                        controller: email,
-                        prefixIcon: Icons.email_outlined,
-                        label: 'Business Email',
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Center(
-                      child: TextFieldWidget(
-                        isEnabled: false,
-                        showEye: true,
-                        isObscure: true,
-                        prefixIcon: Icons.lock_open_outlined,
-                        fontStyle: FontStyle.normal,
-                        hint: 'Password',
-                        borderColor: blue,
-                        radius: 12,
-                        width: 350,
-                        isRequred: false,
-                        controller: password,
-                        label: 'Password',
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    StreamBuilder<DocumentSnapshot>(
-                        stream: FirebaseFirestore.instance
-                            .collection('Referals')
-                            .doc(FirebaseAuth.instance.currentUser!.uid)
-                            .snapshots(),
-                        builder: (context,
-                            AsyncSnapshot<DocumentSnapshot> snapshot) {
-                          if (!snapshot.hasData) {
-                            return const Center(child: Text('Loading'));
-                          } else if (snapshot.hasError) {
-                            return const Center(
-                                child: Text('Something went wrong'));
-                          } else if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          }
-                          dynamic data = snapshot.data;
-                          return Center(
-                            child: TextFieldWidget(
-                              isEnabled: false,
-                              fontStyle: FontStyle.normal,
-                              hint: 'Referral Code',
-                              borderColor: blue,
-                              radius: 12,
-                              width: 350,
-                              isRequred: false,
-                              prefixIcon: Icons.card_giftcard_sharp,
-                              controller: TextEditingController(
-                                text: '${data['ref']} (Referral Code)',
-                              ),
-                              label: 'Referral Code',
-                            ),
-                          );
-                        }),
-                    const SizedBox(
-                      height: 30,
-                    ),
-                    Center(
-                      child: ButtonWidget(
-                        width: 350,
-                        label: 'Update Profile',
-                        onPressed: () async {
-                          await FirebaseFirestore.instance
-                              .collection('Users')
-                              .doc(data.id)
-                              .update({
-                            'name': '${fname.text} ${lname.text}',
-                            'number': number.text,
-                          });
-                          showToast('Profile updated!');
-                        },
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
+                    // Form section with improved styling
                     Padding(
-                      padding: const EdgeInsets.only(left: 30, right: 30),
+                      padding: const EdgeInsets.all(20.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // Section title
                           TextWidget(
-                            text: 'More',
-                            color: blue,
-                            fontSize: 14,
+                            text: 'Personal Information',
+                            fontSize: 18,
                             fontFamily: 'Bold',
+                            color: Colors.black87,
                           ),
-                          const SizedBox(
-                            height: 5,
+                          const SizedBox(height: 20),
+
+                          // First name field
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade50,
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.03),
+                                  spreadRadius: 1,
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ],
+                            ),
+                            child: TextFieldWidget(
+                              fontStyle: FontStyle.normal,
+                              hint: 'First Name',
+                              borderColor: Colors.transparent,
+                              radius: 15,
+                              width: double.infinity,
+                              isRequred: false,
+                              prefixIcon: Icons.person_3_outlined,
+                              controller: fname,
+                              label: 'First Name',
+                            ),
                           ),
-                          Card(
-                            elevation: 3,
+                          const SizedBox(height: 20),
+
+                          // Last name field
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade50,
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.03),
+                                  spreadRadius: 1,
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ],
+                            ),
+                            child: TextFieldWidget(
+                              fontStyle: FontStyle.normal,
+                              hint: 'Last Name',
+                              borderColor: Colors.transparent,
+                              radius: 15,
+                              width: double.infinity,
+                              isRequred: false,
+                              prefixIcon: Icons.person_3_outlined,
+                              controller: lname,
+                              label: 'Last Name',
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Contact number field
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade50,
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.03),
+                                  spreadRadius: 1,
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ],
+                            ),
+                            child: TextFieldWidget(
+                              inputType: TextInputType.number,
+                              fontStyle: FontStyle.normal,
+                              hint: 'Contact Number',
+                              borderColor: Colors.transparent,
+                              radius: 15,
+                              width: double.infinity,
+                              isRequred: false,
+                              controller: number,
+                              prefixIcon: Icons.phone,
+                              label: 'Contact Number',
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Email field
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade50,
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.03),
+                                  spreadRadius: 1,
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ],
+                            ),
+                            child: TextFieldWidget(
+                              isEnabled: false,
+                              fontStyle: FontStyle.normal,
+                              hint: 'Email',
+                              borderColor: Colors.transparent,
+                              radius: 15,
+                              width: double.infinity,
+                              isRequred: false,
+                              controller: email,
+                              prefixIcon: Icons.email_outlined,
+                              label: 'Email',
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Password field
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade50,
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.03),
+                                  spreadRadius: 1,
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ],
+                            ),
+                            child: TextFieldWidget(
+                              isEnabled: false,
+                              showEye: true,
+                              isObscure: true,
+                              prefixIcon: Icons.lock_open_outlined,
+                              fontStyle: FontStyle.normal,
+                              hint: 'Password',
+                              borderColor: Colors.transparent,
+                              radius: 15,
+                              width: double.infinity,
+                              isRequred: false,
+                              controller: password,
+                              label: 'Password',
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Referral code field
+                          StreamBuilder<DocumentSnapshot>(
+                              stream: FirebaseFirestore.instance
+                                  .collection('Referals')
+                                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                                  .snapshots(),
+                              builder: (context,
+                                  AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                if (!snapshot.hasData) {
+                                  return const Center(child: Text('Loading'));
+                                } else if (snapshot.hasError) {
+                                  return const Center(
+                                      child: Text('Something went wrong'));
+                                } else if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Center(
+                                      child: CircularProgressIndicator());
+                                }
+                                dynamic referralData = snapshot.data;
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade50,
+                                    borderRadius: BorderRadius.circular(15),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.03),
+                                        spreadRadius: 1,
+                                        blurRadius: 5,
+                                        offset: const Offset(0, 1),
+                                      ),
+                                    ],
+                                  ),
+                                  child: TextFieldWidget(
+                                    isEnabled: false,
+                                    fontStyle: FontStyle.normal,
+                                    hint: 'Referral Code',
+                                    borderColor: Colors.transparent,
+                                    radius: 15,
+                                    width: double.infinity,
+                                    isRequred: false,
+                                    prefixIcon: Icons.card_giftcard_sharp,
+                                    controller: TextEditingController(
+                                      text:
+                                          '${referralData['ref']} (Referral Code)',
+                                    ),
+                                    label: 'Referral Code',
+                                  ),
+                                );
+                              }),
+                          const SizedBox(height: 30),
+
+                          // Update button
+                          ButtonWidget(
+                            width: double.infinity,
+                            label: 'Update Profile',
+                            onPressed: () async {
+                              await FirebaseFirestore.instance
+                                  .collection('Users')
+                                  .doc(data.id)
+                                  .update({
+                                'name': '${fname.text} ${lname.text}',
+                                'number': number.text,
+                              });
+                              showToast('Profile updated!');
+                            },
+                          ),
+                          const SizedBox(height: 30),
+
+                          // More options section
+                          TextWidget(
+                            text: 'More Options',
+                            fontSize: 18,
+                            fontFamily: 'Bold',
+                            color: Colors.black87,
+                          ),
+                          const SizedBox(height: 15),
+
+                          // My QR Code option
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  spreadRadius: 1,
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
                             child: ListTile(
                               onTap: () {
                                 Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) => MyQRPage()));
                               },
-                              tileColor: Colors.white,
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
                               leading: Container(
+                                padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  color: blue.withOpacity(0.15),
+                                  color: Colors.blue.withOpacity(0.1),
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Padding(
-                                  padding: EdgeInsets.all(10.0),
-                                  child: Icon(
-                                    Icons.qr_code,
-                                    color: Colors.grey,
-                                  ),
+                                child: const Icon(
+                                  Icons.qr_code,
+                                  color: Colors.blue,
                                 ),
                               ),
                               title: TextWidget(
                                 text: 'My QR Code',
-                                fontSize: 14,
+                                fontSize: 16,
+                                color: Colors.black87,
+                                fontFamily: 'Medium',
+                              ),
+                              trailing: const Icon(
+                                Icons.arrow_forward_ios,
                                 color: Colors.grey,
+                                size: 16,
                               ),
                             ),
                           ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          Card(
-                            elevation: 3,
+                          const SizedBox(height: 15),
+
+                          // Logout option
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  spreadRadius: 1,
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
                             child: ListTile(
                               onTap: () {
                                 showDialog(
                                     context: context,
                                     builder: (context) => AlertDialog(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                          ),
                                           title: const Text(
                                             'Logout Confirmation',
                                             style: TextStyle(
-                                                fontFamily: 'QBold',
+                                                fontFamily: 'Bold',
                                                 fontWeight: FontWeight.bold),
                                           ),
                                           content: const Text(
-                                            'Are you sure you want to Logout?',
+                                            'Are you sure you want to logout?',
                                             style: TextStyle(
-                                                fontFamily: 'QRegular'),
+                                                fontFamily: 'Regular'),
                                           ),
                                           actions: <Widget>[
-                                            MaterialButton(
+                                            TextButton(
                                               onPressed: () =>
                                                   Navigator.of(context)
                                                       .pop(true),
                                               child: const Text(
-                                                'Close',
+                                                'Cancel',
                                                 style: TextStyle(
-                                                    fontFamily: 'QRegular',
+                                                    fontFamily: 'Medium',
                                                     fontWeight:
                                                         FontWeight.bold),
                                               ),
                                             ),
-                                            MaterialButton(
+                                            TextButton(
                                               onPressed: () async {
                                                 await FirebaseAuth.instance
                                                     .signOut();
@@ -368,9 +554,10 @@ class _CustomerSettingsPageState extends State<CustomerSettingsPage> {
                                                                 const LandingScreen()));
                                               },
                                               child: const Text(
-                                                'Continue',
+                                                'Logout',
                                                 style: TextStyle(
-                                                    fontFamily: 'QRegular',
+                                                    color: Colors.red,
+                                                    fontFamily: 'Medium',
                                                     fontWeight:
                                                         FontWeight.bold),
                                               ),
@@ -378,30 +565,33 @@ class _CustomerSettingsPageState extends State<CustomerSettingsPage> {
                                           ],
                                         ));
                               },
-                              tileColor: Colors.white,
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
                               leading: Container(
+                                padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  color: blue.withOpacity(0.15),
+                                  color: Colors.red.withOpacity(0.1),
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Padding(
-                                  padding: EdgeInsets.all(10.0),
-                                  child: Icon(
-                                    Icons.logout,
-                                    color: Colors.grey,
-                                  ),
+                                child: const Icon(
+                                  Icons.logout,
+                                  color: Colors.red,
                                 ),
                               ),
                               title: TextWidget(
                                 text: 'Logout',
-                                fontSize: 14,
+                                fontSize: 16,
+                                color: Colors.black87,
+                                fontFamily: 'Medium',
+                              ),
+                              trailing: const Icon(
+                                Icons.arrow_forward_ios,
                                 color: Colors.grey,
+                                size: 16,
                               ),
                             ),
                           ),
-                          const SizedBox(
-                            height: 20,
-                          ),
+                          const SizedBox(height: 20),
                         ],
                       ),
                     ),

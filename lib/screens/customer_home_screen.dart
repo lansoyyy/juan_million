@@ -229,9 +229,50 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
       .collection('Users')
       .doc(FirebaseAuth.instance.currentUser!.uid)
       .snapshots();
+  // Helper method to build header icon buttons
+  Widget _buildHeaderIconButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onPressed,
+  }) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              color: Colors.white,
+              size: 24,
+            ),
+          ),
+          const SizedBox(height: 5),
+          TextWidget(
+            text: label,
+            fontSize: 12,
+            color: Colors.white,
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: scanQRCode,
+          backgroundColor: Colors.blue,
+          child: const Icon(
+            Icons.qr_code_scanner,
+            color: Colors.white,
+          ),
+        ),
         body: StreamBuilder<DocumentSnapshot>(
             stream: userData,
             builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
@@ -255,230 +296,288 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
               return Column(
                 children: [
+                  // Improved header with gradient and better styling
                   Container(
                     width: double.infinity,
-                    color: blue,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          blue,
+                          blue.withOpacity(0.8),
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 5,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
                     child: SafeArea(
                       child: Padding(
-                        padding: const EdgeInsets.only(left: 20, right: 20),
-                        child: Row(
+                        padding: const EdgeInsets.only(
+                            left: 20, right: 20, top: 10, bottom: 15),
+                        child: Column(
                           children: [
-                            TextWidget(
-                              text: 'Hello ka-Juan!',
-                              fontSize: 18,
-                              color: Colors.white,
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      TextWidget(
+                                        text: 'Hello ka-Juan!',
+                                        fontSize: 22,
+                                        fontFamily: 'Bold',
+                                        color: Colors.white,
+                                      ),
+                                      const SizedBox(height: 5),
+                                      TextWidget(
+                                        text: 'Welcome back to Juan4All',
+                                        fontSize: 14,
+                                        color: Colors.white.withOpacity(0.8),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      onPressed: () {
+                                        Navigator.of(context)
+                                            .push(MaterialPageRoute(
+                                                builder: (context) => MyQRPage(
+                                                      isPoints: true,
+                                                    )));
+                                      },
+                                      icon: const Icon(
+                                        Icons.qr_code,
+                                        color: Colors.white,
+                                      ),
+                                      style: IconButton.styleFrom(
+                                        backgroundColor:
+                                            Colors.white.withOpacity(0.2),
+                                        shape: const CircleBorder(),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    IconButton(
+                                      onPressed: () {
+                                        Navigator.of(context)
+                                            .pushAndRemoveUntil(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const CustomerHomeScreen()),
+                                          (route) => false,
+                                        );
+                                      },
+                                      icon: const Icon(
+                                        Icons.sync,
+                                        color: Colors.white,
+                                      ),
+                                      style: IconButton.styleFrom(
+                                        backgroundColor:
+                                            Colors.white.withOpacity(0.2),
+                                        shape: const CircleBorder(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                            const Expanded(
-                              child: SizedBox(),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => MyQRPage(
-                                          isPoints: true,
-                                        )));
-                              },
-                              icon: const Icon(
-                                Icons.qr_code,
-                                color: Colors.white,
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                Navigator.of(context).pushAndRemoveUntil(
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const CustomerHomeScreen()),
-                                  (route) => false,
-                                );
-                              },
-                              icon: const Icon(
-                                Icons.sync,
-                                color: Colors.white,
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        const AffiliateLocatorPage()));
-                              },
-                              icon: const Icon(
-                                Icons.business,
-                                color: Colors.white,
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        const CustomerNotifPage()));
-                              },
-                              icon: const Icon(
-                                Icons.notifications,
-                                color: Colors.white,
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        const CustomerSettingsPage()));
-                              },
-                              icon: const Icon(
-                                Icons.account_circle,
-                                color: Colors.white,
-                              ),
+                            const SizedBox(height: 15),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                _buildHeaderIconButton(
+                                  icon: Icons.business,
+                                  label: 'Affiliates',
+                                  onPressed: () {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const AffiliateLocatorPage()));
+                                  },
+                                ),
+                                _buildHeaderIconButton(
+                                  icon: Icons.notifications,
+                                  label: 'Notifications',
+                                  onPressed: () {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const CustomerNotifPage()));
+                                  },
+                                ),
+                                _buildHeaderIconButton(
+                                  icon: Icons.account_circle,
+                                  label: 'Settings',
+                                  onPressed: () {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const CustomerSettingsPage()));
+                                  },
+                                ),
+                              ],
                             ),
                           ],
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(
+                  // Enhanced wallet cards section
+                  Container(
                     height: 200,
-                    width: 500,
-                    child: ListView.builder(
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 20),
+                    child: PageView.builder(
                       itemCount: 3,
-                      scrollDirection: Axis.horizontal,
+                      controller: PageController(viewportFraction: 0.85),
+                      onPageChanged: (index) {
+                        // Handle page change if needed
+                      },
                       itemBuilder: (context, index) {
-                        return GestureDetector(
-                          onTap: () {
-                            if (index == 0) {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) =>
-                                      const CustomerPointsPage()));
-                            } else if (index == 1) {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) =>
-                                      const CustomerWalletPage()));
-                            } else {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) =>
-                                      const CustomerInventoryPage()));
-                            }
-                          },
-                          child: Center(
+                        return AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          margin: EdgeInsets.only(
+                            right: index == 2 ? 0 : 15,
+                            left: index == 0 ? 0 : 15,
+                          ),
+                          child: GestureDetector(
+                            onTap: () {
+                              if (index == 0) {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) =>
+                                        const CustomerPointsPage()));
+                              } else if (index == 1) {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) =>
+                                        const CustomerWalletPage()));
+                              } else {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) =>
+                                        const CustomerInventoryPage()));
+                              }
+                            },
                             child: Container(
-                              width: 425,
-                              height: 250,
                               decoration: BoxDecoration(
-                                color: index == 0
-                                    ? blue
-                                    : index == 1
-                                        ? primary
-                                        : secondary,
-                                borderRadius: const BorderRadius.only(
-                                  bottomLeft: Radius.circular(1000),
-                                  bottomRight: Radius.circular(1000),
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: index == 0
+                                      ? [blue, blue.withOpacity(0.7)]
+                                      : index == 1
+                                          ? [primary, primary.withOpacity(0.7)]
+                                          : [
+                                              secondary,
+                                              secondary.withOpacity(0.7)
+                                            ],
                                 ),
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    spreadRadius: 1,
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 5),
+                                  ),
+                                ],
                               ),
-                              child: SafeArea(
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(20, 10, 20, 5),
-                                  child: Column(
-                                    children: [
-                                      TextWidget(
-                                        text: index == 0
-                                            ? 'Total Points'
-                                            : index == 1
-                                                ? 'E Wallet'
-                                                : 'Community Wallet',
-                                        fontSize: 14,
-                                        color: Colors.white,
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 50, right: 50),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            index != 0
-                                                ? const Icon(
-                                                    Icons
-                                                        .keyboard_arrow_left_rounded,
-                                                    color: Colors.white60,
-                                                    size: 50,
-                                                  )
-                                                : const SizedBox(
-                                                    width: 50,
-                                                  ),
-                                            StreamBuilder<QuerySnapshot>(
-                                                stream: FirebaseFirestore
-                                                    .instance
-                                                    .collection('Slots')
-                                                    .where('uid',
-                                                        isEqualTo: FirebaseAuth
-                                                            .instance
-                                                            .currentUser!
-                                                            .uid)
-                                                    .snapshots(),
-                                                builder: (BuildContext context,
-                                                    AsyncSnapshot<QuerySnapshot>
-                                                        snapshot) {
-                                                  if (snapshot.hasError) {
-                                                    print(snapshot.error);
-                                                    return const Center(
-                                                        child: Text('Error'));
-                                                  }
-                                                  if (snapshot
-                                                          .connectionState ==
-                                                      ConnectionState.waiting) {
-                                                    return const Padding(
-                                                      padding: EdgeInsets.only(
-                                                          top: 50),
-                                                      child: Center(
-                                                          child:
-                                                              CircularProgressIndicator(
-                                                        color: Colors.black,
-                                                      )),
-                                                    );
-                                                  }
-
-                                                  final mydata =
-                                                      snapshot.requireData;
-
-                                                  return TextWidget(
-                                                    text: index == 0
-                                                        ? '${data['pts'].toInt()}'
-                                                        : index == 1
-                                                            ? AppConstants
-                                                                .formatNumberWithPeso(
-                                                                    data[
-                                                                        'wallet'])
-                                                            : mydata.docs.length
-                                                                .toString(),
-                                                    fontFamily: 'Bold',
-                                                    fontSize: 42,
-                                                    color: Colors.white,
-                                                  );
-                                                }),
-                                            index == 2
-                                                ? const SizedBox(
-                                                    width: 50,
-                                                  )
-                                                : const Icon(
-                                                    Icons
-                                                        .keyboard_arrow_right_rounded,
-                                                    color: Colors.white60,
-                                                    size: 50,
-                                                  ),
-                                          ],
+                              child: Padding(
+                                padding: const EdgeInsets.all(20),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        TextWidget(
+                                          text: index == 0
+                                              ? 'Total Points'
+                                              : index == 1
+                                                  ? 'E Wallet'
+                                                  : 'Community Wallet',
+                                          fontSize: 16,
+                                          fontFamily: 'Medium',
+                                          color: Colors.white,
                                         ),
+                                        Icon(
+                                          index == 0
+                                              ? Icons.star
+                                              : index == 1
+                                                  ? Icons.account_balance_wallet
+                                                  : Icons.group,
+                                          color: Colors.white.withOpacity(0.8),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 20),
+                                    Expanded(
+                                      child: Center(
+                                        child: StreamBuilder<QuerySnapshot>(
+                                            stream: FirebaseFirestore.instance
+                                                .collection('Slots')
+                                                .where('uid',
+                                                    isEqualTo: FirebaseAuth
+                                                        .instance
+                                                        .currentUser!
+                                                        .uid)
+                                                .snapshots(),
+                                            builder: (BuildContext context,
+                                                AsyncSnapshot<QuerySnapshot>
+                                                    snapshot) {
+                                              if (snapshot.hasError) {
+                                                print(snapshot.error);
+                                                return const Center(
+                                                    child: Text('Error'));
+                                              }
+                                              if (snapshot.connectionState ==
+                                                  ConnectionState.waiting) {
+                                                return const Center(
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                  color: Colors.white,
+                                                ));
+                                              }
+
+                                              final mydata =
+                                                  snapshot.requireData;
+
+                                              return TextWidget(
+                                                text: index == 0
+                                                    ? '${data['pts'].toInt()}'
+                                                    : index == 1
+                                                        ? AppConstants
+                                                            .formatNumberWithPeso(
+                                                                data['wallet'])
+                                                        : mydata.docs.length
+                                                            .toString(),
+                                                fontFamily: 'Bold',
+                                                fontSize: 36,
+                                                color: Colors.white,
+                                              );
+                                            }),
                                       ),
-                                      index == 2
-                                          ? TextWidget(
+                                    ),
+                                    const SizedBox(height: 10),
+                                    index == 2
+                                        ? Center(
+                                            child: TextWidget(
                                               text: 'Your Slot/s',
                                               fontSize: 14,
                                               color: Colors.white,
-                                            )
-                                          : const SizedBox(),
-                                    ],
-                                  ),
+                                            ),
+                                          )
+                                        : const SizedBox(),
+                                  ],
                                 ),
                               ),
                             ),
@@ -490,62 +589,63 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                   const SizedBox(
                     height: 10,
                   ),
-                  StreamBuilder<QuerySnapshot>(
-                      stream: FirebaseFirestore.instance
-                          .collection('Points')
-                          .where('uid',
-                              isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-                          .snapshots(),
-                      builder: (BuildContext context,
-                          AsyncSnapshot<QuerySnapshot> snapshot) {
-                        if (snapshot.hasError) {
-                          print(snapshot.error);
-                          return const Center(child: Text('Error'));
-                        }
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Padding(
-                            padding: EdgeInsets.only(top: 50),
-                            child: Center(
-                                child: CircularProgressIndicator(
-                              color: Colors.black,
-                            )),
-                          );
-                        }
+                  // Enhanced recent activity section
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            TextWidget(
+                              text: 'Recent Activity',
+                              fontSize: 20,
+                              fontFamily: 'Bold',
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 15),
+                        StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('Points')
+                                .where('uid',
+                                    isEqualTo:
+                                        FirebaseAuth.instance.currentUser!.uid)
+                                .snapshots(),
+                            builder: (BuildContext context,
+                                AsyncSnapshot<QuerySnapshot> snapshot) {
+                              if (snapshot.hasError) {
+                                print(snapshot.error);
+                                return const Center(child: Text('Error'));
+                              }
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const Center(
+                                    child: CircularProgressIndicator(
+                                  color: Colors.blue,
+                                ));
+                              }
 
-                        final data = snapshot.requireData;
-                        return Padding(
-                          padding: const EdgeInsets.only(left: 20, right: 20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  TextWidget(
-                                    text: 'Recent Activity',
-                                    fontSize: 18,
-                                    fontFamily: 'Bold',
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              data.docs.isEmpty
-                                  ? Center(
-                                      child: TextWidget(
-                                        text: 'No Recent Activity',
-                                        fontSize: 14,
-                                        fontFamily: 'Regular',
-                                        color: Colors.grey,
+                              final data = snapshot.requireData;
+                              return data.docs.isEmpty
+                                  ? Container(
+                                      height: 150,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade100,
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      child: Center(
+                                        child: TextWidget(
+                                          text: 'No Recent Activity',
+                                          fontSize: 16,
+                                          fontFamily: 'Regular',
+                                          color: Colors.grey,
+                                        ),
                                       ),
                                     )
                                   : SizedBox(
-                                      height: 150,
-                                      width: 500,
+                                      height: 180,
                                       child: ListView.builder(
                                         itemCount: data.docs.length,
                                         scrollDirection: Axis.horizontal,
@@ -576,41 +676,88 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                                 }
                                                 dynamic businessdata =
                                                     snapshot.data;
-                                                return Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 5, right: 5),
+                                                return AnimatedContainer(
+                                                  duration: const Duration(
+                                                      milliseconds: 300),
+                                                  margin: const EdgeInsets.only(
+                                                      right: 15),
                                                   child: GestureDetector(
-                                                    child: Card(
-                                                      elevation: 5,
-                                                      color: Colors.white,
-                                                      child: SizedBox(
-                                                        height: 150,
-                                                        width: 150,
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(10.0),
-                                                          child: Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              // Center(
-                                                              //   child:
-                                                              //       TextWidget(
-                                                              //     text: businessdata[
-                                                              //         'name'],
-                                                              //     fontSize: 12,
-                                                              //     fontFamily:
-                                                              //         'Medium',
-                                                              //     color: blue,
-                                                              //   ),
-                                                              // ),
-                                                              const SizedBox(
-                                                                height: 15,
-                                                              ),
-                                                              Row(
+                                                    child: Container(
+                                                      width: 160,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(15),
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: Colors.black
+                                                                .withOpacity(
+                                                                    0.05),
+                                                            spreadRadius: 1,
+                                                            blurRadius: 10,
+                                                            offset:
+                                                                const Offset(
+                                                                    0, 3),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(15.0),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                Container(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .symmetric(
+                                                                    horizontal:
+                                                                        8,
+                                                                    vertical: 4,
+                                                                  ),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    color: Colors
+                                                                        .blue
+                                                                        .withOpacity(
+                                                                            0.1),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            20),
+                                                                  ),
+                                                                  child:
+                                                                      TextWidget(
+                                                                    text: businessdata[
+                                                                        'name'],
+                                                                    fontSize:
+                                                                        12,
+                                                                    fontFamily:
+                                                                        'Medium',
+                                                                    color: Colors
+                                                                        .blue,
+                                                                  ),
+                                                                ),
+                                                                const Icon(
+                                                                  Icons.star,
+                                                                  color: Colors
+                                                                      .amber,
+                                                                  size: 16,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            const SizedBox(
+                                                                height: 20),
+                                                            Center(
+                                                              child: Row(
                                                                 mainAxisAlignment:
                                                                     MainAxisAlignment
                                                                         .center,
@@ -623,10 +770,11 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                                                         .toStringAsFixed(
                                                                             0),
                                                                     fontSize:
-                                                                        38,
+                                                                        32,
                                                                     fontFamily:
                                                                         'Bold',
-                                                                    color: blue,
+                                                                    color: Colors
+                                                                        .blue,
                                                                   ),
                                                                   const SizedBox(
                                                                     width: 5,
@@ -634,39 +782,36 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                                                   TextWidget(
                                                                     text: 'pts',
                                                                     fontSize:
-                                                                        12,
-                                                                    fontFamily:
-                                                                        'Bold',
-                                                                    color: blue,
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              const SizedBox(
-                                                                height: 15,
-                                                              ),
-                                                              Row(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .center,
-                                                                children: [
-                                                                  TextWidget(
-                                                                    text: DateFormat
-                                                                            .yMMMd()
-                                                                        .add_jm()
-                                                                        .format(data
-                                                                            .docs[index]['dateTime']
-                                                                            .toDate()),
-                                                                    fontSize:
-                                                                        10,
+                                                                        14,
                                                                     fontFamily:
                                                                         'Bold',
                                                                     color: Colors
-                                                                        .grey,
+                                                                        .blue,
                                                                   ),
                                                                 ],
                                                               ),
-                                                            ],
-                                                          ),
+                                                            ),
+                                                            const SizedBox(
+                                                                height: 15),
+                                                            Center(
+                                                              child: TextWidget(
+                                                                text: DateFormat
+                                                                        .yMMMd()
+                                                                    .add_jm()
+                                                                    .format(data
+                                                                        .docs[
+                                                                            index]
+                                                                            [
+                                                                            'dateTime']
+                                                                        .toDate()),
+                                                                fontSize: 12,
+                                                                fontFamily:
+                                                                    'Regular',
+                                                                color:
+                                                                    Colors.grey,
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
                                                       ),
                                                     ),
@@ -675,14 +820,11 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                               });
                                         },
                                       ),
-                                    ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                            ],
-                          ),
-                        );
-                      }),
+                                    );
+                            }),
+                      ],
+                    ),
+                  ),
                   const SizedBox(
                     height: 20,
                   ),

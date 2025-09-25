@@ -168,358 +168,463 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                   dynamic mydata = snapshot.data;
                   return Column(
                     children: [
+                      // Enhanced header with better visual hierarchy
                       Container(
                         width: double.infinity,
-                        color: blue,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [blue, Colors.blue.shade800],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              spreadRadius: 1,
+                              blurRadius: 10,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
                         child: Padding(
-                          padding: const EdgeInsets.only(left: 20, right: 20),
+                          padding: const EdgeInsets.only(
+                              left: 20, right: 20, top: 10, bottom: 15),
                           child: SafeArea(
-                            child: Row(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                TextWidget(
-                                  text: 'Hello ka-Juan!',
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                ),
-                                const Expanded(
-                                  child: SizedBox(),
-                                ),
-                                IconButton(
-                                  onPressed: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return Dialog(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(20.0),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                TextFieldWidget(
-                                                  showEye: true,
-                                                  isObscure: true,
-                                                  fontStyle: FontStyle.normal,
-                                                  hint: 'PIN Code',
-                                                  borderColor: blue,
-                                                  radius: 12,
-                                                  width: 350,
-                                                  prefixIcon: Icons.lock,
-                                                  isRequred: false,
-                                                  controller: pin,
-                                                  label: 'PIN Code',
-                                                ),
-                                                const SizedBox(
-                                                  height: 20,
-                                                ),
-                                                ButtonWidget(
-                                                  label: 'Confirm',
-                                                  onPressed: () async {
-                                                    DocumentSnapshot doc =
-                                                        await FirebaseFirestore
-                                                            .instance
-                                                            .collection(
-                                                                'Cashiers')
-                                                            .doc(pin.text)
-                                                            .get()
-                                                            .whenComplete(() {
-                                                      Navigator.pop(context);
-                                                    });
+                                Row(
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        TextWidget(
+                                          text: 'Hello ka-Juan!',
+                                          fontSize: 18,
+                                          color: Colors.white,
+                                          fontFamily: 'Medium',
+                                        ),
+                                        const SizedBox(height: 5),
+                                        TextWidget(
+                                          text:
+                                              mydata['name'] ?? 'Business User',
+                                          fontSize: 14,
+                                          color: Colors.white70,
+                                          fontFamily: 'Regular',
+                                        ),
+                                      ],
+                                    ),
+                                    const Expanded(child: SizedBox()),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.2),
+                                        borderRadius: BorderRadius.circular(50),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          IconButton(
+                                            onPressed: () {
+                                              showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return Dialog(
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20),
+                                                    ),
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              20),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(20),
+                                                      ),
+                                                      child: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            children: [
+                                                              TextWidget(
+                                                                text: 'Scan QR',
+                                                                fontSize: 18,
+                                                                fontFamily:
+                                                                    'Bold',
+                                                                color: Colors
+                                                                    .black87,
+                                                              ),
+                                                              IconButton(
+                                                                onPressed: () =>
+                                                                    Navigator.pop(
+                                                                        context),
+                                                                icon: const Icon(
+                                                                    Icons
+                                                                        .close),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          const SizedBox(
+                                                              height: 20),
+                                                          TextFieldWidget(
+                                                            showEye: true,
+                                                            isObscure: true,
+                                                            fontStyle: FontStyle
+                                                                .normal,
+                                                            hint: 'PIN Code',
+                                                            borderColor: blue,
+                                                            radius: 12,
+                                                            width: 350,
+                                                            prefixIcon:
+                                                                Icons.lock,
+                                                            isRequred: false,
+                                                            controller: pin,
+                                                            label: 'PIN Code',
+                                                          ),
+                                                          const SizedBox(
+                                                              height: 20),
+                                                          ButtonWidget(
+                                                            label: 'Confirm',
+                                                            onPressed:
+                                                                () async {
+                                                              DocumentSnapshot
+                                                                  doc =
+                                                                  await FirebaseFirestore
+                                                                      .instance
+                                                                      .collection(
+                                                                          'Cashiers')
+                                                                      .doc(pin
+                                                                          .text)
+                                                                      .get()
+                                                                      .whenComplete(
+                                                                          () {
+                                                                Navigator.pop(
+                                                                    context);
+                                                              });
 
-                                                    if (doc.exists) {
-                                                      if (mydata['pts'] > 1) {
-                                                        showDialog(
-                                                          context: context,
-                                                          builder: (context) {
-                                                            return AlertDialog(
-                                                              content: StatefulBuilder(
-                                                                  builder: (context,
-                                                                      setState) {
-                                                                return Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .only(
-                                                                          top:
-                                                                              20,
-                                                                          bottom:
-                                                                              20),
-                                                                  child: Column(
-                                                                    mainAxisSize:
-                                                                        MainAxisSize
-                                                                            .min,
-                                                                    children: [
-                                                                      TextWidget(
-                                                                        text:
-                                                                            'Input Amount Purchased',
-                                                                        fontSize:
-                                                                            18,
-                                                                        fontFamily:
-                                                                            'Regular',
-                                                                        color: Colors
-                                                                            .grey,
-                                                                      ),
-                                                                      const SizedBox(
-                                                                        height:
-                                                                            20,
-                                                                      ),
-                                                                      TextFieldWidget(
-                                                                        controller:
-                                                                            amount,
-                                                                        label:
-                                                                            'Amount',
-                                                                        inputType: const TextInputType
-                                                                            .numberWithOptions(
-                                                                            decimal:
-                                                                                true),
-                                                                      ),
-                                                                      const SizedBox(
-                                                                        height:
-                                                                            10,
-                                                                      ),
-                                                                      Row(
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment.end,
-                                                                        children: [
-                                                                          MaterialButton(
-                                                                            onPressed: () =>
-                                                                                Navigator.of(context).pop(true),
+                                                              if (doc.exists) {
+                                                                if (mydata[
+                                                                        'pts'] >
+                                                                    1) {
+                                                                  showDialog(
+                                                                    context:
+                                                                        context,
+                                                                    builder:
+                                                                        (context) {
+                                                                      return AlertDialog(
+                                                                        shape:
+                                                                            RoundedRectangleBorder(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(20),
+                                                                        ),
+                                                                        title:
+                                                                            TextWidget(
+                                                                          text:
+                                                                              'Input Amount Purchased',
+                                                                          fontSize:
+                                                                              18,
+                                                                          fontFamily:
+                                                                              'Regular',
+                                                                          color:
+                                                                              Colors.grey,
+                                                                        ),
+                                                                        content:
+                                                                            StatefulBuilder(builder:
+                                                                                (context, setState) {
+                                                                          return Padding(
+                                                                            padding:
+                                                                                const EdgeInsets.only(top: 20, bottom: 20),
                                                                             child:
-                                                                                const Text(
-                                                                              'Close',
-                                                                              style: TextStyle(fontSize: 16, color: Colors.grey, fontFamily: 'Medium', fontWeight: FontWeight.bold),
+                                                                                Column(
+                                                                              mainAxisSize: MainAxisSize.min,
+                                                                              children: [
+                                                                                TextFieldWidget(
+                                                                                  controller: amount,
+                                                                                  label: 'Amount',
+                                                                                  inputType: const TextInputType.numberWithOptions(decimal: true),
+                                                                                ),
+                                                                                const SizedBox(height: 20),
+                                                                                Row(
+                                                                                  mainAxisAlignment: MainAxisAlignment.end,
+                                                                                  children: [
+                                                                                    TextButton(
+                                                                                      onPressed: () => Navigator.of(context).pop(),
+                                                                                      child: TextWidget(
+                                                                                        text: 'Close',
+                                                                                        fontSize: 16,
+                                                                                        color: Colors.grey,
+                                                                                        fontFamily: 'Medium',
+                                                                                      ),
+                                                                                    ),
+                                                                                    ElevatedButton(
+                                                                                      onPressed: () {
+                                                                                        Navigator.of(context).pop();
+                                                                                        scanQRCode(
+                                                                                          ((double.parse(amount.text) * mydata['ptsconversion']) * 0.01).toInt(),
+                                                                                          doc['name'],
+                                                                                        );
+                                                                                      },
+                                                                                      style: ElevatedButton.styleFrom(
+                                                                                        backgroundColor: blue,
+                                                                                        shape: RoundedRectangleBorder(
+                                                                                          borderRadius: BorderRadius.circular(10),
+                                                                                        ),
+                                                                                      ),
+                                                                                      child: TextWidget(
+                                                                                        text: 'Continue',
+                                                                                        fontSize: 16,
+                                                                                        color: Colors.white,
+                                                                                        fontFamily: 'Bold',
+                                                                                      ),
+                                                                                    ),
+                                                                                  ],
+                                                                                ),
+                                                                              ],
                                                                             ),
-                                                                          ),
-                                                                          MaterialButton(
-                                                                            onPressed:
-                                                                                () {
-                                                                              Navigator.of(context).pop(true);
+                                                                          );
+                                                                        }),
+                                                                      );
+                                                                    },
+                                                                  );
+                                                                } else {
+                                                                  showToast(
+                                                                      "You don't have enough points.");
+                                                                }
+                                                              } else {
+                                                                showToast(
+                                                                    'PIN Code does not exist!');
+                                                              }
 
-                                                                              scanQRCode(
-                                                                                ((double.parse(amount.text) * mydata['ptsconversion']) * 0.01).toInt(),
-                                                                                doc['name'],
-                                                                              );
-                                                                            },
-                                                                            child:
-                                                                                const Text(
-                                                                              'Continue',
-                                                                              style: TextStyle(fontFamily: 'Bold', fontSize: 16, fontWeight: FontWeight.bold),
-                                                                            ),
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                );
-                                                              }),
-                                                            );
-                                                          },
-                                                        );
-                                                      } else {
-                                                        showToast(
-                                                            "You don't have enough points.");
-                                                      }
-                                                    } else {
-                                                      showToast(
-                                                          'PIN Code does not exist!');
-                                                    }
-
-                                                    pin.clear();
-                                                  },
-                                                )
-                                              ],
+                                                              pin.clear();
+                                                            },
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            },
+                                            icon: const Icon(
+                                              Icons.qr_code,
+                                              color: Colors.white,
                                             ),
                                           ),
-                                        );
-                                      },
-                                    );
-                                  },
-                                  icon: const Icon(
-                                    Icons.qr_code,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                IconButton(
-                                  onPressed: () {
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const CashiersScreen()));
-                                  },
-                                  icon: const Icon(
-                                    Icons.groups_2_outlined,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                IconButton(
-                                  onPressed: () {
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const SettingsPage()));
-                                  },
-                                  icon: const Icon(
-                                    Icons.settings,
-                                    color: Colors.white,
-                                  ),
+                                          IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).push(
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const CashiersScreen()));
+                                            },
+                                            icon: const Icon(
+                                              Icons.groups_2_outlined,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).push(
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const SettingsPage()));
+                                            },
+                                            icon: const Icon(
+                                              Icons.settings,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: 200,
-                        width: 500,
-                        child: ListView.builder(
+                      // Enhanced wallet balance display
+                      Container(
+                        height: 220,
+                        margin: const EdgeInsets.symmetric(horizontal: 20),
+                        child: PageView.builder(
                           itemCount: 3,
-                          scrollDirection: Axis.horizontal,
+                          controller: PageController(viewportFraction: 0.85),
+                          onPageChanged: (index) {},
                           itemBuilder: (context, index) {
-                            return GestureDetector(
-                              onTap: () {
-                                if (index == 0) {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) =>
-                                          const PointsPage()));
-                                } else if (index == 1) {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) =>
-                                          const WalletPage()));
-                                } else {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) =>
-                                          const InventoryPage()));
-                                }
-                              },
-                              child: Center(
-                                child: Container(
-                                  width: 425,
-                                  height: 250,
-                                  decoration: BoxDecoration(
-                                    color: index == 0
-                                        ? blue
-                                        : index == 1
-                                            ? primary
-                                            : Colors.lightBlue,
-                                    borderRadius: const BorderRadius.only(
-                                      bottomLeft: Radius.circular(1000),
-                                      bottomRight: Radius.circular(1000),
-                                    ),
+                            return AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 20),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: index == 0
+                                      ? [blue, Colors.blue.shade800]
+                                      : index == 1
+                                          ? [primary, Colors.green.shade800]
+                                          : [
+                                              Colors.yellow,
+                                              Colors.yellow.shade600
+                                            ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    spreadRadius: 1,
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 5),
                                   ),
-                                  child: SafeArea(
-                                    child: Padding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          20, 10, 20, 5),
-                                      child: Column(
+                                ],
+                              ),
+                              child: GestureDetector(
+                                onTap: () {
+                                  if (index == 0) {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const PointsPage()));
+                                  } else if (index == 1) {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const WalletPage()));
+                                  } else {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const InventoryPage()));
+                                  }
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(20),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
-                                          const SizedBox(
-                                            height: 20,
-                                          ),
                                           TextWidget(
                                             text: index == 0
                                                 ? 'Points Inventory'
                                                 : index == 1
                                                     ? 'E Wallet'
                                                     : 'Transaction History',
-                                            fontSize: 14,
+                                            fontSize: 16,
                                             color: Colors.white,
+                                            fontFamily: 'Medium',
                                           ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 50, right: 50),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                index != 0
-                                                    ? const Icon(
-                                                        Icons
-                                                            .keyboard_arrow_left_rounded,
-                                                        color: Colors.white60,
-                                                        size: 50,
-                                                      )
-                                                    : const SizedBox(
-                                                        width: 50,
-                                                      ),
-                                                StreamBuilder<QuerySnapshot>(
-                                                    stream: FirebaseFirestore
-                                                        .instance
-                                                        .collection('Points')
-                                                        .where('uid',
-                                                            isEqualTo:
-                                                                mydata.id)
-                                                        .where('scanned',
-                                                            isEqualTo: true)
-                                                        .snapshots(),
-                                                    builder: (BuildContext
-                                                            context,
-                                                        AsyncSnapshot<
-                                                                QuerySnapshot>
-                                                            snapshot) {
-                                                      if (snapshot.hasError) {
-                                                        print(snapshot.error);
-                                                        return const Center(
-                                                            child:
-                                                                Text('Error'));
-                                                      }
-                                                      if (snapshot
-                                                              .connectionState ==
-                                                          ConnectionState
-                                                              .waiting) {
-                                                        return const Padding(
-                                                          padding:
-                                                              EdgeInsets.only(
-                                                                  top: 50),
-                                                          child: Center(
-                                                              child:
-                                                                  CircularProgressIndicator(
-                                                            color: Colors.black,
-                                                          )),
-                                                        );
-                                                      }
-
-                                                      final data =
-                                                          snapshot.requireData;
-                                                      return Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          TextWidget(
-                                                            text: index == 0
-                                                                ? '${mydata['pts']}'
-                                                                : index == 1
-                                                                    ? AppConstants
-                                                                        .formatNumberWithPeso(mydata[
-                                                                            'wallet'])
-                                                                    : data.docs
-                                                                        .length
-                                                                        .toString(),
-                                                            fontFamily: 'Bold',
-                                                            fontSize: 50,
-                                                            color: Colors.white,
-                                                          ),
-                                                        ],
-                                                      );
-                                                    }),
-                                                index == 2
-                                                    ? const SizedBox(
-                                                        width: 50,
-                                                      )
-                                                    : const Icon(
-                                                        Icons
-                                                            .keyboard_arrow_right_rounded,
-                                                        color: Colors.white60,
-                                                        size: 50,
-                                                      ),
-                                              ],
-                                            ),
+                                          Icon(
+                                            index == 0
+                                                ? Icons.stars_rounded
+                                                : index == 1
+                                                    ? Icons
+                                                        .account_balance_wallet_rounded
+                                                    : Icons.history_rounded,
+                                            color: Colors.white70,
+                                            size: 24,
                                           ),
                                         ],
                                       ),
-                                    ),
+                                      const SizedBox(height: 20),
+                                      StreamBuilder<QuerySnapshot>(
+                                          stream: FirebaseFirestore.instance
+                                              .collection('Points')
+                                              .where('uid',
+                                                  isEqualTo: mydata.id)
+                                              .where('scanned', isEqualTo: true)
+                                              .snapshots(),
+                                          builder: (BuildContext context,
+                                              AsyncSnapshot<QuerySnapshot>
+                                                  snapshot) {
+                                            if (snapshot.hasError) {
+                                              print(snapshot.error);
+                                              return const Center(
+                                                  child: Text('Error'));
+                                            }
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.waiting) {
+                                              return const Center(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                color: Colors.white,
+                                              ));
+                                            }
+
+                                            final data = snapshot.requireData;
+                                            return Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              children: [
+                                                TextWidget(
+                                                  text: index == 0
+                                                      ? '${mydata['pts']}'
+                                                      : index == 1
+                                                          ? AppConstants
+                                                              .formatNumberWithPeso(
+                                                                  mydata[
+                                                                      'wallet'])
+                                                          : data.docs.length
+                                                              .toString(),
+                                                  fontFamily: 'Bold',
+                                                  fontSize: 40,
+                                                  color: Colors.white,
+                                                ),
+                                                const SizedBox(width: 5),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          bottom: 8),
+                                                  child: TextWidget(
+                                                    text: index == 0
+                                                        ? 'pts'
+                                                        : index == 1
+                                                            ? ''
+                                                            : 'txns',
+                                                    fontSize: 14,
+                                                    color: Colors.white70,
+                                                    fontFamily: 'Regular',
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          }),
+                                      const SizedBox(height: 15),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          TextWidget(
+                                            text: 'Tap to view details',
+                                            fontSize: 12,
+                                            color: Colors.white70,
+                                            fontFamily: 'Regular',
+                                          ),
+                                          const SizedBox(width: 5),
+                                          const Icon(
+                                            Icons.arrow_forward_ios_rounded,
+                                            color: Colors.white70,
+                                            size: 12,
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -528,8 +633,9 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                         ),
                       ),
                       const SizedBox(
-                        height: 10,
+                        height: 20,
                       ),
+                      // Enhanced wallet actions section
                       Padding(
                         padding: const EdgeInsets.only(left: 20, right: 20),
                         child: Column(
@@ -548,38 +654,49 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                   onPressed: () {
                                     Navigator.of(context).push(
                                       MaterialPageRoute(
-                                        builder: (context) => const PaymentsPage(),
+                                        builder: (context) =>
+                                            const PaymentsPage(),
                                       ),
                                     );
                                   },
-                                  child: const Text(
-                                    'View Status',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontFamily: 'Medium',
-                                    ),
+                                  child: TextWidget(
+                                    text: 'View Status',
+                                    fontSize: 14,
+                                    color: blue,
+                                    fontFamily: 'Medium',
                                   ),
                                 ),
                               ],
                             ),
                             const SizedBox(
-                              height: 5,
+                              height: 10,
                             ),
-                            GestureDetector(
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
                               child: Card(
-                                elevation: 5,
+                                elevation: 8,
+                                shadowColor: Colors.black.withOpacity(0.1),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
                                 child: Container(
                                   decoration: BoxDecoration(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.circular(
-                                      15,
+                                    borderRadius: BorderRadius.circular(20),
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.white,
+                                        Colors.blue.shade50
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
                                     ),
                                   ),
                                   width: double.infinity,
-                                  height: 150,
+                                  height: 160,
                                   child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 10, right: 10),
+                                    padding: const EdgeInsets.all(15),
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
@@ -587,142 +704,221 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                           CrossAxisAlignment.center,
                                       children: [
                                         Container(
-                                          width: 130,
+                                          width: 120,
                                           height: 120,
                                           decoration: BoxDecoration(
-                                            color: Colors.grey[200],
-                                            borderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black
+                                                    .withOpacity(0.05),
+                                                spreadRadius: 1,
+                                                blurRadius: 5,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ],
                                           ),
                                           child: Center(
-                                            child: Image.asset(
-                                              'assets/images/Juan4All 2.png',
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(10),
+                                              child: Image.asset(
+                                                'assets/images/Juan4All 2.png',
+                                                fit: BoxFit.contain,
+                                              ),
                                             ),
                                           ),
                                         ),
                                         const SizedBox(
                                           width: 20,
                                         ),
-                                        Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            TextWidget(
-                                              align: TextAlign.start,
-                                              maxLines: 2,
-                                              text: 'Reload your\nPOINTS!',
-                                              fontSize: 18,
-                                              color: blue,
-                                              fontFamily: 'Bold',
-                                            ),
-                                            TextWidget(
-                                              text: 'P1.00 per 1 Point',
-                                              fontSize: 12,
-                                              color: grey,
-                                              fontFamily: 'Medium',
-                                            ),
-                                            const SizedBox(
-                                              height: 5,
-                                            ),
-                                            ButtonWidget(
-                                              radius: 100,
-                                              height: 30,
-                                              width: 75,
-                                              fontSize: 12,
-                                              label: 'Reload',
-                                              onPressed: () async {
-                                                QuerySnapshot snapshot =
-                                                    await FirebaseFirestore
-                                                        .instance
-                                                        .collection('Cashiers')
-                                                        .where('uid',
-                                                            isEqualTo:
-                                                                FirebaseAuth
-                                                                    .instance
-                                                                    .currentUser!
-                                                                    .uid)
-                                                        .get();
-
-                                                if (snapshot.docs.isNotEmpty) {
-                                                  showDialog(
-                                                    context: context,
-                                                    builder: (context) {
-                                                      return Dialog(
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(20.0),
-                                                          child: Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            children: [
-                                                              TextFieldWidget(
-                                                                showEye: true,
-                                                                isObscure: true,
-                                                                fontStyle:
-                                                                    FontStyle
-                                                                        .normal,
-                                                                hint:
-                                                                    'PIN Code',
-                                                                borderColor:
-                                                                    blue,
-                                                                radius: 12,
-                                                                width: 350,
-                                                                prefixIcon:
-                                                                    Icons.lock,
-                                                                isRequred:
-                                                                    false,
-                                                                controller: pin,
-                                                                label:
-                                                                    'PIN Code',
-                                                              ),
-                                                              const SizedBox(
-                                                                height: 20,
-                                                              ),
-                                                              ButtonWidget(
-                                                                label:
-                                                                    'Confirm',
-                                                                onPressed:
-                                                                    () async {
-                                                                  Navigator.pop(
-                                                                      context);
-
-                                                                  DocumentSnapshot doc = await FirebaseFirestore
+                                        Expanded(
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              TextWidget(
+                                                text: 'Reload your POINTS!',
+                                                fontSize: 18,
+                                                color: blue,
+                                                fontFamily: 'Bold',
+                                              ),
+                                              const SizedBox(
+                                                height: 5,
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Container(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 8,
+                                                        vertical: 4),
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          blue.withOpacity(0.1),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                    ),
+                                                    child: TextWidget(
+                                                      text: 'P1.00 per 1 Point',
+                                                      fontSize: 12,
+                                                      color: blue,
+                                                      fontFamily: 'Medium',
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(
+                                                height: 15,
+                                              ),
+                                              ButtonWidget(
+                                                radius: 10,
+                                                height: 35,
+                                                width: 100,
+                                                fontSize: 14,
+                                                label: 'Reload Now',
+                                                onPressed: () async {
+                                                  QuerySnapshot snapshot =
+                                                      await FirebaseFirestore
+                                                          .instance
+                                                          .collection(
+                                                              'Cashiers')
+                                                          .where('uid',
+                                                              isEqualTo:
+                                                                  FirebaseAuth
                                                                       .instance
-                                                                      .collection(
-                                                                          'Cashiers')
-                                                                      .doc(pin
-                                                                          .text)
-                                                                      .get();
+                                                                      .currentUser!
+                                                                      .uid)
+                                                          .get();
 
-                                                                  if (doc
-                                                                      .exists) {
-                                                                    reloadPointsDialog(
-                                                                        doc['name']);
-                                                                  } else {
-                                                                    showToast(
-                                                                        'PIN Code does not exist!');
-                                                                  }
-                                                                  pin.clear();
-                                                                },
-                                                              )
-                                                            ],
+                                                  if (snapshot
+                                                      .docs.isNotEmpty) {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (context) {
+                                                        return Dialog(
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20),
                                                           ),
-                                                        ),
-                                                      );
-                                                    },
-                                                  );
-                                                } else {
-                                                  showToast(
-                                                      'Please register your authorized user account');
-                                                }
-                                              },
-                                            ),
-                                          ],
+                                                          child: Container(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(20),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color:
+                                                                  Colors.white,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          20),
+                                                            ),
+                                                            child: Column(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .min,
+                                                              children: [
+                                                                Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .spaceBetween,
+                                                                  children: [
+                                                                    TextWidget(
+                                                                      text:
+                                                                          'Enter PIN',
+                                                                      fontSize:
+                                                                          18,
+                                                                      fontFamily:
+                                                                          'Bold',
+                                                                      color: Colors
+                                                                          .black87,
+                                                                    ),
+                                                                    IconButton(
+                                                                      onPressed:
+                                                                          () =>
+                                                                              Navigator.pop(context),
+                                                                      icon: const Icon(
+                                                                          Icons
+                                                                              .close),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                const SizedBox(
+                                                                    height: 20),
+                                                                TextFieldWidget(
+                                                                  showEye: true,
+                                                                  isObscure:
+                                                                      true,
+                                                                  fontStyle:
+                                                                      FontStyle
+                                                                          .normal,
+                                                                  hint:
+                                                                      'PIN Code',
+                                                                  borderColor:
+                                                                      blue,
+                                                                  radius: 12,
+                                                                  width: 350,
+                                                                  prefixIcon:
+                                                                      Icons
+                                                                          .lock,
+                                                                  isRequred:
+                                                                      false,
+                                                                  controller:
+                                                                      pin,
+                                                                  label:
+                                                                      'PIN Code',
+                                                                ),
+                                                                const SizedBox(
+                                                                    height: 20),
+                                                                ButtonWidget(
+                                                                  label:
+                                                                      'Confirm',
+                                                                  onPressed:
+                                                                      () async {
+                                                                    Navigator.pop(
+                                                                        context);
+
+                                                                    DocumentSnapshot doc = await FirebaseFirestore
+                                                                        .instance
+                                                                        .collection(
+                                                                            'Cashiers')
+                                                                        .doc(pin
+                                                                            .text)
+                                                                        .get();
+
+                                                                    if (doc
+                                                                        .exists) {
+                                                                      reloadPointsDialog(
+                                                                          doc['name']);
+                                                                    } else {
+                                                                      showToast(
+                                                                          'PIN Code does not exist!');
+                                                                    }
+                                                                    pin.clear();
+                                                                  },
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                    );
+                                                  } else {
+                                                    showToast(
+                                                        'Please register your authorized user account');
+                                                  }
+                                                },
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -734,117 +930,298 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                         ),
                       ),
                       const SizedBox(
-                        height: 10,
+                        height: 20,
                       ),
+                      // Enhanced transaction history section
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          StreamBuilder<QuerySnapshot>(
-                              stream: FirebaseFirestore.instance
-                                  .collection('Points')
-                                  .where('uid',
-                                      isEqualTo: FirebaseAuth
-                                          .instance.currentUser!.uid)
-                                  // .where('scanned', isEqualTo: true)
-                                  .snapshots(),
-                              builder: (BuildContext context,
-                                  AsyncSnapshot<QuerySnapshot> snapshot) {
-                                if (snapshot.hasError) {
-                                  print(snapshot.error);
-                                  return const Center(child: Text('Error'));
-                                }
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const Padding(
-                                    padding: EdgeInsets.only(top: 50),
-                                    child: Center(
-                                        child: CircularProgressIndicator(
-                                      color: Colors.black,
-                                    )),
-                                  );
-                                }
+                          Padding(
+                            padding: const EdgeInsets.only(left: 20, right: 20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    TextWidget(
+                                      text: 'Recent Activity',
+                                      fontSize: 18,
+                                      fontFamily: 'Bold',
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const InventoryPage()));
+                                      },
+                                      child: TextWidget(
+                                        text: 'View All',
+                                        fontSize: 14,
+                                        color: blue,
+                                        fontFamily: 'Medium',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 15,
+                                ),
+                                StreamBuilder<QuerySnapshot>(
+                                    stream: FirebaseFirestore.instance
+                                        .collection('Points')
+                                        .where('uid',
+                                            isEqualTo: FirebaseAuth
+                                                .instance.currentUser!.uid)
+                                        // .where('scanned', isEqualTo: true)
+                                        .snapshots(),
+                                    builder: (BuildContext context,
+                                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                                      if (snapshot.hasError) {
+                                        print(snapshot.error);
+                                        return const Center(
+                                            child: Text('Error'));
+                                      }
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return const Padding(
+                                          padding: EdgeInsets.only(top: 50),
+                                          child: Center(
+                                              child: CircularProgressIndicator(
+                                            color: Colors.black,
+                                          )),
+                                        );
+                                      }
 
-                                final data = snapshot.requireData;
-                                return Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 20, right: 20),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        children: [
-                                          TextWidget(
-                                            text: 'Recent Activity',
-                                            fontSize: 18,
-                                            fontFamily: 'Bold',
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                      data.docs.isEmpty
+                                      final data = snapshot.requireData;
+                                      return data.docs.isEmpty
                                           ? Center(
-                                              child: TextWidget(
-                                                text: 'No Recent Activity',
-                                                fontSize: 14,
-                                                fontFamily: 'Regular',
-                                                color: Colors.grey,
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(20),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.grey[100],
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                ),
+                                                child: Column(
+                                                  children: [
+                                                    Icon(
+                                                      Icons.history,
+                                                      color: Colors.grey[400],
+                                                      size: 40,
+                                                    ),
+                                                    const SizedBox(height: 10),
+                                                    TextWidget(
+                                                      text:
+                                                          'No Recent Activity',
+                                                      fontSize: 14,
+                                                      fontFamily: 'Regular',
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             )
                                           : SizedBox(
-                                              height: 150,
-                                              width: 500,
+                                              height: 180,
                                               child: ListView.builder(
                                                 itemCount: data.docs.length,
                                                 scrollDirection:
                                                     Axis.horizontal,
                                                 itemBuilder: (context, index) {
-                                                  return Padding(
-                                                    padding:
+                                                  return AnimatedContainer(
+                                                    duration: const Duration(
+                                                        milliseconds: 300),
+                                                    curve: Curves.easeInOut,
+                                                    margin:
                                                         const EdgeInsets.only(
                                                             left: 5, right: 5),
                                                     child: GestureDetector(
+                                                      onTap: () {
+                                                        // Show transaction details
+                                                        showDialog(
+                                                          context: context,
+                                                          builder: (context) {
+                                                            return Dialog(
+                                                              shape:
+                                                                  RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            20),
+                                                              ),
+                                                              child: Container(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(
+                                                                        20),
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              20),
+                                                                ),
+                                                                child: Column(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .min,
+                                                                  children: [
+                                                                    Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .spaceBetween,
+                                                                      children: [
+                                                                        TextWidget(
+                                                                          text:
+                                                                              'Transaction Details',
+                                                                          fontSize:
+                                                                              18,
+                                                                          fontFamily:
+                                                                              'Bold',
+                                                                          color:
+                                                                              Colors.black87,
+                                                                        ),
+                                                                        IconButton(
+                                                                          onPressed: () =>
+                                                                              Navigator.pop(context),
+                                                                          icon:
+                                                                              const Icon(Icons.close),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    const SizedBox(
+                                                                        height:
+                                                                            20),
+                                                                    Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .center,
+                                                                      children: [
+                                                                        TextWidget(
+                                                                          text: data
+                                                                              .docs[index]['pts']
+                                                                              .toString(),
+                                                                          fontSize:
+                                                                              38,
+                                                                          fontFamily:
+                                                                              'Bold',
+                                                                          color:
+                                                                              blue,
+                                                                        ),
+                                                                        const SizedBox(
+                                                                            width:
+                                                                                5),
+                                                                        Padding(
+                                                                          padding: const EdgeInsets
+                                                                              .only(
+                                                                              bottom: 8),
+                                                                          child:
+                                                                              TextWidget(
+                                                                            text:
+                                                                                'pts',
+                                                                            fontSize:
+                                                                                14,
+                                                                            color:
+                                                                                blue,
+                                                                            fontFamily:
+                                                                                'Regular',
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    const SizedBox(
+                                                                        height:
+                                                                            15),
+                                                                    TextWidget(
+                                                                      text: DateFormat
+                                                                              .yMMMd()
+                                                                          .add_jm()
+                                                                          .format(data
+                                                                              .docs[index]['dateTime']
+                                                                              .toDate()),
+                                                                      fontSize:
+                                                                          14,
+                                                                      fontFamily:
+                                                                          'Medium',
+                                                                      color: Colors
+                                                                          .grey,
+                                                                    ),
+                                                                    const SizedBox(
+                                                                        height:
+                                                                            20),
+                                                                    ButtonWidget(
+                                                                      label:
+                                                                          'Close',
+                                                                      onPressed:
+                                                                          () =>
+                                                                              Navigator.pop(context),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            );
+                                                          },
+                                                        );
+                                                      },
                                                       child: Card(
-                                                        elevation: 5,
+                                                        elevation: 8,
+                                                        shadowColor: Colors
+                                                            .black
+                                                            .withOpacity(0.1),
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(15),
+                                                        ),
                                                         color: Colors.white,
                                                         child: SizedBox(
-                                                          height: 150,
-                                                          width: 150,
+                                                          width: 160,
                                                           child: Padding(
                                                             padding:
                                                                 const EdgeInsets
-                                                                    .all(10.0),
+                                                                    .all(15.0),
                                                             child: Column(
                                                               crossAxisAlignment:
                                                                   CrossAxisAlignment
-                                                                      .start,
+                                                                      .center,
                                                               children: [
-                                                                // Center(
-                                                                //   child:
-                                                                //       TextWidget(
-                                                                //     text: businessdata[
-                                                                //         'name'],
-                                                                //     fontSize:
-                                                                //         12,
-                                                                //     fontFamily:
-                                                                //         'Medium',
-                                                                //     color:
-                                                                //         blue,
-                                                                //   ),
-                                                                // ),
-                                                                const SizedBox(
-                                                                  height: 15,
+                                                                Container(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(
+                                                                          8),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    color: blue
+                                                                        .withOpacity(
+                                                                            0.1),
+                                                                    shape: BoxShape
+                                                                        .circle,
+                                                                  ),
+                                                                  child: Icon(
+                                                                    Icons
+                                                                        .stars_rounded,
+                                                                    color: blue,
+                                                                    size: 24,
+                                                                  ),
                                                                 ),
+                                                                const SizedBox(
+                                                                    height: 15),
                                                                 Row(
                                                                   mainAxisAlignment:
                                                                       MainAxisAlignment
                                                                           .center,
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .end,
                                                                   children: [
                                                                     TextWidget(
                                                                       text: data
@@ -854,50 +1231,50 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                                               'pts']
                                                                           .toString(),
                                                                       fontSize:
-                                                                          38,
+                                                                          32,
                                                                       fontFamily:
                                                                           'Bold',
                                                                       color:
                                                                           blue,
                                                                     ),
                                                                     const SizedBox(
-                                                                      width: 5,
-                                                                    ),
-                                                                    TextWidget(
-                                                                      text:
-                                                                          'pts',
-                                                                      fontSize:
-                                                                          12,
-                                                                      fontFamily:
-                                                                          'Bold',
-                                                                      color:
-                                                                          blue,
+                                                                        width:
+                                                                            5),
+                                                                    Padding(
+                                                                      padding: const EdgeInsets
+                                                                          .only(
+                                                                          bottom:
+                                                                              5),
+                                                                      child:
+                                                                          TextWidget(
+                                                                        text:
+                                                                            'pts',
+                                                                        fontSize:
+                                                                            12,
+                                                                        fontFamily:
+                                                                            'Bold',
+                                                                        color:
+                                                                            blue,
+                                                                      ),
                                                                     ),
                                                                   ],
                                                                 ),
                                                                 const SizedBox(
-                                                                  height: 15,
-                                                                ),
-                                                                Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .center,
-                                                                  children: [
-                                                                    TextWidget(
-                                                                      text: DateFormat
-                                                                              .yMMMd()
-                                                                          .add_jm()
-                                                                          .format(data
-                                                                              .docs[index]['dateTime']
-                                                                              .toDate()),
-                                                                      fontSize:
-                                                                          10,
-                                                                      fontFamily:
-                                                                          'Bold',
-                                                                      color: Colors
-                                                                          .grey,
-                                                                    ),
-                                                                  ],
+                                                                    height: 10),
+                                                                TextWidget(
+                                                                  text: DateFormat
+                                                                          .MMMd()
+                                                                      .format(data
+                                                                          .docs[
+                                                                              index]
+                                                                              [
+                                                                              'dateTime']
+                                                                          .toDate()),
+                                                                  fontSize: 12,
+                                                                  fontFamily:
+                                                                      'Medium',
+                                                                  color: Colors
+                                                                      .grey,
                                                                 ),
                                                               ],
                                                             ),
@@ -908,14 +1285,14 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                   );
                                                 },
                                               ),
-                                            ),
-                                      const SizedBox(
-                                        height: 20,
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }),
+                                            );
+                                    }),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ],
@@ -992,12 +1369,19 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
 
                               if (doc['wallet'] >= int.parse(pts.text)) {
                                 // Prepare payment parameters
-                                final uid = FirebaseAuth.instance.currentUser!.uid;
-                                final email = FirebaseAuth.instance.currentUser!.email ?? 'noemail@example.com';
+                                final uid =
+                                    FirebaseAuth.instance.currentUser!.uid;
+                                final email =
+                                    FirebaseAuth.instance.currentUser!.email ??
+                                        'noemail@example.com';
                                 final int ptsToReload = int.parse(pts.text);
-                                final String amountStr = (ptsToReload.toDouble()).toStringAsFixed(2); // PHP equals points
-                                final String txnId = 'TXN${DateTime.now().millisecondsSinceEpoch}';
-                                final String description = 'Points Reload $ptsToReload pts';
+                                final String amountStr = (ptsToReload
+                                        .toDouble())
+                                    .toStringAsFixed(2); // PHP equals points
+                                final String txnId =
+                                    'TXN${DateTime.now().millisecondsSinceEpoch}';
+                                final String description =
+                                    'Points Reload $ptsToReload pts';
 
                                 // Create a Payments doc with Pending status
                                 await FirebaseFirestore.instance
@@ -1045,7 +1429,8 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                       .doc(FirebaseAuth
                                           .instance.currentUser!.uid)
                                       .update({
-                                    'wallet': FieldValue.increment(-ptsToReload),
+                                    'wallet':
+                                        FieldValue.increment(-ptsToReload),
                                     'pts': FieldValue.increment(ptsToReload),
                                   });
 

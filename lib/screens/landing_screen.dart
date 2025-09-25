@@ -15,127 +15,222 @@ class LandingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/images/Juan4All 2.png',
-              height: 200,
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/newbackground.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.black.withOpacity(0.6),
+                Colors.black.withOpacity(0.3),
+              ],
             ),
-            const SizedBox(
-              height: 10,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 10, right: 10),
-              child: SizedBox(
-                height: 450,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => LoginScreen(
-                                  inCustomer: true,
-                                )));
-                        // final result = await Navigator.push<bool>(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //       builder: (context) => const DragonPayWebView()),
-                        // );
-                        // if (result != null) {
-                        //   ScaffoldMessenger.of(context).showSnackBar(
-                        //     SnackBar(
-                        //       content: Text(result
-                        //           ? 'Payment Successful!'
-                        //           : 'Payment Failed or Canceled'),
-                        //       backgroundColor:
-                        //           result ? Colors.green : Colors.red,
-                        //       duration: const Duration(seconds: 3),
-                        //     ),
-                        //   );
-                        // }
-                      },
-                      child: Align(
-                        alignment: Alignment.topCenter,
-                        child: Container(
-                          height: 300,
-                          width: 150,
-                          decoration: BoxDecoration(
-                            color: primary,
-                            borderRadius: BorderRadius.circular(
-                              15,
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.account_circle_outlined,
-                                color: Colors.white,
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              TextWidget(
-                                text: 'Customer\naccount',
-                                maxLines: 2,
-                                fontSize: 18,
-                                fontFamily: 'Bold',
-                                color: Colors.white,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        // showToast('Under development');
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => LoginScreen(
-                                  inCustomer: false,
-                                )));
-                      },
-                      child: Container(
-                        height: 300,
-                        width: 150,
-                        decoration: BoxDecoration(
-                          color: secondary,
-                          borderRadius: BorderRadius.circular(
-                            15,
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.business_center_outlined,
-                              color: Colors.white,
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            TextWidget(
-                              text: 'Business\naccount',
-                              maxLines: 2,
-                              fontSize: 18,
-                              fontFamily: 'Bold',
-                              color: Colors.white,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+          ),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Logo with animation
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 800),
+                  curve: Curves.elasticOut,
+                  child: Image.asset(
+                    'assets/images/Juan4All 2.png',
+                    height: 200,
+                  ),
                 ),
-              ),
+
+                const SizedBox(
+                  height: 40,
+                ),
+
+                // Account selection cards
+                Padding(
+                  padding: const EdgeInsets.only(left: 20, right: 20),
+                  child: SizedBox(
+                    height: 350,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // Customer Account Card
+                        AnimatedScale(
+                          scale: 1.0,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => LoginScreen(
+                                        inCustomer: true,
+                                      )));
+                            },
+                            onTapDown: (_) {
+                              // Add visual feedback on tap
+                            },
+                            child: Align(
+                              alignment: Alignment.topCenter,
+                              child: Container(
+                                height: 320,
+                                width: 160,
+                                decoration: BoxDecoration(
+                                  color: primary,
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.2),
+                                      spreadRadius: 2,
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 5),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(15),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.2),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.account_circle_outlined,
+                                        color: Colors.white,
+                                        size: 50,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 20,
+                                    ),
+                                    TextWidget(
+                                      text: 'Customer\nAccount',
+                                      maxLines: 2,
+                                      fontSize: 20,
+                                      fontFamily: 'Bold',
+                                      color: Colors.white,
+                                    ),
+                                    const SizedBox(
+                                      height: 15,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 15),
+                                      child: TextWidget(
+                                        text:
+                                            'For personal transactions and payments',
+                                        fontSize: 12,
+                                        fontFamily: 'Regular',
+                                        color: Colors.white.withOpacity(0.8),
+                                        maxLines: 3,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        // Business Account Card
+                        AnimatedScale(
+                          scale: 1.0,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => LoginScreen(
+                                        inCustomer: false,
+                                      )));
+                            },
+                            child: Container(
+                              height: 320,
+                              width: 160,
+                              decoration: BoxDecoration(
+                                color: secondary,
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.2),
+                                    spreadRadius: 2,
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(15),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.2),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.business_center_outlined,
+                                      color: Colors.white,
+                                      size: 50,
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  TextWidget(
+                                    text: 'Business\nAccount',
+                                    maxLines: 2,
+                                    fontSize: 20,
+                                    fontFamily: 'Bold',
+                                    color: Colors.white,
+                                  ),
+                                  const SizedBox(
+                                    height: 15,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 15),
+                                    child: TextWidget(
+                                      text: 'For merchants and business owners',
+                                      fontSize: 12,
+                                      fontFamily: 'Regular',
+                                      color: Colors.white.withOpacity(0.8),
+                                      maxLines: 3,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(
+                  height: 40,
+                ),
+
+                // Footer text
+                TextWidget(
+                  text: 'Secure • Fast • Reliable',
+                  fontSize: 14,
+                  fontFamily: 'Medium',
+                  color: Colors.white.withOpacity(0.7),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
