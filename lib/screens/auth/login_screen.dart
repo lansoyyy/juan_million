@@ -37,280 +37,612 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isWeb = screenWidth > 800;
+
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-              image: AssetImage('assets/images/newbackground.png'),
-              fit: BoxFit.cover,
-              opacity: 0.35),
-          color: Colors.black,
-        ),
-        child: Column(
-          children: [
-            // Header with improved design
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.easeInOut,
-              child: Container(
-                width: double.infinity,
-                height: 250,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      primary.withOpacity(0.8),
-                      primary.withOpacity(0.4),
-                    ],
-                  ),
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(40),
-                    bottomRight: Radius.circular(40),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      spreadRadius: 5,
-                      blurRadius: 15,
-                      offset: const Offset(0, 5),
+      body: isWeb ? _buildWebLayout(context) : _buildMobileLayout(context),
+    );
+  }
+
+  Widget _buildWebLayout(BuildContext context) {
+    return Row(
+      children: [
+        // Left side - Branding
+        Expanded(
+          flex: 1,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  primary,
+                  secondary,
+                ],
+              ),
+            ),
+            child: Stack(
+              children: [
+                // Background pattern
+                Positioned.fill(
+                  child: Opacity(
+                    opacity: 0.1,
+                    child: Image.asset(
+                      'assets/images/newbackground.png',
+                      fit: BoxFit.cover,
                     ),
-                  ],
+                  ),
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 40),
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 800),
-                      curve: Curves.elasticOut,
-                      child: Image.asset(
-                        'assets/images/Juan4All 2.png',
-                        height: 120,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    TextWidget(
-                      text: widget.inCustomer
-                          ? 'Hello ka-Juan!'
-                          : 'Hello ka-Negosyo',
-                      fontSize: 28,
-                      fontFamily: 'Bold',
-                      color: Colors.white,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
-            // Form container with improved styling
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 25),
-              padding: const EdgeInsets.all(25),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    spreadRadius: 2,
-                    blurRadius: 10,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  TextFieldWidget(
-                    fontStyle: FontStyle.normal,
-                    hint: 'Enter your email',
-                    borderColor: Colors.grey.shade300,
-                    radius: 15,
-                    width: double.infinity,
-                    prefixIcon: Icons.email_outlined,
-                    isRequred: false,
-                    controller: username,
-                    label: 'Email Address',
-                  ),
-                  const SizedBox(height: 20),
-                  TextFieldWidget(
-                    showEye: true,
-                    isObscure: true,
-                    fontStyle: FontStyle.normal,
-                    hint: 'Enter your password',
-                    borderColor: Colors.grey.shade300,
-                    radius: 15,
-                    width: double.infinity,
-                    prefixIcon: Icons.lock_outline,
-                    isRequred: false,
-                    controller: password,
-                    label: 'Password',
-                  ),
-                  // Forgot password with better alignment
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {
-                        _showForgotPasswordDialog(context);
-                      },
-                      child: TextWidget(
-                        text: 'Forgot Password?',
-                        fontSize: 14,
-                        color: primary,
-                        fontFamily: 'Medium',
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 25),
-
-                  // Login button with improved styling
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    child: ButtonWidget(
-                      width: double.infinity,
-                      label: 'Log in',
-                      onPressed: () async {
-                        var document =
-                            FirebaseFirestore.instance.doc('App/versions');
-                        var snapshot = await document.get();
-
-                        if (snapshot.data()!['version'] == version) {
-                          login(context);
-                        } else {
-                          showToast(
-                              'Cannot Proceed! Your app version is outdated!');
-                        }
-                      },
-                      color: primary,
-                      radius: 15,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 25),
-
-            // Social login section with improved design
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Divider(
-                      color: Colors.grey.shade300,
-                      thickness: 1,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: TextWidget(
-                      text: 'or continue with',
-                      fontSize: 14,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                  Expanded(
-                    child: Divider(
-                      color: Colors.grey.shade300,
-                      thickness: 1,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Google login button with improved design
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                child: GestureDetector(
-                  onTap: () async {
-                    googleLogin();
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    height: 55,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.grey.shade300,
-                      ),
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(15),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.03),
-                          spreadRadius: 1,
-                          blurRadius: 5,
-                          offset: const Offset(0, 2),
+                // Content
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(60),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/images/Juan4All 2.png',
+                          height: 180,
                         ),
+                        const SizedBox(height: 40),
+                        TextWidget(
+                          text: widget.inCustomer
+                              ? 'Welcome Back, ka-Juan!'
+                              : 'Welcome Back, ka-Negosyo!',
+                          fontSize: 36,
+                          fontFamily: 'Bold',
+                          color: Colors.white,
+                          align: TextAlign.center,
+                          maxLines: 2,
+                        ),
+                        const SizedBox(height: 20),
+                        TextWidget(
+                          text: widget.inCustomer
+                              ? 'Manage your payments and transactions with ease'
+                              : 'Grow your business with our powerful payment solutions',
+                          fontSize: 18,
+                          fontFamily: 'Regular',
+                          color: Colors.white.withOpacity(0.9),
+                          align: TextAlign.center,
+                          maxLines: 3,
+                        ),
+                        const SizedBox(height: 40),
+                        // Features
+                        _buildFeatureItem(
+                            Icons.security, 'Bank-level Security'),
+                        const SizedBox(height: 15),
+                        _buildFeatureItem(
+                            Icons.flash_on, 'Instant Transactions'),
+                        const SizedBox(height: 15),
+                        _buildFeatureItem(Icons.support_agent, '24/7 Support'),
                       ],
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/images/googlelogo.png',
-                            width: 24,
-                          ),
-                          const SizedBox(width: 15),
-                          TextWidget(
-                            text: 'Continue with Google',
-                            fontSize: 16,
-                            color: Colors.grey.shade700,
-                            fontFamily: 'Medium',
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
-            // Sign up section with improved styling
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextWidget(
-                  text: "Don't have an account yet?",
-                  fontSize: 14,
-                  color: Colors.grey.shade600,
-                ),
-                TextButton(
-                  onPressed: () {
-                    if (widget.inCustomer) {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const CustomerSignupScreen()));
-                    } else {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const SignupScreen()));
-                    }
-                  },
-                  child: TextWidget(
-                    text: 'Create account',
-                    fontSize: 16,
-                    fontFamily: 'Medium',
-                    color: primary,
                   ),
                 ),
               ],
             ),
-          ],
+          ),
         ),
+        // Right side - Login Form
+        Expanded(
+          flex: 1,
+          child: Container(
+            color: Colors.white,
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(60),
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 450),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Back button
+                      MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(Icons.arrow_back,
+                                color: Colors.grey.shade700),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+                      TextWidget(
+                        text: 'Sign In',
+                        fontSize: 32,
+                        fontFamily: 'Bold',
+                        color: Colors.black87,
+                      ),
+                      const SizedBox(height: 10),
+                      TextWidget(
+                        text: widget.inCustomer
+                            ? 'Access your customer account'
+                            : 'Access your business account',
+                        fontSize: 16,
+                        fontFamily: 'Regular',
+                        color: Colors.grey.shade600,
+                      ),
+                      const SizedBox(height: 40),
+                      // Email field
+                      TextFieldWidget(
+                        fontStyle: FontStyle.normal,
+                        hint: 'Enter your email',
+                        borderColor: Colors.grey.shade300,
+                        radius: 12,
+                        width: double.infinity,
+                        prefixIcon: Icons.email_outlined,
+                        isRequred: false,
+                        controller: username,
+                        label: 'Email Address',
+                      ),
+                      const SizedBox(height: 20),
+                      // Password field
+                      TextFieldWidget(
+                        showEye: true,
+                        isObscure: true,
+                        fontStyle: FontStyle.normal,
+                        hint: 'Enter your password',
+                        borderColor: Colors.grey.shade300,
+                        radius: 12,
+                        width: double.infinity,
+                        prefixIcon: Icons.lock_outline,
+                        isRequred: false,
+                        controller: password,
+                        label: 'Password',
+                      ),
+                      // Forgot password
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () {
+                            _showForgotPasswordDialog(context);
+                          },
+                          child: TextWidget(
+                            text: 'Forgot Password?',
+                            fontSize: 14,
+                            color: primary,
+                            fontFamily: 'Medium',
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      // Login button
+                      MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: ButtonWidget(
+                          width: double.infinity,
+                          label: 'Sign In',
+                          onPressed: () async {
+                            var document =
+                                FirebaseFirestore.instance.doc('App/versions');
+                            var snapshot = await document.get();
+
+                            if (snapshot.data()!['version'] == version) {
+                              login(context);
+                            } else {
+                              showToast(
+                                  'Cannot Proceed! Your app version is outdated!');
+                            }
+                          },
+                          color: primary,
+                          radius: 12,
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      // Divider
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Divider(
+                              color: Colors.grey.shade300,
+                              thickness: 1,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            child: TextWidget(
+                              text: 'or',
+                              fontSize: 14,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                          Expanded(
+                            child: Divider(
+                              color: Colors.grey.shade300,
+                              thickness: 1,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 30),
+                      // Google login
+                      MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: () async {
+                            googleLogin();
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            height: 55,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.grey.shade300,
+                              ),
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.03),
+                                  spreadRadius: 1,
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  'assets/images/googlelogo.png',
+                                  width: 24,
+                                ),
+                                const SizedBox(width: 15),
+                                TextWidget(
+                                  text: 'Continue with Google',
+                                  fontSize: 16,
+                                  color: Colors.grey.shade700,
+                                  fontFamily: 'Medium',
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      // Sign up link
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          TextWidget(
+                            text: "Don't have an account?",
+                            fontSize: 14,
+                            color: Colors.grey.shade600,
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              if (widget.inCustomer) {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) =>
+                                        const CustomerSignupScreen()));
+                              } else {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) =>
+                                        const SignupScreen()));
+                              }
+                            },
+                            child: TextWidget(
+                              text: 'Sign Up',
+                              fontSize: 14,
+                              fontFamily: 'Bold',
+                              color: primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFeatureItem(IconData icon, String text) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: Colors.white, size: 24),
+        ),
+        const SizedBox(width: 15),
+        TextWidget(
+          text: text,
+          fontSize: 16,
+          fontFamily: 'Medium',
+          color: Colors.white,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMobileLayout(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+            image: AssetImage('assets/images/newbackground.png'),
+            fit: BoxFit.cover,
+            opacity: 0.35),
+        color: Colors.black,
+      ),
+      child: Column(
+        children: [
+          // Header with improved design
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+            child: Container(
+              width: double.infinity,
+              height: 250,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    primary.withOpacity(0.8),
+                    primary.withOpacity(0.4),
+                  ],
+                ),
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(40),
+                  bottomRight: Radius.circular(40),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    spreadRadius: 5,
+                    blurRadius: 15,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 40),
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 800),
+                    curve: Curves.elasticOut,
+                    child: Image.asset(
+                      'assets/images/Juan4All 2.png',
+                      height: 120,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  TextWidget(
+                    text: widget.inCustomer
+                        ? 'Hello ka-Juan!'
+                        : 'Hello ka-Negosyo',
+                    fontSize: 28,
+                    fontFamily: 'Bold',
+                    color: Colors.white,
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 30),
+
+          // Form container with improved styling
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 25),
+            padding: const EdgeInsets.all(25),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  spreadRadius: 2,
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                TextFieldWidget(
+                  fontStyle: FontStyle.normal,
+                  hint: 'Enter your email',
+                  borderColor: Colors.grey.shade300,
+                  radius: 15,
+                  width: double.infinity,
+                  prefixIcon: Icons.email_outlined,
+                  isRequred: false,
+                  controller: username,
+                  label: 'Email Address',
+                ),
+                const SizedBox(height: 20),
+                TextFieldWidget(
+                  showEye: true,
+                  isObscure: true,
+                  fontStyle: FontStyle.normal,
+                  hint: 'Enter your password',
+                  borderColor: Colors.grey.shade300,
+                  radius: 15,
+                  width: double.infinity,
+                  prefixIcon: Icons.lock_outline,
+                  isRequred: false,
+                  controller: password,
+                  label: 'Password',
+                ),
+                // Forgot password with better alignment
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () {
+                      _showForgotPasswordDialog(context);
+                    },
+                    child: TextWidget(
+                      text: 'Forgot Password?',
+                      fontSize: 14,
+                      color: primary,
+                      fontFamily: 'Medium',
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 25),
+
+                // Login button with improved styling
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  child: ButtonWidget(
+                    width: double.infinity,
+                    label: 'Log in',
+                    onPressed: () async {
+                      var document =
+                          FirebaseFirestore.instance.doc('App/versions');
+                      var snapshot = await document.get();
+
+                      if (snapshot.data()!['version'] == version) {
+                        login(context);
+                      } else {
+                        showToast(
+                            'Cannot Proceed! Your app version is outdated!');
+                      }
+                    },
+                    color: primary,
+                    radius: 15,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 25),
+
+          // Social login section with improved design
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 25),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Divider(
+                    color: Colors.grey.shade300,
+                    thickness: 1,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: TextWidget(
+                    text: 'or continue with',
+                    fontSize: 14,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+                Expanded(
+                  child: Divider(
+                    color: Colors.grey.shade300,
+                    thickness: 1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Google login button with improved design
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 25),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              child: GestureDetector(
+                onTap: () async {
+                  googleLogin();
+                },
+                child: Container(
+                  width: double.infinity,
+                  height: 55,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.grey.shade300,
+                    ),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.03),
+                        spreadRadius: 1,
+                        blurRadius: 5,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/images/googlelogo.png',
+                          width: 24,
+                        ),
+                        const SizedBox(width: 15),
+                        TextWidget(
+                          text: 'Continue with Google',
+                          fontSize: 16,
+                          color: Colors.grey.shade700,
+                          fontFamily: 'Medium',
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 30),
+
+          // Sign up section with improved styling
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextWidget(
+                text: "Don't have an account yet?",
+                fontSize: 14,
+                color: Colors.grey.shade600,
+              ),
+              TextButton(
+                onPressed: () {
+                  if (widget.inCustomer) {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const CustomerSignupScreen()));
+                  } else {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const SignupScreen()));
+                  }
+                },
+                child: TextWidget(
+                  text: 'Create account',
+                  fontSize: 16,
+                  fontFamily: 'Medium',
+                  color: primary,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

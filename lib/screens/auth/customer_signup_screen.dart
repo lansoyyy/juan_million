@@ -120,224 +120,742 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isWeb = screenWidth > 800;
+
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(
-                height: 20,
+      body: isWeb ? _buildWebLayout(context) : _buildMobileLayout(context),
+    );
+  }
+
+  Widget _buildWebLayout(BuildContext context) {
+    return Row(
+      children: [
+        // Left side - Branding
+        Expanded(
+          flex: 1,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  primary,
+                  secondary,
+                ],
               ),
-              Image.asset(
-                'assets/images/Juan4All 2.png',
-                height: 200,
+            ),
+            child: Stack(
+              children: [
+                // Background pattern
+                Positioned.fill(
+                  child: Opacity(
+                    opacity: 0.1,
+                    child: Image.asset(
+                      'assets/images/newbackground.png',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                // Content
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(60),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/images/Juan4All 2.png',
+                          height: 180,
+                        ),
+                        const SizedBox(height: 40),
+                        TextWidget(
+                          text: 'Join Juan 4 All Today!',
+                          fontSize: 36,
+                          fontFamily: 'Bold',
+                          color: Colors.white,
+                          align: TextAlign.center,
+                          maxLines: 2,
+                        ),
+                        const SizedBox(height: 20),
+                        TextWidget(
+                          text:
+                              'Create your account and start managing your payments with ease',
+                          fontSize: 18,
+                          fontFamily: 'Regular',
+                          color: Colors.white.withOpacity(0.9),
+                          align: TextAlign.center,
+                          maxLines: 3,
+                        ),
+                        const SizedBox(height: 40),
+                        // Benefits
+                        _buildBenefitItem(Icons.account_balance_wallet,
+                            'Free Digital Wallet'),
+                        const SizedBox(height: 15),
+                        _buildBenefitItem(Icons.qr_code, 'QR Code Payments'),
+                        const SizedBox(height: 15),
+                        _buildBenefitItem(Icons.receipt, 'Easy Bill Payments'),
+                        const SizedBox(height: 15),
+                        _buildBenefitItem(
+                            Icons.card_giftcard, 'Referral Rewards'),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        // Right side - Signup Form
+        Expanded(
+          flex: 1,
+          child: Container(
+            color: Colors.white,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(60),
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 500),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Back button
+                    MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(Icons.arrow_back,
+                              color: Colors.grey.shade700),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    TextWidget(
+                      text: 'Create Account',
+                      fontSize: 32,
+                      fontFamily: 'Bold',
+                      color: Colors.black87,
+                    ),
+                    const SizedBox(height: 10),
+                    TextWidget(
+                      text: 'Sign up as a customer to get started',
+                      fontSize: 16,
+                      fontFamily: 'Regular',
+                      color: Colors.grey.shade600,
+                    ),
+                    const SizedBox(height: 30),
+                    // Profile Picture
+                    Center(
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            maxRadius: 60,
+                            minRadius: 60,
+                            backgroundColor: Colors.grey.shade200,
+                            backgroundImage: imageURL.isNotEmpty
+                                ? NetworkImage(imageURL)
+                                : null,
+                            child: imageURL.isEmpty
+                                ? Icon(Icons.person,
+                                    size: 60, color: Colors.grey.shade400)
+                                : null,
+                          ),
+                          TextButton.icon(
+                            onPressed: () {
+                              uploadPicture('gallery');
+                            },
+                            icon: Icon(Icons.upload, color: primary, size: 18),
+                            label: TextWidget(
+                              text: 'Upload Picture',
+                              fontSize: 14,
+                              fontFamily: 'Medium',
+                              color: primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    // Name fields in row
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFieldWidget(
+                            fontStyle: FontStyle.normal,
+                            hint: 'Firstname',
+                            borderColor: Colors.grey.shade300,
+                            radius: 12,
+                            width: double.infinity,
+                            isRequred: false,
+                            prefixIcon: Icons.person_outline,
+                            controller: fname,
+                            label: 'Firstname',
+                          ),
+                        ),
+                        const SizedBox(width: 15),
+                        Expanded(
+                          child: TextFieldWidget(
+                            fontStyle: FontStyle.normal,
+                            hint: 'Lastname',
+                            borderColor: Colors.grey.shade300,
+                            radius: 12,
+                            width: double.infinity,
+                            isRequred: false,
+                            prefixIcon: Icons.person_outline,
+                            controller: lname,
+                            label: 'Lastname',
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    TextFieldWidget(
+                      fontStyle: FontStyle.normal,
+                      hint: 'Nickname',
+                      borderColor: Colors.grey.shade300,
+                      radius: 12,
+                      width: double.infinity,
+                      isRequred: false,
+                      prefixIcon: Icons.badge_outlined,
+                      controller: nickname,
+                      label: 'Nickname',
+                    ),
+                    const SizedBox(height: 20),
+                    TextFieldWidget(
+                      fontStyle: FontStyle.normal,
+                      hint: 'Mobile Number',
+                      borderColor: Colors.grey.shade300,
+                      radius: 12,
+                      width: double.infinity,
+                      isRequred: true,
+                      inputType: TextInputType.number,
+                      maxLength: 11,
+                      height: 70,
+                      prefixIcon: Icons.phone,
+                      controller: number,
+                      label: 'Mobile Number',
+                    ),
+                    const SizedBox(height: 20),
+                    // Address dropdowns
+                    CustomRegionDropdownView(
+                        onChanged: (Region? value) {
+                          setState(() {
+                            if (region != value) {
+                              province = null;
+                              municipality = null;
+                            }
+                            region = value;
+                          });
+                        },
+                        value: region),
+                    const SizedBox(height: 20),
+                    CustomProvinceDropdownView(
+                      provinces: region?.provinces ?? [],
+                      onChanged: (Province? value) {
+                        setState(() {
+                          if (province != value) {
+                            municipality = null;
+                          }
+                          province = value;
+                        });
+                      },
+                      value: province,
+                    ),
+                    const SizedBox(height: 20),
+                    CustomMunicipalityDropdownView(
+                      municipalities: province?.municipalities ?? [],
+                      onChanged: (value) {
+                        setState(() {
+                          municipality = value;
+                        });
+                      },
+                      value: municipality,
+                    ),
+                    const SizedBox(height: 20),
+                    TextFieldWidget(
+                      fontStyle: FontStyle.normal,
+                      hint: 'Email',
+                      borderColor: Colors.grey.shade300,
+                      radius: 12,
+                      width: double.infinity,
+                      isRequred: false,
+                      controller: email,
+                      prefixIcon: Icons.email_outlined,
+                      label: 'Email',
+                    ),
+                    const SizedBox(height: 20),
+                    TextFieldWidget(
+                      showEye: true,
+                      isObscure: true,
+                      prefixIcon: Icons.lock_outline,
+                      fontStyle: FontStyle.normal,
+                      hint: 'Password',
+                      borderColor: Colors.grey.shade300,
+                      radius: 12,
+                      width: double.infinity,
+                      isRequred: false,
+                      controller: password,
+                      label: 'Password',
+                    ),
+                    const SizedBox(height: 20),
+                    TextFieldWidget(
+                      showEye: true,
+                      isObscure: true,
+                      prefixIcon: Icons.lock_outline,
+                      fontStyle: FontStyle.normal,
+                      hint: 'Confirm Password',
+                      borderColor: Colors.grey.shade300,
+                      radius: 12,
+                      width: double.infinity,
+                      isRequred: false,
+                      controller: confirmpassword,
+                      label: 'Confirm Password',
+                    ),
+                    const SizedBox(height: 20),
+                    TextFieldWidget(
+                      fontStyle: FontStyle.normal,
+                      hint: 'Referral Code (Optional)',
+                      borderColor: Colors.grey.shade300,
+                      radius: 12,
+                      width: double.infinity,
+                      isRequred: false,
+                      prefixIcon: Icons.card_giftcard,
+                      controller: ref,
+                      label: 'Referral Code',
+                    ),
+                    const SizedBox(height: 30),
+                    MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: ButtonWidget(
+                        width: double.infinity,
+                        label: 'Create Account',
+                        onPressed: () async {
+                          if (ref.text == '') {
+                            if (password.text == confirmpassword.text) {
+                              if (fname.text != '' ||
+                                  lname.text != '' ||
+                                  nickname.text != '' ||
+                                  email.text != '' ||
+                                  password.text != '') {
+                                register(context);
+                              } else {
+                                showToast('All fields are required!');
+                              }
+                            } else {
+                              showToast('Password do not match!');
+                            }
+                          } else {
+                            DocumentSnapshot doc = await FirebaseFirestore
+                                .instance
+                                .collection('Referals')
+                                .doc(ref.text)
+                                .get();
+
+                            if (doc.exists) {
+                              if (password.text == confirmpassword.text) {
+                                if (fname.text != '' ||
+                                    lname.text != '' ||
+                                    nickname.text != '' ||
+                                    email.text != '' ||
+                                    password.text != '') {
+                                  await FirebaseFirestore.instance
+                                      .collection(doc['type'])
+                                      .doc(doc['uid'])
+                                      .update(
+                                          {'pts': FieldValue.increment(20)});
+                                  register(context);
+                                } else {
+                                  showToast('All fields are required!');
+                                }
+                              } else {
+                                showToast('Password do not match!');
+                              }
+                            } else {
+                              showToast(
+                                  'Cannot proceed! Referral Code does not exist!');
+                            }
+                          }
+                        },
+                        color: primary,
+                        radius: 12,
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    // Divider
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Divider(
+                            color: Colors.grey.shade300,
+                            thickness: 1,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          child: TextWidget(
+                            text: 'or',
+                            fontSize: 14,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                        Expanded(
+                          child: Divider(
+                            color: Colors.grey.shade300,
+                            thickness: 1,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+                    // Google signup
+                    MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: GestureDetector(
+                        onTap: () {
+                          googleLogin();
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          height: 55,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.grey.shade300,
+                            ),
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.03),
+                                spreadRadius: 1,
+                                blurRadius: 5,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                'assets/images/googlelogo.png',
+                                width: 24,
+                              ),
+                              const SizedBox(width: 15),
+                              TextWidget(
+                                text: 'Continue with Google',
+                                fontSize: 16,
+                                color: Colors.grey.shade700,
+                                fontFamily: 'Medium',
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    // Login link
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextWidget(
+                          text: "Already have an account?",
+                          fontSize: 14,
+                          color: Colors.grey.shade600,
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) =>
+                                    LoginScreen(inCustomer: true)));
+                          },
+                          child: TextWidget(
+                            text: 'Sign In',
+                            fontSize: 14,
+                            fontFamily: 'Bold',
+                            color: primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+                  ],
+                ),
               ),
-              TextWidget(
-                text: 'Register as Customer',
-                fontSize: 32,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBenefitItem(IconData icon, String text) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: Colors.white, size: 24),
+        ),
+        const SizedBox(width: 15),
+        TextWidget(
+          text: text,
+          fontSize: 16,
+          fontFamily: 'Medium',
+          color: Colors.white,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMobileLayout(BuildContext context) {
+    return SingleChildScrollView(
+      child: Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(
+              height: 20,
+            ),
+            Image.asset(
+              'assets/images/Juan4All 2.png',
+              height: 200,
+            ),
+            TextWidget(
+              text: 'Register as Customer',
+              fontSize: 32,
+              fontFamily: 'Bold',
+              color: primary,
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            CircleAvatar(
+              maxRadius: 75,
+              minRadius: 75,
+              backgroundImage: NetworkImage(imageURL),
+            ),
+            TextButton(
+              onPressed: () {
+                uploadPicture('gallery');
+              },
+              child: TextWidget(
+                text: 'Upload Picture',
+                fontSize: 14,
                 fontFamily: 'Bold',
                 color: primary,
               ),
-              const SizedBox(
-                height: 20,
-              ),
-              CircleAvatar(
-                maxRadius: 75,
-                minRadius: 75,
-                backgroundImage: NetworkImage(imageURL),
-              ),
-              TextButton(
-                onPressed: () {
-                  uploadPicture('gallery');
-                },
-                child: TextWidget(
-                  text: 'Upload Picture',
-                  fontSize: 14,
-                  fontFamily: 'Bold',
-                  color: primary,
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              TextFieldWidget(
-                fontStyle: FontStyle.normal,
-                hint: 'Firstname',
-                borderColor: blue,
-                radius: 12,
-                width: 350,
-                isRequred: false,
-                prefixIcon: Icons.person_3_outlined,
-                controller: fname,
-                label: 'Firstname',
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              TextFieldWidget(
-                fontStyle: FontStyle.normal,
-                hint: 'Lastname',
-                borderColor: blue,
-                radius: 12,
-                width: 350,
-                isRequred: false,
-                prefixIcon: Icons.person_3_outlined,
-                controller: lname,
-                label: 'Lastname',
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              TextFieldWidget(
-                fontStyle: FontStyle.normal,
-                hint: 'Nickname',
-                borderColor: blue,
-                radius: 12,
-                width: 350,
-                isRequred: false,
-                prefixIcon: Icons.person_3_outlined,
-                controller: nickname,
-                label: 'Nickname',
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              TextFieldWidget(
-                fontStyle: FontStyle.normal,
-                hint: 'Mobile Number',
-                borderColor: blue,
-                radius: 12,
-                width: 350,
-                isRequred: true,
-                inputType: TextInputType.number,
-                maxLength: 11,
-                height: 70,
-                prefixIcon: Icons.phone,
-                controller: number,
-                label: 'Mobile Number',
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              SizedBox(
-                child: CustomRegionDropdownView(
-                    onChanged: (Region? value) {
-                      setState(() {
-                        if (region != value) {
-                          province = null;
-                          municipality = null;
-                        }
-                        region = value;
-                      });
-                    },
-                    value: region),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              SizedBox(
-                child: CustomProvinceDropdownView(
-                  provinces: region?.provinces ?? [],
-                  onChanged: (Province? value) {
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            TextFieldWidget(
+              fontStyle: FontStyle.normal,
+              hint: 'Firstname',
+              borderColor: blue,
+              radius: 12,
+              width: 350,
+              isRequred: false,
+              prefixIcon: Icons.person_3_outlined,
+              controller: fname,
+              label: 'Firstname',
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            TextFieldWidget(
+              fontStyle: FontStyle.normal,
+              hint: 'Lastname',
+              borderColor: blue,
+              radius: 12,
+              width: 350,
+              isRequred: false,
+              prefixIcon: Icons.person_3_outlined,
+              controller: lname,
+              label: 'Lastname',
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            TextFieldWidget(
+              fontStyle: FontStyle.normal,
+              hint: 'Nickname',
+              borderColor: blue,
+              radius: 12,
+              width: 350,
+              isRequred: false,
+              prefixIcon: Icons.person_3_outlined,
+              controller: nickname,
+              label: 'Nickname',
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            TextFieldWidget(
+              fontStyle: FontStyle.normal,
+              hint: 'Mobile Number',
+              borderColor: blue,
+              radius: 12,
+              width: 350,
+              isRequred: true,
+              inputType: TextInputType.number,
+              maxLength: 11,
+              height: 70,
+              prefixIcon: Icons.phone,
+              controller: number,
+              label: 'Mobile Number',
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            SizedBox(
+              child: CustomRegionDropdownView(
+                  onChanged: (Region? value) {
                     setState(() {
-                      if (province != value) {
+                      if (region != value) {
+                        province = null;
                         municipality = null;
                       }
-                      province = value;
+                      region = value;
                     });
                   },
-                  value: province,
-                ),
+                  value: region),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            SizedBox(
+              child: CustomProvinceDropdownView(
+                provinces: region?.provinces ?? [],
+                onChanged: (Province? value) {
+                  setState(() {
+                    if (province != value) {
+                      municipality = null;
+                    }
+                    province = value;
+                  });
+                },
+                value: province,
               ),
-              const SizedBox(
-                height: 20,
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            SizedBox(
+              child: CustomMunicipalityDropdownView(
+                municipalities: province?.municipalities ?? [],
+                onChanged: (value) {
+                  setState(() {
+                    municipality = value;
+                  });
+                },
+                value: municipality,
               ),
-              SizedBox(
-                child: CustomMunicipalityDropdownView(
-                  municipalities: province?.municipalities ?? [],
-                  onChanged: (value) {
-                    setState(() {
-                      municipality = value;
-                    });
-                  },
-                  value: municipality,
-                ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              TextFieldWidget(
-                fontStyle: FontStyle.normal,
-                hint: 'Email',
-                borderColor: blue,
-                radius: 12,
-                width: 350,
-                isRequred: false,
-                controller: email,
-                prefixIcon: Icons.email,
-                label: 'Email',
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              TextFieldWidget(
-                showEye: true,
-                isObscure: true,
-                prefixIcon: Icons.lock_open_outlined,
-                fontStyle: FontStyle.normal,
-                hint: 'Password',
-                borderColor: blue,
-                radius: 12,
-                width: 350,
-                isRequred: false,
-                controller: password,
-                label: 'Password',
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              TextFieldWidget(
-                showEye: true,
-                isObscure: true,
-                prefixIcon: Icons.lock_open_outlined,
-                fontStyle: FontStyle.normal,
-                hint: 'Confirm Password',
-                borderColor: blue,
-                radius: 12,
-                width: 350,
-                isRequred: false,
-                controller: confirmpassword,
-                label: 'Confirm Password',
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              TextFieldWidget(
-                fontStyle: FontStyle.normal,
-                hint: 'Referral Code',
-                borderColor: blue,
-                radius: 12,
-                width: 350,
-                isRequred: false,
-                prefixIcon: Icons.card_giftcard,
-                controller: ref,
-                label: 'Referral Code',
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              ButtonWidget(
-                width: 350,
-                label: 'Signup',
-                onPressed: () async {
-                  if (ref.text == '') {
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            TextFieldWidget(
+              fontStyle: FontStyle.normal,
+              hint: 'Email',
+              borderColor: blue,
+              radius: 12,
+              width: 350,
+              isRequred: false,
+              controller: email,
+              prefixIcon: Icons.email,
+              label: 'Email',
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            TextFieldWidget(
+              showEye: true,
+              isObscure: true,
+              prefixIcon: Icons.lock_open_outlined,
+              fontStyle: FontStyle.normal,
+              hint: 'Password',
+              borderColor: blue,
+              radius: 12,
+              width: 350,
+              isRequred: false,
+              controller: password,
+              label: 'Password',
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            TextFieldWidget(
+              showEye: true,
+              isObscure: true,
+              prefixIcon: Icons.lock_open_outlined,
+              fontStyle: FontStyle.normal,
+              hint: 'Confirm Password',
+              borderColor: blue,
+              radius: 12,
+              width: 350,
+              isRequred: false,
+              controller: confirmpassword,
+              label: 'Confirm Password',
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            TextFieldWidget(
+              fontStyle: FontStyle.normal,
+              hint: 'Referral Code',
+              borderColor: blue,
+              radius: 12,
+              width: 350,
+              isRequred: false,
+              prefixIcon: Icons.card_giftcard,
+              controller: ref,
+              label: 'Referral Code',
+            ),
+            const SizedBox(
+              height: 30,
+            ),
+            ButtonWidget(
+              width: 350,
+              label: 'Signup',
+              onPressed: () async {
+                if (ref.text == '') {
+                  if (password.text == confirmpassword.text) {
+                    if (fname.text != '' ||
+                        lname.text != '' ||
+                        nickname.text != '' ||
+                        email.text != '' ||
+                        password.text != '') {
+                      register(context);
+                    } else {
+                      showToast('All fields are required!');
+                    }
+                  } else {
+                    showToast('Password do not match!');
+                  }
+                } else {
+                  DocumentSnapshot doc = await FirebaseFirestore.instance
+                      .collection('Referals')
+                      .doc(ref.text)
+                      .get();
+
+                  if (doc.exists) {
                     if (password.text == confirmpassword.text) {
                       if (fname.text != '' ||
                           lname.text != '' ||
                           nickname.text != '' ||
                           email.text != '' ||
                           password.text != '') {
+                        await FirebaseFirestore.instance
+                            .collection(doc['type'])
+                            .doc(doc['uid'])
+                            .update({'pts': FieldValue.increment(20)});
                         register(context);
                       } else {
                         showToast('All fields are required!');
@@ -346,114 +864,88 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
                       showToast('Password do not match!');
                     }
                   } else {
-                    DocumentSnapshot doc = await FirebaseFirestore.instance
-                        .collection('Referals')
-                        .doc(ref.text)
-                        .get();
-
-                    if (doc.exists) {
-                      if (password.text == confirmpassword.text) {
-                        if (fname.text != '' ||
-                            lname.text != '' ||
-                            nickname.text != '' ||
-                            email.text != '' ||
-                            password.text != '') {
-                          await FirebaseFirestore.instance
-                              .collection(doc['type'])
-                              .doc(doc['uid'])
-                              .update({'pts': FieldValue.increment(20)});
-                          register(context);
-                        } else {
-                          showToast('All fields are required!');
-                        }
-                      } else {
-                        showToast('Password do not match!');
-                      }
-                    } else {
-                      showToast(
-                          'Cannot proceed! Referral Code does not exist!');
-                    }
+                    showToast('Cannot proceed! Referral Code does not exist!');
                   }
-                },
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(
-                    width: 150,
-                    child: Divider(),
+                }
+              },
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(
+                  width: 150,
+                  child: Divider(),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                TextWidget(
+                  text: 'or',
+                  fontSize: 12,
+                  color: blue,
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                const SizedBox(
+                  width: 150,
+                  child: Divider(),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            GestureDetector(
+              onTap: () {
+                googleLogin();
+              },
+              child: Container(
+                width: 325,
+                height: 50,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.grey,
                   ),
-                  const SizedBox(
-                    width: 10,
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(
+                    50,
                   ),
-                  TextWidget(
-                    text: 'or',
-                    fontSize: 12,
-                    color: blue,
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  const SizedBox(
-                    width: 150,
-                    child: Divider(),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              GestureDetector(
-                onTap: () {
-                  googleLogin();
-                },
-                child: Container(
-                  width: 325,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.grey,
-                    ),
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(
-                      50,
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 20, right: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          'assets/images/googlelogo.png',
-                          width: 25,
-                        ),
-                        const SizedBox(
-                          width: 50,
-                        ),
-                        TextWidget(
-                          text: 'Continue with Google',
-                          fontSize: 14,
-                          color: blue,
-                        ),
-                      ],
-                    ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 20, right: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/images/googlelogo.png',
+                        width: 25,
+                      ),
+                      const SizedBox(
+                        width: 50,
+                      ),
+                      TextWidget(
+                        text: 'Continue with Google',
+                        fontSize: 14,
+                        color: blue,
+                      ),
+                    ],
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 10,
-              ),
-              const SizedBox(
-                height: 50,
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            const SizedBox(
+              height: 50,
+            ),
+          ],
         ),
       ),
     );
