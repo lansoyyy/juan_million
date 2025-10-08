@@ -184,13 +184,68 @@ class _PackagePageState extends State<PackagePage> {
 
   Widget _buildMobilePackageList(QuerySnapshot data) {
     return Column(
-      children: List.generate(
-        data.docs.length,
-        (index) => Padding(
-          padding: const EdgeInsets.only(bottom: 20),
-          child: _buildPackageCard(data.docs[index], false),
+      children: [
+        // Mobile header section
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+          child: Column(
+            children: [
+              // Logo with shadow
+              Container(
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: primary.withOpacity(0.2),
+                      blurRadius: 20,
+                      spreadRadius: 5,
+                    ),
+                  ],
+                ),
+                child: Image.asset(
+                  'assets/images/Juan4All 2.png',
+                  height: 60,
+                ),
+              ),
+              const SizedBox(height: 20),
+              TextWidget(
+                text: 'Step 3 of 3',
+                fontSize: 14,
+                fontFamily: 'Medium',
+                color: primary,
+                align: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              TextWidget(
+                text: 'Choose Your Package',
+                fontSize: 28,
+                fontFamily: 'Bold',
+                color: Colors.black87,
+                align: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              TextWidget(
+                text: 'Select the package that best fits your business needs',
+                fontSize: 14,
+                fontFamily: 'Regular',
+                color: Colors.grey.shade600,
+                align: TextAlign.center,
+                maxLines: 2,
+              ),
+            ],
+          ),
         ),
-      ),
+        // Package cards
+        ...List.generate(
+          data.docs.length,
+          (index) => Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: _buildPackageCard(data.docs[index], false),
+          ),
+        ),
+      ],
     );
   }
 
@@ -264,27 +319,71 @@ class _PackagePageState extends State<PackagePage> {
                   ),
                   const SizedBox(height: 30),
                   // Select button
-                  MouseRegion(
-                    cursor: SystemMouseCursors.click,
-                    child: ButtonWidget(
-                      radius: 12,
-                      height: 50,
-                      width: double.infinity,
-                      fontSize: 16,
-                      label: 'Select Package',
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => PackagesPaymentPage(
-                              id: widget.id,
-                              data: doc,
+                  isWeb
+                      ? MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: ButtonWidget(
+                            radius: 12,
+                            height: 50,
+                            width: double.infinity,
+                            fontSize: 16,
+                            label: 'Select Package',
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => PackagesPaymentPage(
+                                    id: widget.id,
+                                    data: doc,
+                                  ),
+                                ),
+                              );
+                            },
+                            color: primary,
+                          ),
+                        )
+                      : Container(
+                          width: double.infinity,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [primary, secondary],
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: primary.withOpacity(0.4),
+                                blurRadius: 15,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(16),
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => PackagesPaymentPage(
+                                      id: widget.id,
+                                      data: doc,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Center(
+                                child: TextWidget(
+                                  text: 'Select Package',
+                                  fontSize: 18,
+                                  fontFamily: 'Bold',
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           ),
-                        );
-                      },
-                      color: primary,
-                    ),
-                  ),
+                        ),
                 ],
               ),
             ),

@@ -373,276 +373,383 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildMobileLayout(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        image: DecorationImage(
-            image: AssetImage('assets/images/newbackground.png'),
-            fit: BoxFit.cover,
-            opacity: 0.35),
-        color: Colors.black,
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            primary.withOpacity(0.05),
+            Colors.white,
+          ],
+        ),
       ),
-      child: Column(
-        children: [
-          // Header with improved design
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-            child: Container(
-              width: double.infinity,
-              height: 250,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    primary.withOpacity(0.8),
-                    primary.withOpacity(0.4),
+      child: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              // Logo and welcome section
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30, vertical: 40),
+                child: Column(
+                  children: [
+                    // Logo with shadow
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: primary.withOpacity(0.2),
+                            blurRadius: 20,
+                            spreadRadius: 5,
+                          ),
+                        ],
+                      ),
+                      child: Image.asset(
+                        'assets/images/Juan4All 2.png',
+                        height: 80,
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    // Welcome text
+                    TextWidget(
+                      text:
+                          widget.inCustomer ? 'Welcome Back!' : 'Welcome Back!',
+                      fontSize: 32,
+                      fontFamily: 'Bold',
+                      color: Colors.black87,
+                      align: TextAlign.center,
+                    ),
+                    const SizedBox(height: 10),
+                    TextWidget(
+                      text: widget.inCustomer
+                          ? 'Sign in to your customer account'
+                          : 'Sign in to your business account',
+                      fontSize: 16,
+                      fontFamily: 'Regular',
+                      color: Colors.grey.shade600,
+                      align: TextAlign.center,
+                      maxLines: 2,
+                    ),
                   ],
                 ),
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(40),
-                  bottomRight: Radius.circular(40),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    spreadRadius: 5,
-                    blurRadius: 15,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 40),
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 800),
-                    curve: Curves.elasticOut,
-                    child: Image.asset(
-                      'assets/images/Juan4All 2.png',
-                      height: 120,
+
+              // Form container with modern card design
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.all(30),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 30,
+                      spreadRadius: 0,
+                      offset: const Offset(0, 10),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  TextWidget(
-                    text: widget.inCustomer
-                        ? 'Hello ka-Juan!'
-                        : 'Hello ka-Negosyo',
-                    fontSize: 28,
-                    fontFamily: 'Bold',
-                    color: Colors.white,
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 30),
-
-          // Form container with improved styling
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 25),
-            padding: const EdgeInsets.all(25),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  spreadRadius: 2,
-                  blurRadius: 10,
-                  offset: const Offset(0, 3),
+                  ],
                 ),
-              ],
-            ),
-            child: Column(
-              children: [
-                TextFieldWidget(
-                  fontStyle: FontStyle.normal,
-                  hint: 'Enter your email',
-                  borderColor: Colors.grey.shade300,
-                  radius: 15,
-                  width: double.infinity,
-                  prefixIcon: Icons.email_outlined,
-                  isRequred: false,
-                  controller: username,
-                  label: 'Email Address',
-                ),
-                const SizedBox(height: 20),
-                TextFieldWidget(
-                  showEye: true,
-                  isObscure: true,
-                  fontStyle: FontStyle.normal,
-                  hint: 'Enter your password',
-                  borderColor: Colors.grey.shade300,
-                  radius: 15,
-                  width: double.infinity,
-                  prefixIcon: Icons.lock_outline,
-                  isRequred: false,
-                  controller: password,
-                  label: 'Password',
-                ),
-                // Forgot password with better alignment
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      _showForgotPasswordDialog(context);
-                    },
-                    child: TextWidget(
-                      text: 'Forgot Password?',
-                      fontSize: 14,
-                      color: primary,
-                      fontFamily: 'Medium',
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 25),
-
-                // Login button with improved styling
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  child: ButtonWidget(
-                    width: double.infinity,
-                    label: 'Log in',
-                    onPressed: () async {
-                      var document =
-                          FirebaseFirestore.instance.doc('App/versions');
-                      var snapshot = await document.get();
-
-                      if (snapshot.data()!['version'] == version) {
-                        login(context);
-                      } else {
-                        showToast(
-                            'Cannot Proceed! Your app version is outdated!');
-                      }
-                    },
-                    color: primary,
-                    radius: 15,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 25),
-
-          // Social login section with improved design
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Divider(
-                    color: Colors.grey.shade300,
-                    thickness: 1,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: TextWidget(
-                    text: 'or continue with',
-                    fontSize: 14,
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-                Expanded(
-                  child: Divider(
-                    color: Colors.grey.shade300,
-                    thickness: 1,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // Google login button with improved design
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              child: GestureDetector(
-                onTap: () async {
-                  googleLogin();
-                },
-                child: Container(
-                  width: double.infinity,
-                  height: 55,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.grey.shade300,
-                    ),
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.03),
-                        spreadRadius: 1,
-                        blurRadius: 5,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Email field with icon container
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Image.asset(
-                          'assets/images/googlelogo.png',
-                          width: 24,
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: primary.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                Icons.email_outlined,
+                                color: primary,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            TextWidget(
+                              text: 'Email Address',
+                              fontSize: 16,
+                              fontFamily: 'Bold',
+                              color: Colors.black87,
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 15),
-                        TextWidget(
-                          text: 'Continue with Google',
-                          fontSize: 16,
-                          color: Colors.grey.shade700,
-                          fontFamily: 'Medium',
+                        const SizedBox(height: 12),
+                        TextFieldWidget(
+                          fontStyle: FontStyle.normal,
+                          hint: 'Enter your email',
+                          borderColor: Colors.grey.shade200,
+                          radius: 15,
+                          width: double.infinity,
+                          prefixIcon: null,
+                          isRequred: false,
+                          controller: username,
+                          label: '',
                         ),
                       ],
                     ),
-                  ),
+                    const SizedBox(height: 25),
+                    // Password field with icon container
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: primary.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                Icons.lock_outline,
+                                color: primary,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            TextWidget(
+                              text: 'Password',
+                              fontSize: 16,
+                              fontFamily: 'Bold',
+                              color: Colors.black87,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        TextFieldWidget(
+                          showEye: true,
+                          isObscure: true,
+                          fontStyle: FontStyle.normal,
+                          hint: 'Enter your password',
+                          borderColor: Colors.grey.shade200,
+                          radius: 15,
+                          width: double.infinity,
+                          prefixIcon: null,
+                          isRequred: false,
+                          controller: password,
+                          label: '',
+                        ),
+                      ],
+                    ),
+                    // Forgot password
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () {
+                          _showForgotPasswordDialog(context);
+                        },
+                        child: TextWidget(
+                          text: 'Forgot Password?',
+                          fontSize: 14,
+                          color: primary,
+                          fontFamily: 'Bold',
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    // Sign in button with gradient
+                    Container(
+                      width: double.infinity,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [primary, secondary],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: primary.withOpacity(0.4),
+                            blurRadius: 15,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () async {
+                            var document =
+                                FirebaseFirestore.instance.doc('App/versions');
+                            var snapshot = await document.get();
+
+                            if (snapshot.data()!['version'] == version) {
+                              login(context);
+                            } else {
+                              showToast(
+                                  'Cannot Proceed! Your app version is outdated!');
+                            }
+                          },
+                          child: Center(
+                            child: TextWidget(
+                              text: 'Sign In',
+                              fontSize: 18,
+                              fontFamily: 'Bold',
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 30),
+
+                    // Divider with text
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            height: 1,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.transparent,
+                                  Colors.grey.shade300,
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: TextWidget(
+                            text: 'OR',
+                            fontSize: 12,
+                            fontFamily: 'Bold',
+                            color: Colors.grey.shade500,
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            height: 1,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.grey.shade300,
+                                  Colors.transparent,
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 30),
+
+                    // Google sign in button
+                    GestureDetector(
+                      onTap: () async {
+                        googleLogin();
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(
+                            color: Colors.grey.shade300,
+                            width: 1.5,
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'assets/images/googlelogo.png',
+                              width: 24,
+                              height: 24,
+                            ),
+                            const SizedBox(width: 12),
+                            TextWidget(
+                              text: 'Continue with Google',
+                              fontSize: 16,
+                              color: Colors.grey.shade800,
+                              fontFamily: 'Bold',
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ),
 
-          const SizedBox(height: 30),
+              const SizedBox(height: 30),
 
-          // Sign up section with improved styling
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextWidget(
-                text: "Don't have an account yet?",
-                fontSize: 14,
-                color: Colors.grey.shade600,
-              ),
-              TextButton(
-                onPressed: () {
-                  if (widget.inCustomer) {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const CustomerSignupScreen()));
-                  } else {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const SignupScreen()));
-                  }
-                },
-                child: TextWidget(
-                  text: 'Create account',
-                  fontSize: 16,
-                  fontFamily: 'Medium',
-                  color: primary,
+              // Sign up section with better design
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextWidget(
+                      text: "Don't have an account?",
+                      fontSize: 15,
+                      color: Colors.grey.shade700,
+                      fontFamily: 'Regular',
+                    ),
+                    const SizedBox(width: 4),
+                    GestureDetector(
+                      onTap: () {
+                        if (widget.inCustomer) {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) =>
+                                  const CustomerSignupScreen()));
+                        } else {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => const SignupScreen()));
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              primary.withOpacity(0.1),
+                              secondary.withOpacity(0.1),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: TextWidget(
+                          text: 'Sign Up',
+                          fontSize: 15,
+                          fontFamily: 'Bold',
+                          color: primary,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
+              const SizedBox(height: 20),
             ],
           ),
-        ],
+        ),
       ),
     );
   }

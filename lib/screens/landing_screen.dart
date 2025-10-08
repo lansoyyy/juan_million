@@ -20,59 +20,52 @@ class LandingScreen extends StatelessWidget {
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/newbackground.png'),
-            fit: BoxFit.cover,
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF1a1a2e),
+              Color(0xFF16213e),
+              Color(0xFF0f3460),
+            ],
           ),
         ),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.black.withOpacity(0.7),
-                Colors.black.withOpacity(0.4),
-              ],
-            ),
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                // Navigation Bar
-                if (isWeb) _buildNavigationBar(context),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // Navigation Bar
+              if (isWeb) _buildNavigationBar(context),
 
-                // Hero Section
-                _buildHeroSection(context, isWeb),
+              // Hero Section
+              _buildHeroSection(context, isWeb),
 
-                // Statistics Section
-                _buildStatisticsSection(context, isWeb),
+              // Statistics Section
+              _buildStatisticsSection(context, isWeb),
 
-                // Features Section
-                if (isWeb) _buildFeaturesSection(context),
+              // Features Section
+              if (isWeb) _buildFeaturesSection(context),
 
-                // How It Works Section
-                _buildHowItWorksSection(context, isWeb),
+              // How It Works Section
+              _buildHowItWorksSection(context, isWeb),
 
-                // Account Selection Section
-                _buildAccountSection(context, isWeb),
+              // Account Selection Section
+              _buildAccountSection(context, isWeb),
 
-                // Benefits Section
-                _buildBenefitsSection(context, isWeb),
+              // Benefits Section
+              _buildBenefitsSection(context, isWeb),
 
-                // Testimonials Section
-                if (isWeb) _buildTestimonialsSection(context),
+              // Testimonials Section
+              if (isWeb) _buildTestimonialsSection(context),
 
-                // FAQ Section
-                _buildFAQSection(context, isWeb),
+              // FAQ Section
+              _buildFAQSection(context, isWeb),
 
-                // Final CTA Section
-                _buildFinalCTASection(context, isWeb),
+              // Final CTA Section
+              _buildFinalCTASection(context, isWeb),
 
-                // Footer
-                _buildFooter(context, isWeb),
-              ],
-            ),
+              // Footer
+              _buildFooter(context, isWeb),
+            ],
           ),
         ),
       ),
@@ -480,7 +473,11 @@ class LandingScreen extends StatelessWidget {
         vertical: isWeb ? 60 : 40,
       ),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.black.withOpacity(0.2),
+        border: Border(
+          top: BorderSide(color: primary.withOpacity(0.3), width: 1),
+          bottom: BorderSide(color: primary.withOpacity(0.3), width: 1),
+        ),
       ),
       child: isWeb
           ? Row(
@@ -697,7 +694,7 @@ class LandingScreen extends StatelessWidget {
         vertical: isWeb ? 80 : 50,
       ),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
+        color: Colors.black.withOpacity(0.15),
       ),
       child: Column(
         children: [
@@ -904,7 +901,7 @@ class LandingScreen extends StatelessWidget {
         vertical: isWeb ? 80 : 50,
       ),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
+        color: Colors.black.withOpacity(0.15),
       ),
       child: Column(
         children: [
@@ -1116,7 +1113,10 @@ class LandingScreen extends StatelessWidget {
         vertical: isWeb ? 60 : 40,
       ),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.5),
+        color: Colors.black.withOpacity(0.3),
+        border: Border(
+          top: BorderSide(color: primary.withOpacity(0.2), width: 1),
+        ),
       ),
       child: Column(
         children: [

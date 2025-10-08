@@ -258,8 +258,9 @@ class _SignupScreen2State extends State<SignupScreen2> {
                             maxRadius: 60,
                             minRadius: 60,
                             backgroundColor: Colors.grey.shade200,
-                            backgroundImage:
-                                imageURL.isNotEmpty ? NetworkImage(imageURL) : null,
+                            backgroundImage: imageURL.isNotEmpty
+                                ? NetworkImage(imageURL)
+                                : null,
                             child: imageURL.isEmpty
                                 ? Icon(Icons.business,
                                     size: 60, color: Colors.grey.shade400)
@@ -472,234 +473,353 @@ class _SignupScreen2State extends State<SignupScreen2> {
   }
 
   Widget _buildMobileLayout(BuildContext context) {
-    return SingleChildScrollView(
-      child: Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(
-              height: 50,
-            ),
-            CircleAvatar(
-              maxRadius: 75,
-              minRadius: 75,
-              backgroundImage: NetworkImage(imageURL),
-            ),
-            TextButton(
-              onPressed: () {
-                uploadPicture('gallery');
-              },
-              child: TextWidget(
-                text: 'Company Logo',
-                fontSize: 14,
-                fontFamily: 'Bold',
-                color: primary,
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            SizedBox(
-              width: 350,
-              child: CustomRegionDropdownView(
-                  onChanged: (Region? value) {
-                    setState(() {
-                      if (region != value) {
-                        province = null;
-                        municipality = null;
-                      }
-                      region = value;
-                    });
-                  },
-                  value: region),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            SizedBox(
-              width: 350,
-              child: CustomProvinceDropdownView(
-                provinces: region?.provinces ?? [],
-                onChanged: (Province? value) {
-                  setState(() {
-                    if (province != value) {
-                      municipality = null;
-                    }
-                    province = value;
-                  });
-                },
-                value: province,
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            SizedBox(
-              width: 350,
-              child: CustomMunicipalityDropdownView(
-                municipalities: province?.municipalities ?? [],
-                onChanged: (value) {
-                  setState(() {
-                    municipality = value;
-                  });
-                },
-                value: municipality,
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            TextFieldWidget(
-              fontStyle: FontStyle.normal,
-              hint: 'Business Description',
-              borderColor: blue,
-              radius: 12,
-              maxLine: 5,
-              height: 100,
-              width: 350,
-              isRequred: false,
-              controller: desc,
-              label: 'Business Description',
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(
-                  top: 10, bottom: 10, left: 10, right: 10),
-              child: Column(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12.5),
-                      border: Border.all(
-                        color: blue,
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            primary.withOpacity(0.05),
+            Colors.white,
+          ],
+        ),
+      ),
+      child: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              // Header section
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+                child: Column(
+                  children: [
+                    // Logo with shadow
+                    Container(
+                      padding: const EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: primary.withOpacity(0.2),
+                            blurRadius: 20,
+                            spreadRadius: 5,
+                          ),
+                        ],
+                      ),
+                      child: Image.asset(
+                        'assets/images/Juan4All 2.png',
+                        height: 70,
                       ),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
-                      child: DropdownButton<String>(
-                        underline: const SizedBox(),
-                        hint: Text(
-                          'Select Business Classification',
-                          style: TextStyle(
-                            color: blue,
-                          ),
+                    const SizedBox(height: 25),
+                    // Title
+                    TextWidget(
+                      text: 'Business Details',
+                      fontSize: 32,
+                      fontFamily: 'Bold',
+                      color: Colors.black87,
+                      align: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    TextWidget(
+                      text: 'Step 2 of 3: Company Information',
+                      fontSize: 15,
+                      fontFamily: 'Regular',
+                      color: Colors.grey.shade600,
+                      align: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+
+              // Form card
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.all(30),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 30,
+                      spreadRadius: 0,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    // Logo upload section
+                    Column(
+                      children: [
+                        Stack(
+                          children: [
+                            CircleAvatar(
+                              radius: 50,
+                              backgroundColor: Colors.grey.shade100,
+                              backgroundImage: imageURL.isNotEmpty
+                                  ? NetworkImage(imageURL)
+                                  : null,
+                              child: imageURL.isEmpty
+                                  ? Icon(Icons.business,
+                                      size: 50, color: Colors.grey.shade400)
+                                  : null,
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: GestureDetector(
+                                onTap: () {
+                                  uploadPicture('gallery');
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [primary, secondary],
+                                    ),
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: primary.withOpacity(0.4),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Icon(
+                                    Icons.camera_alt,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        value: _selectedCategory,
-                        onChanged: (String? newValue) {
+                        const SizedBox(height: 10),
+                        TextWidget(
+                          text: 'Upload Company Logo',
+                          fontSize: 13,
+                          fontFamily: 'Medium',
+                          color: Colors.grey.shade600,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+                    // Address dropdowns
+                    CustomRegionDropdownView(
+                        onChanged: (Region? value) {
                           setState(() {
-                            _selectedCategory = newValue;
-                            _selectedSubCategory = null;
+                            if (region != value) {
+                              province = null;
+                              municipality = null;
+                            }
+                            region = value;
                           });
                         },
-                        items: _categoryOptions.keys.map((String category) {
-                          return DropdownMenuItem<String>(
-                            value: category,
-                            child: TextWidget(
-                              text: category,
-                              fontSize: 14,
-                              color: blue,
-                            ),
-                          );
-                        }).toList(),
-                      ),
+                        value: region),
+                    const SizedBox(height: 20),
+                    CustomProvinceDropdownView(
+                      provinces: region?.provinces ?? [],
+                      onChanged: (Province? value) {
+                        setState(() {
+                          if (province != value) {
+                            municipality = null;
+                          }
+                          province = value;
+                        });
+                      },
+                      value: province,
                     ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  if (_selectedCategory != null)
+                    const SizedBox(height: 20),
+                    CustomMunicipalityDropdownView(
+                      municipalities: province?.municipalities ?? [],
+                      onChanged: (value) {
+                        setState(() {
+                          municipality = value;
+                        });
+                      },
+                      value: municipality,
+                    ),
+                    const SizedBox(height: 20),
+                    // Business description
+                    TextFieldWidget(
+                      fontStyle: FontStyle.normal,
+                      hint: 'Business Description',
+                      borderColor: Colors.grey.shade200,
+                      radius: 15,
+                      maxLine: 5,
+                      height: 100,
+                      width: double.infinity,
+                      isRequred: false,
+                      controller: desc,
+                      label: 'Business Description',
+                    ),
+                    const SizedBox(height: 20),
+                    // Category dropdowns with modern styling
                     Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12.5),
+                        borderRadius: BorderRadius.circular(15),
                         border: Border.all(
-                          color: blue,
+                          color: Colors.grey.shade200,
                         ),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
                         child: DropdownButton<String>(
                           underline: const SizedBox(),
+                          isExpanded: true,
                           hint: Text(
-                            'Select Clarification Type',
+                            'Select Business Classification',
                             style: TextStyle(
-                              color: blue,
+                              color: Colors.grey.shade600,
                             ),
                           ),
-                          value: _selectedSubCategory,
+                          value: _selectedCategory,
                           onChanged: (String? newValue) {
                             setState(() {
-                              _selectedSubCategory = newValue;
+                              _selectedCategory = newValue;
+                              _selectedSubCategory = null;
                             });
                           },
-                          items: _categoryOptions[_selectedCategory]!
-                              .map((String subCategory) {
+                          items: _categoryOptions.keys.map((String category) {
                             return DropdownMenuItem<String>(
-                              value: subCategory,
+                              value: category,
                               child: TextWidget(
-                                text: subCategory,
+                                text: category,
                                 fontSize: 14,
-                                color: blue,
+                                color: Colors.black87,
                               ),
                             );
                           }).toList(),
                         ),
                       ),
                     ),
-                ],
+                    const SizedBox(height: 20),
+                    if (_selectedCategory != null)
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(
+                            color: Colors.grey.shade200,
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: DropdownButton<String>(
+                            underline: const SizedBox(),
+                            isExpanded: true,
+                            hint: Text(
+                              'Select Classification Type',
+                              style: TextStyle(
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                            value: _selectedSubCategory,
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                _selectedSubCategory = newValue;
+                              });
+                            },
+                            items: _categoryOptions[_selectedCategory]!
+                                .map((String subCategory) {
+                              return DropdownMenuItem<String>(
+                                value: subCategory,
+                                child: TextWidget(
+                                  text: subCategory,
+                                  fontSize: 14,
+                                  color: Colors.black87,
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+                    const SizedBox(height: 20),
+                    // Points conversion
+                    TextFieldWidget(
+                      inputType: TextInputType.number,
+                      fontStyle: FontStyle.normal,
+                      hint: 'Points Conversion (%)',
+                      borderColor: Colors.grey.shade200,
+                      radius: 15,
+                      width: double.infinity,
+                      isRequred: false,
+                      controller: pts,
+                      prefixIcon: Icons.monetization_on,
+                      label: 'Points Conversion (%)',
+                    ),
+                    const SizedBox(height: 30),
+                    // Next button with gradient
+                    Container(
+                      width: double.infinity,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [primary, secondary],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: primary.withOpacity(0.4),
+                            blurRadius: 15,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () async {
+                            if (desc.text != '' || rep.text != '') {
+                              await FirebaseFirestore.instance
+                                  .collection('Business')
+                                  .doc(widget.id)
+                                  .update({
+                                'logo': imageURL,
+                                'address':
+                                    '${municipality!.name}, ${province!.name}',
+                                'desc': desc.text,
+                                'clarification': _selectedSubCategory,
+                                'representative': rep.text,
+                                'ptsconversion': double.parse(pts.text),
+                              }).whenComplete(() {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => PackagePage(
+                                          id: widget.id,
+                                        )));
+                              });
+                            } else {
+                              showToast('All fields are required!');
+                            }
+                          },
+                          child: Center(
+                            child: TextWidget(
+                              text: 'Next',
+                              fontSize: 18,
+                              fontFamily: 'Bold',
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            TextFieldWidget(
-              inputType: TextInputType.number,
-              fontStyle: FontStyle.normal,
-              hint: 'Points Conversion (%)',
-              borderColor: blue,
-              radius: 12,
-              width: 350,
-              isRequred: false,
-              controller: pts,
-              prefixIcon: Icons.monetization_on,
-              label: 'Points Conversion (%)',
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            ButtonWidget(
-              width: 350,
-              label: 'Next',
-              onPressed: () async {
-                if (desc.text != '' || rep.text != '') {
-                  await FirebaseFirestore.instance
-                      .collection('Business')
-                      .doc(widget.id)
-                      .update({
-                    'logo': imageURL,
-                    'address': '${municipality!.name}, ${province!.name}',
-                    'desc': desc.text,
-                    'clarification': _selectedSubCategory,
-                    'representative': rep.text,
-                    'ptsconversion': double.parse(pts.text),
-                  }).whenComplete(() {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => PackagePage(
-                              id: widget.id,
-                            )));
-                  });
-                } else {
-                  showToast('All fields are required!');
-                }
-              },
-            ),
-            const SizedBox(
-              height: 50,
-            ),
-          ],
+              const SizedBox(height: 50),
+            ],
+          ),
         ),
       ),
     );
