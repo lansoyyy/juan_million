@@ -372,98 +372,33 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
                                   );
                                 }
 
-                                return ListView.builder(
-                                  itemCount: userTransactions.length,
-                                  itemBuilder: (context, index) {
-                                    final transaction = userTransactions[index];
-                                    return Container(
-                                      margin: const EdgeInsets.only(bottom: 12),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(20),
-                                        border: Border.all(
-                                            color:
-                                                walletPrimary.withOpacity(0.1),
-                                            width: 1),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color:
-                                                Colors.black.withOpacity(0.05),
-                                            blurRadius: 10,
-                                            offset: const Offset(0, 3),
-                                          ),
-                                        ],
-                                      ),
-                                      child: ListTile(
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                horizontal: 20, vertical: 12),
-                                        leading: Container(
-                                          padding: const EdgeInsets.all(12),
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                walletPrimary.withOpacity(0.2),
-                                                walletSecondary
-                                                    .withOpacity(0.2),
-                                              ],
-                                            ),
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: Icon(
-                                            Icons
-                                                .account_balance_wallet_rounded,
-                                            color: walletPrimary,
-                                            size: 24,
-                                          ),
+                                // Desktop: 2-column grid, Mobile: list
+                                return isDesktop
+                                    ? GridView.builder(
+                                        gridDelegate:
+                                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: 2,
+                                          crossAxisSpacing: 20,
+                                          mainAxisSpacing: 20,
+                                          childAspectRatio: 3,
                                         ),
-                                        title: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            TextWidget(
-                                              text: AppConstants
-                                                  .formatNumberWithPeso(
-                                                      transaction['pts']),
-                                              fontSize: 17,
-                                              color: Colors.black87,
-                                              fontFamily: 'Bold',
-                                            ),
-                                            const SizedBox(height: 4),
-                                            TextWidget(
-                                              text: '${transaction['type']}',
-                                              fontSize: 13,
-                                              color: Colors.grey.shade600,
-                                              fontFamily: 'Medium',
-                                            ),
-                                          ],
-                                        ),
-                                        subtitle: Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 8),
-                                          child: Row(
-                                            children: [
-                                              Icon(Icons.access_time_rounded,
-                                                  size: 14,
-                                                  color: Colors.grey.shade500),
-                                              const SizedBox(width: 5),
-                                              TextWidget(
-                                                text: DateFormat.yMMMd()
-                                                    .add_jm()
-                                                    .format(
-                                                        transaction['dateTime']
-                                                            .toDate()),
-                                                fontSize: 12,
-                                                color: Colors.grey.shade500,
-                                                fontFamily: 'Regular',
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                );
+                                        itemCount: userTransactions.length,
+                                        itemBuilder: (context, index) {
+                                          final transaction =
+                                              userTransactions[index];
+                                          return _buildTransactionCard(
+                                              transaction, true);
+                                        },
+                                      )
+                                    : ListView.builder(
+                                        itemCount: userTransactions.length,
+                                        itemBuilder: (context, index) {
+                                          final transaction =
+                                              userTransactions[index];
+                                          return _buildTransactionCard(
+                                              transaction, false);
+                                        },
+                                      );
                               }),
                         ),
                       ],
@@ -473,6 +408,81 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
               ],
             );
           }),
+    );
+  }
+
+  Widget _buildTransactionCard(dynamic transaction, bool isDesktop) {
+    return Container(
+      margin: EdgeInsets.only(bottom: isDesktop ? 0 : 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: walletPrimary.withOpacity(0.1), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: ListTile(
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        leading: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                walletPrimary.withOpacity(0.2),
+                walletSecondary.withOpacity(0.2),
+              ],
+            ),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            Icons.account_balance_wallet_rounded,
+            color: walletPrimary,
+            size: 24,
+          ),
+        ),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextWidget(
+              text: AppConstants.formatNumberWithPeso(transaction['pts']),
+              fontSize: 17,
+              color: Colors.black87,
+              fontFamily: 'Bold',
+            ),
+            const SizedBox(height: 4),
+            TextWidget(
+              text: '${transaction['type']}',
+              fontSize: 13,
+              color: Colors.grey.shade600,
+              fontFamily: 'Medium',
+            ),
+          ],
+        ),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Row(
+            children: [
+              Icon(Icons.access_time_rounded,
+                  size: 14, color: Colors.grey.shade500),
+              const SizedBox(width: 5),
+              TextWidget(
+                text: DateFormat.yMMMd()
+                    .add_jm()
+                    .format(transaction['dateTime'].toDate()),
+                fontSize: 12,
+                color: Colors.grey.shade500,
+                fontFamily: 'Regular',
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

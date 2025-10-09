@@ -582,98 +582,79 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                               id = data.docs.first.id;
                             }
 
-                            // for (int i = 0; i < data.docs.length; i++) {
-                            //   if (data.docs[i]['uid'] ==
-                            //       FirebaseAuth.instance.currentUser!.uid) {
-                            //     WidgetsBinding.instance
-                            //         .addPostFrameCallback((timeStamp) {
-                            //       if (position == 0) {
-                            //         setState(() {});
-                            //       }
+                            final itemCount =
+                                data.docs.length > 9 ? 9 : data.docs.length;
 
-                            //       position++;
-                            //     });
-                            //   }
-                            // }
-
+                            // Desktop: 2-column grid, Mobile: list
                             return SizedBox(
-                              height: 300,
-                              child: ListView.builder(
-                                itemCount:
-                                    data.docs.length > 9 ? 9 : data.docs.length,
-                                itemBuilder: (context, index) {
-                                  return StreamBuilder<DocumentSnapshot>(
-                                      stream: FirebaseFirestore.instance
-                                          .collection('Users')
-                                          .doc(data.docs[index]['uid'])
-                                          .snapshots(),
-                                      builder: (context,
-                                          AsyncSnapshot<DocumentSnapshot>
-                                              snapshot) {
-                                        if (!snapshot.hasData) {
-                                          return const Center(
-                                              child: Text('Loading'));
-                                        } else if (snapshot.hasError) {
-                                          return const Center(
-                                              child:
-                                                  Text('Something went wrong'));
-                                        } else if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return const Center(
-                                              child:
-                                                  CircularProgressIndicator());
-                                        }
-                                        dynamic mydata = snapshot.data;
-                                        return Padding(
-                                          padding: const EdgeInsets.all(5.0),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                            ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  TextWidget(
-                                                    text: '${index + 1}',
-                                                    fontSize: 11,
-                                                    color: Colors.black,
-                                                    fontFamily: 'Bold',
-                                                  ),
-                                                  const SizedBox(
-                                                    width: 20,
-                                                  ),
-                                                  CircleAvatar(
-                                                    maxRadius: 20,
-                                                    minRadius: 20,
-                                                    backgroundImage:
-                                                        NetworkImage(
-                                                            mydata['pic']),
-                                                  ),
-                                                  const SizedBox(
-                                                    width: 20,
-                                                  ),
-                                                  TextWidget(
-                                                    text: mydata['name'],
-                                                    fontSize: 16,
-                                                    color: Colors.black,
-                                                    fontFamily: 'Bold',
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      });
-                                },
-                              ),
+                              height: isDesktop ? 400 : 300,
+                              child: isDesktop
+                                  ? GridView.builder(
+                                      gridDelegate:
+                                          const SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 2,
+                                        crossAxisSpacing: 15,
+                                        mainAxisSpacing: 15,
+                                        childAspectRatio: 4,
+                                      ),
+                                      itemCount: itemCount,
+                                      itemBuilder: (context, index) {
+                                        return StreamBuilder<DocumentSnapshot>(
+                                            stream: FirebaseFirestore.instance
+                                                .collection('Users')
+                                                .doc(data.docs[index]['uid'])
+                                                .snapshots(),
+                                            builder: (context,
+                                                AsyncSnapshot<DocumentSnapshot>
+                                                    snapshot) {
+                                              if (!snapshot.hasData) {
+                                                return const SizedBox();
+                                              } else if (snapshot.hasError) {
+                                                return const SizedBox();
+                                              } else if (snapshot
+                                                      .connectionState ==
+                                                  ConnectionState.waiting) {
+                                                return const Center(
+                                                    child:
+                                                        CircularProgressIndicator());
+                                              }
+                                              dynamic mydata = snapshot.data;
+                                              return _buildLeaderboardCard(
+                                                  index, mydata, true);
+                                            });
+                                      },
+                                    )
+                                  : ListView.builder(
+                                      itemCount: itemCount,
+                                      itemBuilder: (context, index) {
+                                        return StreamBuilder<DocumentSnapshot>(
+                                            stream: FirebaseFirestore.instance
+                                                .collection('Users')
+                                                .doc(data.docs[index]['uid'])
+                                                .snapshots(),
+                                            builder: (context,
+                                                AsyncSnapshot<DocumentSnapshot>
+                                                    snapshot) {
+                                              if (!snapshot.hasData) {
+                                                return const Center(
+                                                    child: Text('Loading'));
+                                              } else if (snapshot.hasError) {
+                                                return const Center(
+                                                    child: Text(
+                                                        'Something went wrong'));
+                                              } else if (snapshot
+                                                      .connectionState ==
+                                                  ConnectionState.waiting) {
+                                                return const Center(
+                                                    child:
+                                                        CircularProgressIndicator());
+                                              }
+                                              dynamic mydata = snapshot.data;
+                                              return _buildLeaderboardCard(
+                                                  index, mydata, false);
+                                            });
+                                      },
+                                    ),
                             );
                           }),
                     ],
@@ -683,5 +664,106 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
             ),
           ],
         ));
+  }
+
+  Widget _buildLeaderboardCard(int index, dynamic userData, bool isDesktop) {
+    // Medal colors for top 3
+    Color? rankColor;
+    IconData? rankIcon;
+
+    if (index == 0) {
+      rankColor = const Color(0xFFFFD700); // Gold
+      rankIcon = Icons.emoji_events_rounded;
+    } else if (index == 1) {
+      rankColor = const Color(0xFFC0C0C0); // Silver
+      rankIcon = Icons.emoji_events_rounded;
+    } else if (index == 2) {
+      rankColor = const Color(0xFFCD7F32); // Bronze
+      rankIcon = Icons.emoji_events_rounded;
+    }
+
+    return Container(
+      margin: EdgeInsets.only(bottom: isDesktop ? 0 : 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: rankColor != null
+              ? rankColor.withOpacity(0.3)
+              : Colors.grey.shade200,
+          width: 2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: rankColor != null
+                ? rankColor.withOpacity(0.2)
+                : Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            // Rank number or medal
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                gradient: rankColor != null
+                    ? LinearGradient(
+                        colors: [
+                          rankColor,
+                          rankColor.withOpacity(0.7),
+                        ],
+                      )
+                    : LinearGradient(
+                        colors: [
+                          Colors.grey.shade300,
+                          Colors.grey.shade400,
+                        ],
+                      ),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: rankIcon != null
+                    ? Icon(rankIcon, color: Colors.white, size: 20)
+                    : TextWidget(
+                        text: '${index + 1}',
+                        fontSize: 16,
+                        color: Colors.white,
+                        fontFamily: 'Bold',
+                      ),
+              ),
+            ),
+            const SizedBox(width: 15),
+            // Avatar
+            CircleAvatar(
+              radius: 24,
+              backgroundImage: NetworkImage(userData['pic']),
+            ),
+            const SizedBox(width: 15),
+            // Name
+            Expanded(
+              child: TextWidget(
+                text: userData['name'],
+                fontSize: 16,
+                color: Colors.black87,
+                fontFamily: 'Bold',
+              ),
+            ),
+            // Trophy icon for top 3
+            if (rankIcon != null)
+              Icon(
+                Icons.workspace_premium_rounded,
+                color: rankColor,
+                size: 24,
+              ),
+          ],
+        ),
+      ),
+    );
   }
 }
