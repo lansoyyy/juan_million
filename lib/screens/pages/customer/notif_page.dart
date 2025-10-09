@@ -17,76 +17,94 @@ class _CustomerNotifPageState extends State<CustomerNotifPage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth > 800;
+    
     return Scaffold(
-      appBar: AppBar(
-        title: TextWidget(
-          text: 'Notifications',
-          fontSize: 18,
-          fontFamily: 'Bold',
-          color: Colors.white,
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.blue,
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(
-            Icons.arrow_back_ios_rounded,
-            color: Colors.white,
+      backgroundColor: Colors.grey.shade50,
+      body: Column(
+        children: [
+          // Modern Gradient Header
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [primary, secondary],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: primary.withOpacity(0.3),
+                  blurRadius: 20,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            child: SafeArea(
+              child: Padding(
+                padding: EdgeInsets.all(isDesktop ? 30 : 20),
+                child: Row(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: const Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 15),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextWidget(
+                            text: 'Notifications',
+                            fontSize: isDesktop ? 28 : 24,
+                            color: Colors.white,
+                            fontFamily: 'Bold',
+                          ),
+                          const SizedBox(height: 4),
+                          TextWidget(
+                            text: 'Stay updated with your activities',
+                            fontSize: isDesktop ? 16 : 14,
+                            color: Colors.white.withOpacity(0.9),
+                            fontFamily: 'Regular',
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
-        ),
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              setState(() {
-                _filterType = value;
-              });
-            },
-            itemBuilder: (BuildContext context) {
-              return [
-                const PopupMenuItem<String>(
-                  value: 'all',
-                  child: Text('All Notifications'),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'today',
-                  child: Text('Today'),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'week',
-                  child: Text('This Week'),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'month',
-                  child: Text('This Month'),
-                ),
-              ];
-            },
-            icon: const Icon(Icons.filter_list, color: Colors.white),
-          ),
-        ],
-      ),
-      body: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection('Points')
-              .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-              .snapshots(),
-          builder:
-              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-            if (snapshot.hasError) {
-              print('error');
-              return const Center(child: Text('Error'));
-            }
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                  child: CircularProgressIndicator(
-                color: Colors.blue,
-              ));
-            }
+          // Content
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('Points')
+                    .where('uid',
+                        isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                    .snapshots(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.hasError) {
+                    print('error');
+                    return const Center(child: Text('Error'));
+                  }
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-            final data = snapshot.requireData;
+                  final data = snapshot.requireData;
 
             // Filter notifications based on selected filter
             List<QueryDocumentSnapshot> filteredDocs = [];
@@ -145,26 +163,26 @@ class _CustomerNotifPageState extends State<CustomerNotifPage> {
             }
 
             return Padding(
-              padding: const EdgeInsets.all(15.0),
+              padding: EdgeInsets.all(isDesktop ? 30 : 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Filter chips
+                  // Modern Filter Chips
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
-                        _buildFilterChip('All', 'all'),
-                        const SizedBox(width: 10),
-                        _buildFilterChip('Today', 'today'),
-                        const SizedBox(width: 10),
-                        _buildFilterChip('This Week', 'week'),
-                        const SizedBox(width: 10),
-                        _buildFilterChip('This Month', 'month'),
+                        _buildFilterChip('All', 'all', Icons.notifications_rounded),
+                        const SizedBox(width: 12),
+                        _buildFilterChip('Today', 'today', Icons.today_rounded),
+                        const SizedBox(width: 12),
+                        _buildFilterChip('This Week', 'week', Icons.date_range_rounded),
+                        const SizedBox(width: 12),
+                        _buildFilterChip('This Month', 'month', Icons.calendar_month_rounded),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 25),
 
                   // Notifications list
                   Expanded(
@@ -183,34 +201,41 @@ class _CustomerNotifPageState extends State<CustomerNotifPage> {
                           child: Container(
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                  color: primary.withOpacity(0.1), width: 1),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  spreadRadius: 1,
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 3),
+                                  color: Colors.black.withOpacity(0.08),
+                                  spreadRadius: 0,
+                                  blurRadius: 15,
+                                  offset: const Offset(0, 5),
                                 ),
                               ],
                             ),
                             child: Padding(
-                              padding: const EdgeInsets.all(15.0),
+                              padding: const EdgeInsets.all(20.0),
                               child: Row(
                                 children: [
-                                  // Notification icon
+                                  // Notification icon with gradient
                                   Container(
-                                    padding: const EdgeInsets.all(10),
+                                    padding: const EdgeInsets.all(14),
                                     decoration: BoxDecoration(
-                                      color: Colors.blue.withOpacity(0.1),
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          primary.withOpacity(0.2),
+                                          secondary.withOpacity(0.2),
+                                        ],
+                                      ),
                                       shape: BoxShape.circle,
                                     ),
-                                    child: const Icon(
-                                      Icons.star,
-                                      color: Colors.blue,
-                                      size: 24,
+                                    child: Icon(
+                                      Icons.stars_rounded,
+                                      color: primary,
+                                      size: 28,
                                     ),
                                   ),
-                                  const SizedBox(width: 15),
+                                  const SizedBox(width: 18),
 
                                   // Notification content
                                   Expanded(
@@ -219,41 +244,61 @@ class _CustomerNotifPageState extends State<CustomerNotifPage> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         TextWidget(
-                                          text: 'Points Earned',
-                                          fontSize: 16,
+                                          text: 'Points Earned! 🎉',
+                                          fontSize: 17,
                                           fontFamily: 'Bold',
                                           color: Colors.black87,
                                         ),
-                                        const SizedBox(height: 5),
-                                        TextWidget(
-                                          text:
-                                              'You earned ${points.round().toStringAsFixed(0)} points',
-                                          fontSize: 14,
-                                          color: Colors.grey.shade700,
+                                        const SizedBox(height: 6),
+                                        Row(
+                                          children: [
+                                            TextWidget(
+                                              text: 'You earned ',
+                                              fontSize: 14,
+                                              color: Colors.grey.shade700,
+                                            ),
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(
+                                                  horizontal: 8, vertical: 3),
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  colors: [
+                                                    primary.withOpacity(0.1),
+                                                    secondary.withOpacity(0.1),
+                                                  ],
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                              child: TextWidget(
+                                                text:
+                                                    '${points.round().toStringAsFixed(0)} pts',
+                                                fontSize: 13,
+                                                fontFamily: 'Bold',
+                                                color: primary,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        const SizedBox(height: 5),
-                                        TextWidget(
-                                          text: DateFormat.yMMMd()
-                                              .add_jm()
-                                              .format(dateTime),
-                                          fontSize: 12,
-                                          color: Colors.grey.shade500,
+                                        const SizedBox(height: 8),
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.access_time_rounded,
+                                              size: 14,
+                                              color: Colors.grey.shade500,
+                                            ),
+                                            const SizedBox(width: 5),
+                                            TextWidget(
+                                              text: DateFormat.yMMMd()
+                                                  .add_jm()
+                                                  .format(dateTime),
+                                              fontSize: 12,
+                                              color: Colors.grey.shade500,
+                                            ),
+                                          ],
                                         ),
                                       ],
-                                    ),
-                                  ),
-
-                                  // Notification status
-                                  Container(
-                                    padding: const EdgeInsets.all(5),
-                                    decoration: BoxDecoration(
-                                      color: Colors.green.withOpacity(0.1),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(
-                                      Icons.check,
-                                      color: Colors.green,
-                                      size: 16,
                                     ),
                                   ),
                                 ],
@@ -267,11 +312,14 @@ class _CustomerNotifPageState extends State<CustomerNotifPage> {
                 ],
               ),
             );
-          }),
+                }),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildFilterChip(String label, String value) {
+  Widget _buildFilterChip(String label, String value, IconData icon) {
     bool isSelected = _filterType == value;
 
     return GestureDetector(
@@ -282,16 +330,49 @@ class _CustomerNotifPageState extends State<CustomerNotifPage> {
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.blue : Colors.grey.shade200,
+          gradient: isSelected
+              ? LinearGradient(colors: [primary, secondary])
+              : null,
+          color: isSelected ? null : Colors.white,
           borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? Colors.transparent : Colors.grey.shade200,
+            width: 1,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: primary.withOpacity(0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
         ),
-        child: TextWidget(
-          text: label,
-          fontSize: 14,
-          color: isSelected ? Colors.white : Colors.grey.shade700,
-          fontFamily: isSelected ? 'Medium' : 'Regular',
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 18,
+              color: isSelected ? Colors.white : primary,
+            ),
+            const SizedBox(width: 8),
+            TextWidget(
+              text: label,
+              fontSize: 14,
+              color: isSelected ? Colors.white : Colors.grey.shade700,
+              fontFamily: isSelected ? 'Bold' : 'Medium',
+            ),
+          ],
         ),
       ),
     );

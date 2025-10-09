@@ -4,6 +4,8 @@ import 'package:juan_million/models/province_model.dart';
 import 'package:juan_million/models/region_model.dart';
 import '../models/municipality_model.dart';
 
+final userId = 'kBTiUHQQkDbM07nbGIGckXCdJS53';
+
 class AppConstants {
   AppConstants._();
 

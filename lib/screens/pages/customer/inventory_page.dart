@@ -132,84 +132,140 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth > 800;
+
     return Scaffold(
-        backgroundColor: secondary,
-        body: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: const Icon(
-                        Icons.arrow_back_ios_rounded,
-                        color: Colors.white,
-                      )),
+        backgroundColor: Colors.grey.shade50,
+        body: Column(
+          children: [
+            // Modern Gradient Header
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [secondary, primary],
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Center(
-                  child: TextWidget(
-                    text: 'Community Wallet',
-                    fontSize: 14,
-                    color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: secondary.withOpacity(0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, 5),
                   ),
-                ),
-                StreamBuilder<QuerySnapshot>(
-                    stream: FirebaseFirestore.instance
-                        .collection('Slots')
-                        .where('uid',
-                            isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-                        .snapshots(),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.hasError) {
-                        print(snapshot.error);
-                        return const Center(child: Text('Error'));
-                      }
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Padding(
-                          padding: EdgeInsets.only(top: 50),
-                          child: Center(
-                              child: CircularProgressIndicator(
-                            color: Colors.black,
-                          )),
-                        );
-                      }
-
-                      final data = snapshot.requireData;
-
-                      return Center(
-                        child: TextWidget(
-                          text: data.docs.length.toString(),
-                          fontFamily: 'Bold',
-                          fontSize: 75,
-                          color: Colors.white,
-                        ),
-                      );
-                    }),
-                Center(
+                ],
+              ),
+              child: SafeArea(
+                child: Padding(
+                  padding: EdgeInsets.all(isDesktop ? 30 : 20),
                   child: Column(
                     children: [
-                      TextWidget(
-                        text: 'Current Slot/s',
-                        fontSize: 18,
-                        color: Colors.white,
-                        fontFamily: 'Bold',
+                      // Header Row
+                      Row(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: IconButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              icon: const Icon(
+                                Icons.arrow_back_ios_new_rounded,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          const Spacer(),
+                          TextWidget(
+                            text: 'Community Wallet',
+                            fontSize: isDesktop ? 28 : 24,
+                            color: Colors.white,
+                            fontFamily: 'Bold',
+                          ),
+                          const Spacer(),
+                          const SizedBox(width: 48),
+                        ],
                       ),
+                      const SizedBox(height: 30),
+                      // Slots Display
+                      StreamBuilder<QuerySnapshot>(
+                          stream: FirebaseFirestore.instance
+                              .collection('Slots')
+                              .where('uid',
+                                  isEqualTo:
+                                      FirebaseAuth.instance.currentUser!.uid)
+                              .snapshots(),
+                          builder: (BuildContext context,
+                              AsyncSnapshot<QuerySnapshot> snapshot) {
+                            if (snapshot.hasError) {
+                              return const SizedBox();
+                            }
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const CircularProgressIndicator(
+                                  color: Colors.white);
+                            }
+
+                            final data = snapshot.requireData;
+
+                            return Container(
+                              padding: const EdgeInsets.all(30),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(25),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.3),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      TextWidget(
+                                        text: data.docs.length.toString(),
+                                        fontFamily: 'Bold',
+                                        fontSize: isDesktop ? 80 : 70,
+                                        color: Colors.white,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 15),
+                                        child: Icon(
+                                          Icons.confirmation_number_rounded,
+                                          color: Colors.white.withOpacity(0.8),
+                                          size: 32,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10),
+                                  TextWidget(
+                                    text: 'Current Slot/s',
+                                    fontSize: 18,
+                                    color: Colors.white.withOpacity(0.9),
+                                    fontFamily: 'Bold',
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
                     ],
                   ),
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 20, right: 20),
+              ),
+            ),
+            // Content Section
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.all(isDesktop ? 30 : 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -623,9 +679,9 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                     ],
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ));
   }
 }

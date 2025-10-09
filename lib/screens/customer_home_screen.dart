@@ -12,8 +12,6 @@ import 'package:juan_million/screens/pages/customer/points_page.dart';
 import 'package:juan_million/screens/pages/customer/qr_scanned_page.dart';
 import 'package:juan_million/screens/pages/customer/settings_page.dart';
 import 'package:juan_million/screens/pages/customer/wallet_page.dart';
-import 'package:juan_million/screens/pages/payment_selection_screen.dart';
-import 'package:juan_million/screens/pages/store_page.dart';
 import 'package:juan_million/services/add_slots.dart';
 import 'package:juan_million/utlis/app_constants.dart';
 import 'package:juan_million/utlis/colors.dart';
@@ -55,8 +53,6 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         },
       );
 
-      print('qr value $qrCode');
-
       if (!mounted) return;
 
       setState(() {
@@ -72,7 +68,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           if (documentSnapshot.exists) {
             await FirebaseFirestore.instance
                 .collection('Users')
-                .doc(FirebaseAuth.instance.currentUser!.uid)
+                .doc(userId)
                 .update({
               'pts': FieldValue.increment(documentSnapshot['pts']),
             });
@@ -87,18 +83,15 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                 .doc(documentSnapshot.id)
                 .update({
               'scanned': true,
-              'scannedId': FirebaseAuth.instance.currentUser!.uid,
+              'scannedId': userId,
             });
 
             await FirebaseFirestore.instance
                 .collection('Community Wallet')
                 .doc('wallet')
                 .update({
-              // 'wallet': FieldValue.increment(total),
               'pts': FieldValue.increment(documentSnapshot['pts']),
             });
-            // Update my points
-            // Update business points
           }
           setState(() {
             pts = documentSnapshot['pts'].toString();
@@ -122,13 +115,13 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   void checkPoints(int limit) async {
     FirebaseFirestore.instance
         .collection('Users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .doc(userId)
         .get()
         .then((DocumentSnapshot documentSnapshot) async {
       if (documentSnapshot['pts'].toInt() >= limit) {
         await FirebaseFirestore.instance
             .collection('Slots')
-            .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+            .where('uid', isEqualTo: userId)
             .where('dateTime',
                 isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime(
                     DateTime.now().year,
@@ -142,119 +135,908 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                     .subtract(const Duration(seconds: 1))))
             .get()
             .then((snapshot) {
-          int total = documentSnapshot['pts'].toInt() - limit;
-
           int slotsFromPoints = documentSnapshot['pts'].toInt() ~/ limit;
           int currentSlots = snapshot.docs.length;
           int slotsLeft = 5 - currentSlots;
 
           if (slotsFromPoints > slotsLeft) {
-            FirebaseFirestore.instance
-                .collection('Users')
-                .doc(FirebaseAuth.instance.currentUser!.uid)
-                .update({
-              // 'wallet': FieldValue.increment(total),
+            FirebaseFirestore.instance.collection('Users').doc(userId).update({
               'pts': FieldValue.increment(-slotsLeft * limit),
             });
             for (int i = 0; i < slotsLeft; i++) {
               addSlots();
-
-              // FirebaseFirestore.instance
-              //     .collection('Users')
-              //     .doc(FirebaseAuth.instance.currentUser!.uid)
-              //     .update({
-              //   // 'wallet': FieldValue.increment(total),
-              //   'pts': FieldValue.increment(-150),
-              // });
-
-              // FirebaseFirestore.instance
-              //     .collection('Community Wallet')
-              //     .doc('wallet')
-              //     .update({
-              //   // 'wallet': FieldValue.increment(total),
-              //   'pts': FieldValue.increment(150),
-              // });
             }
           } else {
-            FirebaseFirestore.instance
-                .collection('Users')
-                .doc(FirebaseAuth.instance.currentUser!.uid)
-                .update({
-              // 'wallet': FieldValue.increment(total),
+            FirebaseFirestore.instance.collection('Users').doc(userId).update({
               'pts': FieldValue.increment(-slotsFromPoints * limit),
             });
             for (int i = 0; i < slotsFromPoints; i++) {
               addSlots();
-
-              // FirebaseFirestore.instance
-              //     .collection('Users')
-              //     .doc(FirebaseAuth.instance.currentUser!.uid)
-              //     .update({
-              //   // 'wallet': FieldValue.increment(total),
-              //   'pts': FieldValue.increment(-150),
-              // });
-
-              // FirebaseFirestore.instance
-              //     .collection('Community Wallet')
-              //     .doc('wallet')
-              //     .update({
-              //   // 'wallet': FieldValue.increment(total),
-              //   'pts': FieldValue.increment(150),
-              // });
             }
           }
         });
-
-        // Add to Slot
-      } else {
-        print('Points are within the limit.');
       }
     });
   }
 
   @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-  }
-
-  @override
   void initState() {
     checkPoints(150);
-    // TODO: implement initState
     super.initState();
   }
 
-  final Stream<DocumentSnapshot> userData = FirebaseFirestore.instance
-      .collection('Users')
-      .doc(FirebaseAuth.instance.currentUser!.uid)
-      .snapshots();
-  // Helper method to build header icon buttons
-  Widget _buildHeaderIconButton({
+  final Stream<DocumentSnapshot> userData =
+      FirebaseFirestore.instance.collection('Users').doc(userId).snapshots();
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth > 1024;
+
+    return Scaffold(
+      backgroundColor: Colors.grey.shade50,
+      floatingActionButton: Container(
+        width: 70,
+        height: 70,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: LinearGradient(
+            colors: [primary, secondary],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: primary.withOpacity(0.6),
+              blurRadius: 20,
+              spreadRadius: 2,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: FloatingActionButton(
+          onPressed: scanQRCode,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: const Icon(
+            Icons.qr_code_scanner_rounded,
+            color: Colors.white,
+            size: 32,
+          ),
+        ),
+      ),
+      body: StreamBuilder<DocumentSnapshot>(
+        stream: userData,
+        builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return const Center(child: Text('Something went wrong'));
+          } else if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          dynamic data = snapshot.data;
+
+          return isDesktop
+              ? _buildDesktopLayout(data, context)
+              : _buildMobileLayout(data, context);
+        },
+      ),
+    );
+  }
+
+  // Desktop Layout with Sidebar
+  Widget _buildDesktopLayout(dynamic data, BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.grey.shade50,
+            Colors.white,
+          ],
+        ),
+      ),
+      child: Row(
+        children: [
+          // Modern Sidebar
+          Container(
+            width: 280,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [primary, secondary],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 20,
+                  offset: const Offset(5, 0),
+                ),
+              ],
+            ),
+            child: SafeArea(
+              child: Column(
+                children: [
+                  const SizedBox(height: 30),
+                  // Logo
+                  Container(
+                    padding: const EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Image.asset(
+                      'assets/images/Juan4All 2.png',
+                      height: 60,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  TextWidget(
+                    text: 'Juan 4 All',
+                    fontSize: 24,
+                    fontFamily: 'Bold',
+                    color: Colors.white,
+                  ),
+                  const SizedBox(height: 40),
+                  // Menu Items
+                  _buildSidebarItem(
+                    icon: Icons.home_rounded,
+                    label: 'Dashboard',
+                    isActive: true,
+                    onTap: () {},
+                  ),
+                  _buildSidebarItem(
+                    icon: Icons.business_rounded,
+                    label: 'Affiliates',
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const AffiliateLocatorPage()));
+                    },
+                  ),
+                  _buildSidebarItem(
+                    icon: Icons.notifications_rounded,
+                    label: 'Notifications',
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const CustomerNotifPage()));
+                    },
+                  ),
+                  _buildSidebarItem(
+                    icon: Icons.qr_code_rounded,
+                    label: 'My QR Code',
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => MyQRPage(isPoints: true)));
+                    },
+                  ),
+                  _buildSidebarItem(
+                    icon: Icons.settings_rounded,
+                    label: 'Settings',
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const CustomerSettingsPage()));
+                    },
+                  ),
+                  const Spacer(),
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Container(
+                      padding: const EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.help_outline_rounded,
+                              color: Colors.white, size: 20),
+                          const SizedBox(width: 10),
+                          TextWidget(
+                            text: 'Need Help?',
+                            fontSize: 14,
+                            fontFamily: 'Medium',
+                            color: Colors.white,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Main Content Area
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(40),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TextWidget(
+                              text: 'Hello ka-Juan! 👋',
+                              fontSize: 32,
+                              fontFamily: 'Bold',
+                              color: Colors.black87,
+                            ),
+                            const SizedBox(height: 8),
+                            TextWidget(
+                              text: 'Welcome back to your dashboard',
+                              fontSize: 16,
+                              fontFamily: 'Regular',
+                              color: Colors.grey.shade600,
+                            ),
+                          ],
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const CustomerHomeScreen()),
+                              (route) => false,
+                            );
+                          },
+                          icon: const Icon(Icons.refresh_rounded),
+                          iconSize: 28,
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            padding: const EdgeInsets.all(15),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 40),
+                    // Wallet Cards Row
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildDesktopWalletCard(
+                            context,
+                            'Total Points',
+                            '${data['pts'].toInt()}',
+                            Icons.stars_rounded,
+                            [primary, secondary],
+                            () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) =>
+                                      const CustomerPointsPage()));
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Expanded(
+                          child: _buildDesktopWalletCard(
+                            context,
+                            'E-Wallet',
+                            AppConstants.formatNumberWithPeso(data['wallet']),
+                            Icons.account_balance_wallet_rounded,
+                            [const Color(0xFF6a11cb), const Color(0xFF2575fc)],
+                            () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) =>
+                                      const CustomerWalletPage()));
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Expanded(
+                          child: StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('Slots')
+                                .where('uid',
+                                    isEqualTo:
+                                        FirebaseAuth.instance.currentUser!.uid)
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) {
+                                return _buildDesktopWalletCard(
+                                  context,
+                                  'Community Wallet',
+                                  '0',
+                                  Icons.group_rounded,
+                                  [
+                                    const Color(0xFFf093fb),
+                                    const Color(0xFFf5576c)
+                                  ],
+                                  () {},
+                                );
+                              }
+                              return _buildDesktopWalletCard(
+                                context,
+                                'Community Wallet',
+                                '${snapshot.data!.docs.length}',
+                                Icons.group_rounded,
+                                [
+                                  const Color(0xFFf093fb),
+                                  const Color(0xFFf5576c)
+                                ],
+                                () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          const CustomerInventoryPage()));
+                                },
+                                subtitle: 'Your Slots',
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 40),
+                    // Recent Activity
+                    _buildDesktopRecentActivity(context),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSidebarItem({
     required IconData icon,
     required String label,
-    required VoidCallback onPressed,
+    bool isActive = false,
+    required VoidCallback onTap,
   }) {
     return GestureDetector(
-      onTap: onPressed,
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        decoration: BoxDecoration(
+          color: isActive ? Colors.white.withOpacity(0.25) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: Colors.white, size: 22),
+            const SizedBox(width: 15),
+            TextWidget(
+              text: label,
+              fontSize: 15,
+              fontFamily: isActive ? 'Bold' : 'Medium',
+              color: Colors.white,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDesktopWalletCard(
+    BuildContext context,
+    String title,
+    String value,
+    IconData icon,
+    List<Color> gradientColors,
+    VoidCallback onTap, {
+    String? subtitle,
+  }) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(30),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: gradientColors,
+            ),
+            borderRadius: BorderRadius.circular(25),
+            boxShadow: [
+              BoxShadow(
+                color: gradientColors[1].withOpacity(0.4),
+                blurRadius: 25,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.25),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(icon, color: Colors.white, size: 28),
+                  ),
+                  Icon(Icons.arrow_forward_ios_rounded,
+                      color: Colors.white.withOpacity(0.7), size: 18),
+                ],
+              ),
+              const SizedBox(height: 25),
+              TextWidget(
+                text: title,
+                fontSize: 14,
+                fontFamily: 'Medium',
+                color: Colors.white.withOpacity(0.9),
+              ),
+              const SizedBox(height: 10),
+              TextWidget(
+                text: value,
+                fontSize: 36,
+                fontFamily: 'Bold',
+                color: Colors.white,
+              ),
+              if (subtitle != null) ...[
+                const SizedBox(height: 8),
+                TextWidget(
+                  text: subtitle,
+                  fontSize: 12,
+                  fontFamily: 'Regular',
+                  color: Colors.white.withOpacity(0.8),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDesktopRecentActivity(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [primary, secondary]),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(Icons.history_rounded,
+                  color: Colors.white, size: 24),
+            ),
+            const SizedBox(width: 15),
+            TextWidget(
+              text: 'Recent Activity',
+              fontSize: 24,
+              fontFamily: 'Bold',
+              color: Colors.black87,
+            ),
+          ],
+        ),
+        const SizedBox(height: 25),
+        StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('Points')
+              .where('uid', isEqualTo: userId)
+              .limit(6)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return const Center(child: Text('Error'));
+            }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            final data = snapshot.data!;
+            if (data.docs.isEmpty) {
+              return Container(
+                height: 200,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(25),
+                  border: Border.all(color: Colors.grey.shade200),
+                ),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.inbox_outlined,
+                          size: 64, color: Colors.grey.shade300),
+                      const SizedBox(height: 15),
+                      TextWidget(
+                        text: 'No Recent Activity',
+                        fontSize: 18,
+                        fontFamily: 'Medium',
+                        color: Colors.grey.shade600,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 20,
+                mainAxisSpacing: 20,
+                childAspectRatio: 1.5,
+              ),
+              itemCount: data.docs.length,
+              itemBuilder: (context, index) {
+                return StreamBuilder<DocumentSnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('Business')
+                      .doc(data.docs[index]['uid'])
+                      .snapshots(),
+                  builder: (context, businessSnapshot) {
+                    if (!businessSnapshot.hasData) {
+                      return const SizedBox();
+                    }
+                    dynamic businessData = businessSnapshot.data;
+                    return Container(
+                      padding: const EdgeInsets.all(25),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                            color: primary.withOpacity(0.1), width: 1),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 15,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: primary.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: TextWidget(
+                                    text: businessData['name'],
+                                    fontSize: 12,
+                                    fontFamily: 'Bold',
+                                    color: primary,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.star_rounded,
+                                  color: Colors.amber, size: 20),
+                            ],
+                          ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              TextWidget(
+                                text: (data.docs[index]['pts'].ceilToDouble())
+                                    .toStringAsFixed(0),
+                                fontSize: 32,
+                                fontFamily: 'Bold',
+                                color: primary,
+                              ),
+                              const SizedBox(width: 6),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 4),
+                                child: TextWidget(
+                                  text: 'pts',
+                                  fontSize: 14,
+                                  fontFamily: 'Bold',
+                                  color: primary.withOpacity(0.7),
+                                ),
+                              ),
+                            ],
+                          ),
+                          TextWidget(
+                            text: DateFormat.yMMMd()
+                                .add_jm()
+                                .format(data.docs[index]['dateTime'].toDate()),
+                            fontSize: 11,
+                            fontFamily: 'Regular',
+                            color: Colors.grey.shade500,
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  // Mobile Layout
+  Widget _buildMobileLayout(dynamic data, BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          // Modern Curved Header
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [primary, secondary],
+              ),
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(40),
+                bottomRight: Radius.circular(40),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: primary.withOpacity(0.3),
+                  blurRadius: 25,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(25, 20, 25, 40),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              TextWidget(
+                                text: 'Hello ka-Juan! 👋',
+                                fontSize: 28,
+                                fontFamily: 'Bold',
+                                color: Colors.white,
+                              ),
+                              const SizedBox(height: 8),
+                              TextWidget(
+                                text: DateFormat('EEEE, MMMM d')
+                                    .format(DateTime.now()),
+                                fontSize: 14,
+                                fontFamily: 'Regular',
+                                color: Colors.white.withOpacity(0.9),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            _buildHeaderAction(
+                              Icons.qr_code_rounded,
+                              () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) =>
+                                        MyQRPage(isPoints: true)));
+                              },
+                            ),
+                            const SizedBox(width: 12),
+                            _buildHeaderAction(
+                              Icons.refresh_rounded,
+                              () {
+                                Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const CustomerHomeScreen()),
+                                  (route) => false,
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 35),
+                    // Quick Actions
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildQuickAction(
+                          Icons.business_rounded,
+                          'Affiliates',
+                          () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) =>
+                                    const AffiliateLocatorPage()));
+                          },
+                        ),
+                        _buildQuickAction(
+                          Icons.notifications_rounded,
+                          'Notifications',
+                          () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) =>
+                                    const CustomerNotifPage()));
+                          },
+                        ),
+                        _buildQuickAction(
+                          Icons.settings_rounded,
+                          'Settings',
+                          () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) =>
+                                    const CustomerSettingsPage()));
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          // Wallet Cards
+          Padding(
+            padding: const EdgeInsets.all(25),
+            child: Column(
+              children: [
+                _buildMobileWalletCard(
+                  'Total Points',
+                  '${data['pts'].toInt()}',
+                  Icons.stars_rounded,
+                  [primary, secondary],
+                  () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const CustomerPointsPage()));
+                  },
+                ),
+                const SizedBox(height: 20),
+                _buildMobileWalletCard(
+                  'E-Wallet',
+                  AppConstants.formatNumberWithPeso(data['wallet']),
+                  Icons.account_balance_wallet_rounded,
+                  [const Color(0xFF6a11cb), const Color(0xFF2575fc)],
+                  () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const CustomerWalletPage()));
+                  },
+                ),
+                const SizedBox(height: 20),
+                StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('Slots')
+                      .where('uid',
+                          isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return _buildMobileWalletCard(
+                        'Community Wallet',
+                        '0',
+                        Icons.group_rounded,
+                        [const Color(0xFFf093fb), const Color(0xFFf5576c)],
+                        () {},
+                        subtitle: 'Your Slots',
+                      );
+                    }
+                    return _buildMobileWalletCard(
+                      'Community Wallet',
+                      '${snapshot.data!.docs.length}',
+                      Icons.group_rounded,
+                      [const Color(0xFFf093fb), const Color(0xFFf5576c)],
+                      () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                const CustomerInventoryPage()));
+                      },
+                      subtitle: 'Your Slots',
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+          // Recent Activity
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 25),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: [primary, secondary]),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(Icons.history_rounded,
+                          color: Colors.white, size: 22),
+                    ),
+                    const SizedBox(width: 12),
+                    TextWidget(
+                      text: 'Recent Activity',
+                      fontSize: 22,
+                      fontFamily: 'Bold',
+                      color: Colors.black87,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                _buildMobileRecentActivity(context),
+              ],
+            ),
+          ),
+          const SizedBox(height: 30),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeaderAction(IconData icon, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.25),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Icon(icon, color: Colors.white, size: 22),
+      ),
+    );
+  }
+
+  Widget _buildQuickAction(IconData icon, String label, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              shape: BoxShape.circle,
+              color: Colors.white.withOpacity(0.25),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: 24,
-            ),
+            child: Icon(icon, color: Colors.white, size: 26),
           ),
-          const SizedBox(height: 5),
+          const SizedBox(height: 10),
           TextWidget(
             text: label,
-            fontSize: 12,
+            fontSize: 13,
+            fontFamily: 'Medium',
             color: Colors.white,
           ),
         ],
@@ -262,741 +1044,225 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        floatingActionButton: FloatingActionButton(
-          onPressed: scanQRCode,
-          backgroundColor: Colors.blue,
-          child: const Icon(
-            Icons.qr_code_scanner,
-            color: Colors.white,
+  Widget _buildMobileWalletCard(
+    String title,
+    String value,
+    IconData icon,
+    List<Color> gradientColors,
+    VoidCallback onTap, {
+    String? subtitle,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(25),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: gradientColors,
           ),
+          borderRadius: BorderRadius.circular(25),
+          boxShadow: [
+            BoxShadow(
+              color: gradientColors[1].withOpacity(0.4),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
-        body: StreamBuilder<DocumentSnapshot>(
-            stream: userData,
-            builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-              if (!snapshot.hasData) {
-                return const Center(child: Text('Loading'));
-              } else if (snapshot.hasError) {
-                return const Center(child: Text('Something went wrong'));
-              } else if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              dynamic data = snapshot.data;
-
-              // if (mypoints < 0) {
-              //   FirebaseFirestore.instance
-              //       .collection('Users')
-              //       .doc(FirebaseAuth.instance.currentUser!.uid)
-              //       .update({
-              //     'pts': mypoints.abs(),
-              //   });
-              // }
-
-              return Column(
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.25),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Icon(icon, color: Colors.white, size: 32),
+            ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Improved header with gradient and better styling
-                  Container(
-                    width: double.infinity,
+                  TextWidget(
+                    text: title,
+                    fontSize: 14,
+                    fontFamily: 'Medium',
+                    color: Colors.white.withOpacity(0.9),
+                  ),
+                  const SizedBox(height: 8),
+                  TextWidget(
+                    text: value,
+                    fontSize: 32,
+                    fontFamily: 'Bold',
+                    color: Colors.white,
+                  ),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 4),
+                    TextWidget(
+                      text: subtitle,
+                      fontSize: 12,
+                      fontFamily: 'Regular',
+                      color: Colors.white.withOpacity(0.8),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios_rounded,
+                color: Colors.white.withOpacity(0.7), size: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMobileRecentActivity(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('Points')
+          .where('uid', isEqualTo: userId)
+          .limit(10)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return const Center(child: Text('Error'));
+        }
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final data = snapshot.data!;
+        if (data.docs.isEmpty) {
+          return Container(
+            height: 150,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.grey.shade200),
+            ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.inbox_outlined,
+                      size: 48, color: Colors.grey.shade300),
+                  const SizedBox(height: 12),
+                  TextWidget(
+                    text: 'No Recent Activity',
+                    fontSize: 16,
+                    fontFamily: 'Medium',
+                    color: Colors.grey.shade600,
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        return SizedBox(
+          height: 200,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: data.docs.length,
+            itemBuilder: (context, index) {
+              return StreamBuilder<DocumentSnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('Business')
+                    .doc(data.docs[index]['uid'])
+                    .snapshots(),
+                builder: (context, businessSnapshot) {
+                  if (!businessSnapshot.hasData) {
+                    return const SizedBox();
+                  }
+                  dynamic businessData = businessSnapshot.data;
+                  return Container(
+                    width: 180,
+                    margin: const EdgeInsets.only(right: 15),
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          blue,
-                          blue.withOpacity(0.8),
-                        ],
-                      ),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border:
+                          Border.all(color: primary.withOpacity(0.1), width: 1),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          spreadRadius: 1,
-                          blurRadius: 5,
-                          offset: const Offset(0, 2),
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 15,
+                          offset: const Offset(0, 5),
                         ),
                       ],
                     ),
-                    child: SafeArea(
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            left: 20, right: 20, top: 10, bottom: 15),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      TextWidget(
-                                        text: 'Hello ka-Juan!',
-                                        fontSize: 22,
-                                        fontFamily: 'Bold',
-                                        color: Colors.white,
-                                      ),
-                                      const SizedBox(height: 5),
-                                      TextWidget(
-                                        text: 'Welcome back to Juan4All',
-                                        fontSize: 14,
-                                        color: Colors.white.withOpacity(0.8),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    IconButton(
-                                      onPressed: () {
-                                        Navigator.of(context)
-                                            .push(MaterialPageRoute(
-                                                builder: (context) => MyQRPage(
-                                                      isPoints: true,
-                                                    )));
-                                      },
-                                      icon: const Icon(
-                                        Icons.qr_code,
-                                        color: Colors.white,
-                                      ),
-                                      style: IconButton.styleFrom(
-                                        backgroundColor:
-                                            Colors.white.withOpacity(0.2),
-                                        shape: const CircleBorder(),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    IconButton(
-                                      onPressed: () {
-                                        Navigator.of(context)
-                                            .pushAndRemoveUntil(
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const CustomerHomeScreen()),
-                                          (route) => false,
-                                        );
-                                      },
-                                      icon: const Icon(
-                                        Icons.sync,
-                                        color: Colors.white,
-                                      ),
-                                      style: IconButton.styleFrom(
-                                        backgroundColor:
-                                            Colors.white.withOpacity(0.2),
-                                        shape: const CircleBorder(),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 15),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                _buildHeaderIconButton(
-                                  icon: Icons.business,
-                                  label: 'Affiliates',
-                                  onPressed: () {
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const AffiliateLocatorPage()));
-                                  },
-                                ),
-                                _buildHeaderIconButton(
-                                  icon: Icons.notifications,
-                                  label: 'Notifications',
-                                  onPressed: () {
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const CustomerNotifPage()));
-                                  },
-                                ),
-                                _buildHeaderIconButton(
-                                  icon: Icons.account_circle,
-                                  label: 'Settings',
-                                  onPressed: () {
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const CustomerSettingsPage()));
-                                  },
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  // Enhanced wallet cards section
-                  Container(
-                    height: 200,
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 20),
-                    child: PageView.builder(
-                      itemCount: 3,
-                      controller: PageController(viewportFraction: 0.85),
-                      onPageChanged: (index) {
-                        // Handle page change if needed
-                      },
-                      itemBuilder: (context, index) {
-                        return AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                          margin: EdgeInsets.only(
-                            right: index == 2 ? 0 : 15,
-                            left: index == 0 ? 0 : 15,
-                          ),
-                          child: GestureDetector(
-                            onTap: () {
-                              if (index == 0) {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        const CustomerPointsPage()));
-                              } else if (index == 1) {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        const CustomerWalletPage()));
-                              } else {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        const CustomerInventoryPage()));
-                              }
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: index == 0
-                                      ? [blue, blue.withOpacity(0.7)]
-                                      : index == 1
-                                          ? [primary, primary.withOpacity(0.7)]
-                                          : [
-                                              secondary,
-                                              secondary.withOpacity(0.7)
-                                            ],
-                                ),
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    spreadRadius: 1,
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 5),
-                                  ),
-                                ],
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(20),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        TextWidget(
-                                          text: index == 0
-                                              ? 'Total Points'
-                                              : index == 1
-                                                  ? 'E Wallet'
-                                                  : 'Community Wallet',
-                                          fontSize: 16,
-                                          fontFamily: 'Medium',
-                                          color: Colors.white,
-                                        ),
-                                        Icon(
-                                          index == 0
-                                              ? Icons.star
-                                              : index == 1
-                                                  ? Icons.account_balance_wallet
-                                                  : Icons.group,
-                                          color: Colors.white.withOpacity(0.8),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 20),
-                                    Expanded(
-                                      child: Center(
-                                        child: StreamBuilder<QuerySnapshot>(
-                                            stream: FirebaseFirestore.instance
-                                                .collection('Slots')
-                                                .where('uid',
-                                                    isEqualTo: FirebaseAuth
-                                                        .instance
-                                                        .currentUser!
-                                                        .uid)
-                                                .snapshots(),
-                                            builder: (BuildContext context,
-                                                AsyncSnapshot<QuerySnapshot>
-                                                    snapshot) {
-                                              if (snapshot.hasError) {
-                                                print(snapshot.error);
-                                                return const Center(
-                                                    child: Text('Error'));
-                                              }
-                                              if (snapshot.connectionState ==
-                                                  ConnectionState.waiting) {
-                                                return const Center(
-                                                    child:
-                                                        CircularProgressIndicator(
-                                                  color: Colors.white,
-                                                ));
-                                              }
-
-                                              final mydata =
-                                                  snapshot.requireData;
-
-                                              return TextWidget(
-                                                text: index == 0
-                                                    ? '${data['pts'].toInt()}'
-                                                    : index == 1
-                                                        ? AppConstants
-                                                            .formatNumberWithPeso(
-                                                                data['wallet'])
-                                                        : mydata.docs.length
-                                                            .toString(),
-                                                fontFamily: 'Bold',
-                                                fontSize: 36,
-                                                color: Colors.white,
-                                              );
-                                            }),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    index == 2
-                                        ? Center(
-                                            child: TextWidget(
-                                              text: 'Your Slot/s',
-                                              fontSize: 14,
-                                              color: Colors.white,
-                                            ),
-                                          )
-                                        : const SizedBox(),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  // Enhanced recent activity section
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
+                            Expanded(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 5),
+                                decoration: BoxDecoration(
+                                  color: primary.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: TextWidget(
+                                  text: businessData['name'],
+                                  fontSize: 11,
+                                  fontFamily: 'Bold',
+                                  color: primary,
+                                  maxLines: 1,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            const Icon(Icons.star_rounded,
+                                color: Colors.amber, size: 18),
+                          ],
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
                             TextWidget(
-                              text: 'Recent Activity',
-                              fontSize: 20,
+                              text: (data.docs[index]['pts'].ceilToDouble())
+                                  .toStringAsFixed(0),
+                              fontSize: 36,
                               fontFamily: 'Bold',
+                              color: primary,
+                            ),
+                            const SizedBox(width: 5),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 6),
+                              child: TextWidget(
+                                text: 'pts',
+                                fontSize: 14,
+                                fontFamily: 'Bold',
+                                color: primary.withOpacity(0.7),
+                              ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 15),
-                        StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance
-                                .collection('Points')
-                                .where('uid',
-                                    isEqualTo:
-                                        FirebaseAuth.instance.currentUser!.uid)
-                                .snapshots(),
-                            builder: (BuildContext context,
-                                AsyncSnapshot<QuerySnapshot> snapshot) {
-                              if (snapshot.hasError) {
-                                print(snapshot.error);
-                                return const Center(child: Text('Error'));
-                              }
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return const Center(
-                                    child: CircularProgressIndicator(
-                                  color: Colors.blue,
-                                ));
-                              }
-
-                              final data = snapshot.requireData;
-                              return data.docs.isEmpty
-                                  ? Container(
-                                      height: 150,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade100,
-                                        borderRadius: BorderRadius.circular(15),
-                                      ),
-                                      child: Center(
-                                        child: TextWidget(
-                                          text: 'No Recent Activity',
-                                          fontSize: 16,
-                                          fontFamily: 'Regular',
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    )
-                                  : SizedBox(
-                                      height: 180,
-                                      child: ListView.builder(
-                                        itemCount: data.docs.length,
-                                        scrollDirection: Axis.horizontal,
-                                        itemBuilder: (context, index) {
-                                          return StreamBuilder<
-                                                  DocumentSnapshot>(
-                                              stream: FirebaseFirestore.instance
-                                                  .collection('Business')
-                                                  .doc(data.docs[index]['uid'])
-                                                  .snapshots(),
-                                              builder: (context,
-                                                  AsyncSnapshot<
-                                                          DocumentSnapshot>
-                                                      snapshot) {
-                                                if (!snapshot.hasData) {
-                                                  return const Center(
-                                                      child: Text('Loading'));
-                                                } else if (snapshot.hasError) {
-                                                  return const Center(
-                                                      child: Text(
-                                                          'Something went wrong'));
-                                                } else if (snapshot
-                                                        .connectionState ==
-                                                    ConnectionState.waiting) {
-                                                  return const Center(
-                                                      child:
-                                                          CircularProgressIndicator());
-                                                }
-                                                dynamic businessdata =
-                                                    snapshot.data;
-                                                return AnimatedContainer(
-                                                  duration: const Duration(
-                                                      milliseconds: 300),
-                                                  margin: const EdgeInsets.only(
-                                                      right: 15),
-                                                  child: GestureDetector(
-                                                    child: Container(
-                                                      width: 160,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(15),
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            color: Colors.black
-                                                                .withOpacity(
-                                                                    0.05),
-                                                            spreadRadius: 1,
-                                                            blurRadius: 10,
-                                                            offset:
-                                                                const Offset(
-                                                                    0, 3),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(15.0),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                Container(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .symmetric(
-                                                                    horizontal:
-                                                                        8,
-                                                                    vertical: 4,
-                                                                  ),
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    color: Colors
-                                                                        .blue
-                                                                        .withOpacity(
-                                                                            0.1),
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            20),
-                                                                  ),
-                                                                  child:
-                                                                      TextWidget(
-                                                                    text: businessdata[
-                                                                        'name'],
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontFamily:
-                                                                        'Medium',
-                                                                    color: Colors
-                                                                        .blue,
-                                                                  ),
-                                                                ),
-                                                                const Icon(
-                                                                  Icons.star,
-                                                                  color: Colors
-                                                                      .amber,
-                                                                  size: 16,
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            const SizedBox(
-                                                                height: 20),
-                                                            Center(
-                                                              child: Row(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .center,
-                                                                children: [
-                                                                  TextWidget(
-                                                                    text: (data
-                                                                            .docs[index][
-                                                                                'pts']
-                                                                            .ceilToDouble())
-                                                                        .toStringAsFixed(
-                                                                            0),
-                                                                    fontSize:
-                                                                        32,
-                                                                    fontFamily:
-                                                                        'Bold',
-                                                                    color: Colors
-                                                                        .blue,
-                                                                  ),
-                                                                  const SizedBox(
-                                                                    width: 5,
-                                                                  ),
-                                                                  TextWidget(
-                                                                    text: 'pts',
-                                                                    fontSize:
-                                                                        14,
-                                                                    fontFamily:
-                                                                        'Bold',
-                                                                    color: Colors
-                                                                        .blue,
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                            const SizedBox(
-                                                                height: 15),
-                                                            Center(
-                                                              child: TextWidget(
-                                                                text: DateFormat
-                                                                        .yMMMd()
-                                                                    .add_jm()
-                                                                    .format(data
-                                                                        .docs[
-                                                                            index]
-                                                                            [
-                                                                            'dateTime']
-                                                                        .toDate()),
-                                                                fontSize: 12,
-                                                                fontFamily:
-                                                                    'Regular',
-                                                                color:
-                                                                    Colors.grey,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                );
-                                              });
-                                        },
-                                      ),
-                                    );
-                            }),
+                        TextWidget(
+                          text: DateFormat.yMMMd()
+                              .add_jm()
+                              .format(data.docs[index]['dateTime'].toDate()),
+                          fontSize: 11,
+                          fontFamily: 'Regular',
+                          color: Colors.grey.shade500,
+                        ),
                       ],
                     ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  // Padding(
-                  //   padding: const EdgeInsets.only(left: 20, right: 20),
-                  //   child: Column(
-                  //     crossAxisAlignment: CrossAxisAlignment.start,
-                  //     children: [
-                  //       Row(
-                  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //         crossAxisAlignment: CrossAxisAlignment.end,
-                  //         children: [
-                  //           TextWidget(
-                  //             text: 'Promo & Deals',
-                  //             fontSize: 18,
-                  //             fontFamily: 'Bold',
-                  //           ),
-                  //           GestureDetector(
-                  //             onTap: () {
-                  //               Navigator.of(context).push(MaterialPageRoute(
-                  //                   builder: (context) => StorePage()));
-                  //             },
-                  //             child: TextWidget(
-                  //               text: 'See all',
-                  //               color: blue,
-                  //               fontSize: 14,
-                  //               fontFamily: 'Bold',
-                  //             ),
-                  //           ),
-                  //         ],
-                  //       ),
-                  //       const SizedBox(
-                  //         height: 5,
-                  //       ),
-                  //       StreamBuilder<QuerySnapshot>(
-                  //           stream: FirebaseFirestore.instance
-                  //               .collection('Boosters')
-                  //               .snapshots(),
-                  //           builder: (BuildContext context,
-                  //               AsyncSnapshot<QuerySnapshot> snapshot) {
-                  //             if (snapshot.hasError) {
-                  //               print(snapshot.error);
-                  //               return const Center(child: Text('Error'));
-                  //             }
-                  //             if (snapshot.connectionState ==
-                  //                 ConnectionState.waiting) {
-                  //               return const Padding(
-                  //                 padding: EdgeInsets.only(top: 50),
-                  //                 child: Center(
-                  //                     child: CircularProgressIndicator(
-                  //                   color: Colors.black,
-                  //                 )),
-                  //               );
-                  //             }
-
-                  //             final data = snapshot.requireData;
-                  //             return SizedBox(
-                  //               height: 150,
-                  //               width: 500,
-                  //               child: ListView.builder(
-                  //                 itemCount: data.docs.length,
-                  //                 scrollDirection: Axis.horizontal,
-                  //                 itemBuilder: (context, index) {
-                  //                   return data.docs[index]['price'] == 250 ||
-                  //                           data.docs[index]['price'] == 20
-                  //                       ? const SizedBox()
-                  //                       : Padding(
-                  //                           padding: const EdgeInsets.only(
-                  //                               left: 5, right: 5),
-                  //                           child: GestureDetector(
-                  //                             onTap: () {
-                  //                               Navigator.of(context).push(
-                  //                                   MaterialPageRoute(
-                  //                                       builder: (context) =>
-                  //                                           PaymentSelectionScreen(
-                  //                                             item: data
-                  //                                                 .docs[index],
-                  //                                           )));
-                  //                             },
-                  //                             child: Card(
-                  //                               elevation: 5,
-                  //                               color: Colors.white,
-                  //                               child: SizedBox(
-                  //                                 height: 150,
-                  //                                 width: 150,
-                  //                                 child: Padding(
-                  //                                   padding:
-                  //                                       const EdgeInsets.all(
-                  //                                           10.0),
-                  //                                   child: Column(
-                  //                                     crossAxisAlignment:
-                  //                                         CrossAxisAlignment
-                  //                                             .start,
-                  //                                     children: [
-                  //                                       TextWidget(
-                  //                                         text:
-                  //                                             'P${data.docs[index]['price']}',
-                  //                                         fontSize: 14,
-                  //                                         fontFamily: 'Medium',
-                  //                                         color: blue,
-                  //                                       ),
-                  //                                       const SizedBox(
-                  //                                         height: 15,
-                  //                                       ),
-                  //                                       Row(
-                  //                                         mainAxisAlignment:
-                  //                                             MainAxisAlignment
-                  //                                                 .center,
-                  //                                         children: [
-                  //                                           TextWidget(
-                  //                                             text:
-                  //                                                 '${data.docs[index]['slots'] * 150}',
-                  //                                             fontSize: 38,
-                  //                                             fontFamily:
-                  //                                                 'Bold',
-                  //                                             color: blue,
-                  //                                           ),
-                  //                                           const SizedBox(
-                  //                                             width: 5,
-                  //                                           ),
-                  //                                           TextWidget(
-                  //                                             text: 'pts',
-                  //                                             fontSize: 12,
-                  //                                             fontFamily:
-                  //                                                 'Bold',
-                  //                                             color: blue,
-                  //                                           ),
-                  //                                         ],
-                  //                                       ),
-                  //                                       const SizedBox(
-                  //                                         height: 15,
-                  //                                       ),
-                  //                                       Row(
-                  //                                         mainAxisAlignment:
-                  //                                             MainAxisAlignment
-                  //                                                 .center,
-                  //                                         children: [
-                  //                                           Icon(
-                  //                                             Icons.circle,
-                  //                                             color: secondary,
-                  //                                             size: 15,
-                  //                                           ),
-                  //                                           const SizedBox(
-                  //                                             width: 5,
-                  //                                           ),
-                  //                                           TextWidget(
-                  //                                             text:
-                  //                                                 'Limited offer',
-                  //                                             fontSize: 10,
-                  //                                             fontFamily:
-                  //                                                 'Bold',
-                  //                                             color:
-                  //                                                 Colors.black,
-                  //                                           ),
-                  //                                         ],
-                  //                                       ),
-                  //                                     ],
-                  //                                   ),
-                  //                                 ),
-                  //                               ),
-                  //                             ),
-                  //                           ),
-                  //                         );
-                  //                 },
-                  //               ),
-                  //             );
-                  //           })
-                  //     ],
-                  //   ),
-                  // ),
-                ],
+                  );
+                },
               );
-            }));
+            },
+          ),
+        );
+      },
+    );
   }
 }

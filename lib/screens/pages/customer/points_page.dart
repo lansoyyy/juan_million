@@ -66,269 +66,445 @@ class _CustomerPointsPageState extends State<CustomerPointsPage> {
   String selected = '';
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth > 800;
+
     final Stream<DocumentSnapshot> userData = FirebaseFirestore.instance
         .collection('Users')
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .snapshots();
 
     return Scaffold(
-      backgroundColor: blue,
+      backgroundColor: Colors.grey.shade50,
       body: StreamBuilder<DocumentSnapshot>(
           stream: userData,
           builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
             if (!snapshot.hasData) {
-              return const Center(child: Text('Loading'));
+              return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
               return const Center(child: Text('Something went wrong'));
             } else if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             }
             dynamic data = snapshot.data;
-            return SafeArea(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: IconButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          icon: const Icon(
-                            Icons.arrow_back_ios_rounded,
-                            color: Colors.white,
-                          )),
+            return Column(
+              children: [
+                // Modern Gradient Header
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [primary, secondary],
                     ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Center(
-                      child: TextWidget(
-                        text: 'Total Points',
-                        fontSize: 14,
-                        color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: primary.withOpacity(0.3),
+                        blurRadius: 20,
+                        offset: const Offset(0, 5),
                       ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        TextWidget(
-                          text: '${data['pts']}',
-                          fontFamily: 'Bold',
-                          fontSize: 75,
-                          color: Colors.white,
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20, right: 20),
-                      child: Container(
-                        width: double.infinity,
-                        height: 75,
-                        decoration: BoxDecoration(
-                          color: Colors.white54,
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                showModalBottomSheet(
-                                  context: context,
-                                  builder: (context) {
-                                    return SizedBox(
-                                      height: 100,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(10.0),
-                                        child: Column(
-                                          children: [
-                                            ListTile(
-                                              onTap: () {
-                                                setState(() {
-                                                  selected = 'Users';
-                                                });
-                                                Navigator.pop(context);
-                                                showAmountDialog();
-                                              },
-                                              leading: const Icon(
-                                                Icons.person,
+                    ],
+                  ),
+                  child: SafeArea(
+                    child: Padding(
+                      padding: EdgeInsets.all(isDesktop ? 30 : 20),
+                      child: Column(
+                        children: [
+                          // Header Row
+                          Row(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: IconButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  icon: const Icon(
+                                    Icons.arrow_back_ios_new_rounded,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              const Spacer(),
+                              TextWidget(
+                                text: 'My Points',
+                                fontSize: isDesktop ? 28 : 24,
+                                color: Colors.white,
+                                fontFamily: 'Bold',
+                              ),
+                              const Spacer(),
+                              const SizedBox(
+                                  width: 48), // Balance for back button
+                            ],
+                          ),
+                          const SizedBox(height: 30),
+                          // Points Display
+                          Container(
+                            padding: const EdgeInsets.all(30),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(25),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                TextWidget(
+                                  text: 'Total Points',
+                                  fontSize: 16,
+                                  color: Colors.white.withOpacity(0.9),
+                                  fontFamily: 'Medium',
+                                ),
+                                const SizedBox(height: 15),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TextWidget(
+                                      text: '${data['pts']}',
+                                      fontFamily: 'Bold',
+                                      fontSize: isDesktop ? 80 : 70,
+                                      color: Colors.white,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 15),
+                                      child: TextWidget(
+                                        text: 'pts',
+                                        fontSize: 24,
+                                        color: Colors.white.withOpacity(0.8),
+                                        fontFamily: 'Bold',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 25),
+                          // Action Buttons
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildActionButton(
+                                  icon: Icons.sync_alt_rounded,
+                                  label: 'Transfer',
+                                  onTap: () {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      shape: const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(25),
+                                        ),
+                                      ),
+                                      builder: (context) {
+                                        return Container(
+                                          padding: const EdgeInsets.all(25),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Container(
+                                                width: 50,
+                                                height: 5,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.grey.shade300,
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
                                               ),
-                                              title: TextWidget(
-                                                text: 'To member',
-                                                fontSize: 14,
+                                              const SizedBox(height: 25),
+                                              TextWidget(
+                                                text: 'Transfer Points',
+                                                fontSize: 20,
                                                 fontFamily: 'Bold',
                                               ),
+                                              const SizedBox(height: 20),
+                                              ListTile(
+                                                onTap: () {
+                                                  setState(() {
+                                                    selected = 'Users';
+                                                  });
+                                                  Navigator.pop(context);
+                                                  showAmountDialog();
+                                                },
+                                                leading: Container(
+                                                  padding:
+                                                      const EdgeInsets.all(10),
+                                                  decoration: BoxDecoration(
+                                                    gradient: LinearGradient(
+                                                      colors: [
+                                                        primary,
+                                                        secondary
+                                                      ],
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            12),
+                                                  ),
+                                                  child: const Icon(
+                                                    Icons.person_rounded,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                                title: TextWidget(
+                                                  text: 'To Member',
+                                                  fontSize: 16,
+                                                  fontFamily: 'Bold',
+                                                ),
+                                                subtitle: TextWidget(
+                                                  text:
+                                                      'Transfer points to another member',
+                                                  fontSize: 13,
+                                                  color: Colors.grey.shade600,
+                                                ),
+                                                trailing: const Icon(
+                                                  Icons
+                                                      .arrow_forward_ios_rounded,
+                                                  size: 16,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 15),
+                              Expanded(
+                                child: _buildActionButton(
+                                  icon: Icons.wallet_rounded,
+                                  label: 'Top Up',
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                StorePage(inbusiness: false)));
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                // Transactions Section
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.all(isDesktop ? 30 : 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                    colors: [primary, secondary]),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(Icons.history_rounded,
+                                  color: Colors.white, size: 22),
+                            ),
+                            const SizedBox(width: 12),
+                            TextWidget(
+                              text: 'Transactions',
+                              fontSize: 22,
+                              fontFamily: 'Bold',
+                              color: Colors.black87,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        Expanded(
+                          child: StreamBuilder<QuerySnapshot>(
+                              stream: FirebaseFirestore.instance
+                                  .collection('Points')
+                                  .where('uid',
+                                      isEqualTo: FirebaseAuth
+                                          .instance.currentUser!.uid)
+                                  .snapshots(),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                                if (snapshot.hasError) {
+                                  print(snapshot.error);
+                                  return const Center(child: Text('Error'));
+                                }
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Padding(
+                                    padding: EdgeInsets.only(top: 50),
+                                    child: Center(
+                                        child: CircularProgressIndicator(
+                                      color: Colors.black,
+                                    )),
+                                  );
+                                }
+
+                                final data = snapshot.requireData;
+
+                                if (data.docs.isEmpty) {
+                                  return Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.inbox_outlined,
+                                            size: 64,
+                                            color: Colors.grey.shade300),
+                                        const SizedBox(height: 15),
+                                        TextWidget(
+                                          text: 'No Transactions Yet',
+                                          fontSize: 18,
+                                          fontFamily: 'Medium',
+                                          color: Colors.grey.shade600,
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }
+
+                                return ListView.builder(
+                                  itemCount: data.docs.length,
+                                  itemBuilder: (context, index) {
+                                    double points =
+                                        data.docs[index]['pts'].toDouble();
+                                    return Container(
+                                      margin: const EdgeInsets.only(bottom: 12),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                            color: primary.withOpacity(0.1),
+                                            width: 1),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color:
+                                                Colors.black.withOpacity(0.05),
+                                            blurRadius: 10,
+                                            offset: const Offset(0, 3),
+                                          ),
+                                        ],
+                                      ),
+                                      child: ListTile(
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                horizontal: 20, vertical: 12),
+                                        leading: Container(
+                                          padding: const EdgeInsets.all(12),
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                primary.withOpacity(0.2),
+                                                secondary.withOpacity(0.2),
+                                              ],
+                                            ),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Icon(
+                                            Icons.stars_rounded,
+                                            color: primary,
+                                            size: 24,
+                                          ),
+                                        ),
+                                        title: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            TextWidget(
+                                              text:
+                                                  '${incrementIfEndsWith49Or99(points)} points',
+                                              fontSize: 17,
+                                              color: Colors.black87,
+                                              fontFamily: 'Bold',
+                                            ),
+                                            const SizedBox(height: 4),
+                                            TextWidget(
+                                              text:
+                                                  '${data.docs[index]['type']}',
+                                              fontSize: 13,
+                                              color: Colors.grey.shade600,
+                                              fontFamily: 'Medium',
                                             ),
                                           ],
+                                        ),
+                                        subtitle: Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 8),
+                                          child: Row(
+                                            children: [
+                                              Icon(Icons.access_time_rounded,
+                                                  size: 14,
+                                                  color: Colors.grey.shade500),
+                                              const SizedBox(width: 5),
+                                              TextWidget(
+                                                text: DateFormat.yMMMd()
+                                                    .add_jm()
+                                                    .format(data.docs[index]
+                                                            ['dateTime']
+                                                        .toDate()),
+                                                fontSize: 12,
+                                                color: Colors.grey.shade500,
+                                                fontFamily: 'Regular',
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     );
                                   },
                                 );
-                              },
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  const Icon(
-                                    Icons.sync_alt,
-                                    color: Colors.white,
-                                    size: 30,
-                                  ),
-                                  TextWidget(
-                                    text: 'Transfer',
-                                    fontSize: 12,
-                                    color: Colors.white,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const Padding(
-                              padding: EdgeInsets.only(top: 10, bottom: 10),
-                              child: VerticalDivider(
-                                color: Colors.white,
-                                thickness: 0.5,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => StorePage(
-                                          inbusiness: false,
-                                        )));
-                              },
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  const Icon(
-                                    Icons.wallet,
-                                    color: Colors.white,
-                                    size: 30,
-                                  ),
-                                  TextWidget(
-                                    text: 'Top up',
-                                    fontSize: 12,
-                                    color: Colors.white,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                              }),
                         ),
-                      ),
+                      ],
                     ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20),
-                      child: TextWidget(
-                        text: 'Transactions',
-                        fontSize: 18,
-                        color: Colors.white,
-                        fontFamily: 'Bold',
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    StreamBuilder<QuerySnapshot>(
-                        stream: FirebaseFirestore.instance
-                            .collection('Points')
-                            .where('uid',
-                                isEqualTo:
-                                    FirebaseAuth.instance.currentUser!.uid)
-                            .snapshots(),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<QuerySnapshot> snapshot) {
-                          if (snapshot.hasError) {
-                            print(snapshot.error);
-                            return const Center(child: Text('Error'));
-                          }
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Padding(
-                              padding: EdgeInsets.only(top: 50),
-                              child: Center(
-                                  child: CircularProgressIndicator(
-                                color: Colors.black,
-                              )),
-                            );
-                          }
-
-                          final data = snapshot.requireData;
-
-                          return SizedBox(
-                            height: 1000,
-                            child: ListView.builder(
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: data.docs.length,
-                              itemBuilder: (context, index) {
-                                double points =
-                                    data.docs[index]['pts'].toDouble();
-                                return Padding(
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: ListTile(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(
-                                        15,
-                                      ),
-                                    ),
-                                    tileColor: Colors.white,
-                                    leading: Icon(
-                                      Icons.volunteer_activism_outlined,
-                                      color: secondary,
-                                      size: 32,
-                                    ),
-                                    title: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        TextWidget(
-                                          text: DateFormat.yMMMd()
-                                              .add_jm()
-                                              .format(data.docs[index]
-                                                      ['dateTime']
-                                                  .toDate()),
-                                          fontSize: 11,
-                                          color: Colors.grey,
-                                          fontFamily: 'Medium',
-                                        ),
-                                        TextWidget(
-                                          text:
-                                              '${incrementIfEndsWith49Or99(points)} points',
-                                          fontSize: 16,
-                                          color: Colors.black,
-                                          fontFamily: 'Medium',
-                                        ),
-                                        TextWidget(
-                                          text: '${data.docs[index]['type']}',
-                                          fontSize: 12,
-                                          color: Colors.black,
-                                          fontFamily: 'Medium',
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          );
-                        }),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             );
           }),
+    );
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.25),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Colors.white.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: Colors.white, size: 28),
+            const SizedBox(height: 8),
+            TextWidget(
+              text: label,
+              fontSize: 14,
+              color: Colors.white,
+              fontFamily: 'Medium',
+            ),
+          ],
+        ),
+      ),
     );
   }
 

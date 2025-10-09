@@ -71,101 +71,167 @@ class _AffiliateLocatorPageState extends State<AffiliateLocatorPage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth > 800;
+
     return Scaffold(
-      appBar: AppBar(
-        foregroundColor: Colors.white,
-        backgroundColor: blue,
-        elevation: 0,
-        title: TextWidget(
-          text: 'Affiliate Locator',
-          fontSize: 18,
-          fontFamily: 'Bold',
-          color: Colors.white,
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () {
-              // Add search functionality
-            },
-            icon: const Icon(Icons.search),
-          ),
-        ],
-      ),
+      backgroundColor: Colors.grey.shade50,
       body: Column(
         children: [
-          // Search bar
-          Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(15),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    spreadRadius: 1,
-                    blurRadius: 5,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+          // Modern Header with Gradient
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [primary, secondary],
               ),
-              child: TextField(
-                controller: searchController,
-                onChanged: (value) {
-                  setState(() {
-                    nameSearched = value;
-                  });
-                },
-                decoration: InputDecoration(
-                  hintText: 'Search affiliates...',
-                  hintStyle: TextStyle(
-                    color: Colors.grey.shade500,
-                    fontSize: 14,
-                  ),
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: Colors.grey.shade500,
-                  ),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 15),
+              boxShadow: [
+                BoxShadow(
+                  color: primary.withOpacity(0.3),
+                  blurRadius: 20,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            child: SafeArea(
+              child: Padding(
+                padding: EdgeInsets.all(isDesktop ? 30 : 20),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: IconButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: const Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 15),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              TextWidget(
+                                text: 'Affiliate Locator',
+                                fontSize: isDesktop ? 28 : 24,
+                                color: Colors.white,
+                                fontFamily: 'Bold',
+                              ),
+                              const SizedBox(height: 4),
+                              TextWidget(
+                                text: 'Find businesses near you',
+                                fontSize: isDesktop ? 16 : 14,
+                                color: Colors.white.withOpacity(0.9),
+                                fontFamily: 'Regular',
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    // Modern Search Bar
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 15,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: TextField(
+                        controller: searchController,
+                        onChanged: (value) {
+                          setState(() {
+                            nameSearched = value;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Search affiliates by name...',
+                          hintStyle: TextStyle(
+                            color: Colors.grey.shade400,
+                            fontSize: 15,
+                          ),
+                          prefixIcon: Icon(
+                            Icons.search_rounded,
+                            color: primary,
+                            size: 24,
+                          ),
+                          suffixIcon: searchController.text.isNotEmpty
+                              ? IconButton(
+                                  icon: Icon(Icons.clear_rounded,
+                                      color: Colors.grey.shade400),
+                                  onPressed: () {
+                                    searchController.clear();
+                                    setState(() {
+                                      nameSearched = '';
+                                    });
+                                  },
+                                )
+                              : null,
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 18, horizontal: 20),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
 
-          // Enhanced filter section
+          const SizedBox(height: 20),
+          // Modern Filter Section
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 15),
+            margin: EdgeInsets.symmetric(horizontal: isDesktop ? 30 : 15),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  spreadRadius: 1,
-                  blurRadius: 5,
-                  offset: const Offset(0, 2),
+                  color: Colors.black.withOpacity(0.08),
+                  spreadRadius: 0,
+                  blurRadius: 15,
+                  offset: const Offset(0, 5),
                 ),
               ],
             ),
             child: ExpansionTile(
-              title: Row(
-                children: [
-                  const Icon(
-                    Icons.filter_list,
-                    color: Colors.blue,
-                  ),
-                  const SizedBox(width: 10),
-                  TextWidget(
-                    text: 'Filters',
-                    fontSize: 16,
-                    fontFamily: 'Bold',
-                  ),
-                ],
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [primary, secondary]),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.tune_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+              title: TextWidget(
+                text: 'Advanced Filters',
+                fontSize: 16,
+                fontFamily: 'Bold',
+                color: Colors.black87,
               ),
               tilePadding:
-                  const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               children: [
                 Padding(
                   padding: const EdgeInsets.all(15.0),
@@ -393,179 +459,297 @@ class _AffiliateLocatorPageState extends State<AffiliateLocatorPage> {
                       );
                     }
 
-                    return ListView.builder(
-                      itemCount: data.docs.length,
-                      itemBuilder: (context, index) {
-                        return AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                          margin: const EdgeInsets.only(bottom: 15),
-                          child: GestureDetector(
-                            onTap: () {
-                              // Navigate to store page or show details
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(15),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.05),
-                                    spreadRadius: 1,
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(15.0),
-                                child: Row(
-                                  children: [
-                                    // Business logo with better styling
-                                    Container(
-                                      width: 80,
-                                      height: 80,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade100,
-                                        borderRadius: BorderRadius.circular(12),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color:
-                                                Colors.black.withOpacity(0.05),
-                                            spreadRadius: 1,
-                                            blurRadius: 5,
-                                            offset: const Offset(0, 2),
-                                          ),
-                                        ],
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(12),
-                                        child: Image.network(
-                                          data.docs[index]['logo'],
-                                          fit: BoxFit.cover,
-                                          errorBuilder:
-                                              (context, error, stackTrace) {
-                                            return Icon(
-                                              Icons.storefront,
-                                              size: 40,
-                                              color: Colors.grey.shade400,
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 15),
-
-                                    // Business details with better layout
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          TextWidget(
-                                            text: data.docs[index]['name'],
-                                            fontSize: 18,
-                                            fontFamily: 'Bold',
-                                            color: Colors.black87,
-                                          ),
-                                          const SizedBox(height: 5),
-                                          Row(
-                                            children: [
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 8,
-                                                        vertical: 3),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.blue
-                                                      .withOpacity(0.1),
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
-                                                ),
-                                                child: TextWidget(
-                                                  text: data.docs[index]
-                                                      ['clarification'],
-                                                  fontSize: 12,
-                                                  color: Colors.blue,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 8),
-                                          Row(
-                                            children: [
-                                              const Icon(
-                                                Icons.location_on,
-                                                size: 14,
-                                                color: Colors.grey,
-                                              ),
-                                              const SizedBox(width: 5),
-                                              Expanded(
-                                                child: TextWidget(
-                                                  text: data.docs[index]
-                                                      ['address'],
-                                                  fontSize: 12,
-                                                  color: Colors.grey.shade600,
-                                                  maxLines: 1,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 5),
-                                          Row(
-                                            children: [
-                                              const Icon(
-                                                Icons.email,
-                                                size: 14,
-                                                color: Colors.grey,
-                                              ),
-                                              const SizedBox(width: 5),
-                                              Expanded(
-                                                child: TextWidget(
-                                                  text: data.docs[index]
-                                                      ['email'],
-                                                  fontSize: 12,
-                                                  color: Colors.grey.shade600,
-                                                  maxLines: 1,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-
-                                    // View details button
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                            color: Colors.blue.withOpacity(0.1),
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: const Icon(
-                                            Icons.arrow_forward_ios,
-                                            size: 16,
-                                            color: Colors.blue,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
+                    return isDesktop
+                        ? GridView.builder(
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 20,
+                              mainAxisSpacing: 20,
+                              childAspectRatio: 1.5,
                             ),
-                          ),
-                        );
-                      },
-                    );
+                            itemCount: data.docs.length,
+                            itemBuilder: (context, index) {
+                              return _buildBusinessCard(data.docs[index], true);
+                            },
+                          )
+                        : ListView.builder(
+                            itemCount: data.docs.length,
+                            itemBuilder: (context, index) {
+                              return _buildBusinessCard(
+                                  data.docs[index], false);
+                            },
+                          );
                   }),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildBusinessCard(DocumentSnapshot data, bool isDesktop) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      margin: EdgeInsets.only(bottom: isDesktop ? 0 : 15),
+      child: GestureDetector(
+        onTap: () {
+          // Navigate to store page or show details
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: primary.withOpacity(0.1), width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                spreadRadius: 0,
+                blurRadius: 15,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: isDesktop
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          // Business logo
+                          Container(
+                            width: 70,
+                            height: 70,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  primary.withOpacity(0.1),
+                                  secondary.withOpacity(0.1),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(15),
+                              child: Image.network(
+                                data['logo'],
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Icon(
+                                    Icons.storefront_rounded,
+                                    size: 35,
+                                    color: primary,
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 15),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                TextWidget(
+                                  text: data['name'],
+                                  fontSize: 18,
+                                  fontFamily: 'Bold',
+                                  color: Colors.black87,
+                                  maxLines: 1,
+                                ),
+                                const SizedBox(height: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 5),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        primary.withOpacity(0.1),
+                                        secondary.withOpacity(0.1),
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  child: TextWidget(
+                                    text: data['clarification'],
+                                    fontSize: 11,
+                                    fontFamily: 'Bold',
+                                    color: primary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 15),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.location_on_rounded,
+                            size: 16,
+                            color: Colors.grey.shade600,
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: TextWidget(
+                              text: data['address'],
+                              fontSize: 13,
+                              color: Colors.grey.shade600,
+                              maxLines: 1,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.email_rounded,
+                            size: 16,
+                            color: Colors.grey.shade600,
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: TextWidget(
+                              text: data['email'],
+                              fontSize: 13,
+                              color: Colors.grey.shade600,
+                              maxLines: 1,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+                : Row(
+                    children: [
+                      // Business logo
+                      Container(
+                        width: 90,
+                        height: 90,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              primary.withOpacity(0.1),
+                              secondary.withOpacity(0.1),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(18),
+                          child: Image.network(
+                            data['logo'],
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Icon(
+                                Icons.storefront_rounded,
+                                size: 45,
+                                color: primary,
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 18),
+                      // Business details
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TextWidget(
+                              text: data['name'],
+                              fontSize: 18,
+                              fontFamily: 'Bold',
+                              color: Colors.black87,
+                              maxLines: 1,
+                            ),
+                            const SizedBox(height: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    primary.withOpacity(0.1),
+                                    secondary.withOpacity(0.1),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              child: TextWidget(
+                                text: data['clarification'],
+                                fontSize: 12,
+                                fontFamily: 'Bold',
+                                color: primary,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.location_on_rounded,
+                                  size: 16,
+                                  color: Colors.grey.shade600,
+                                ),
+                                const SizedBox(width: 5),
+                                Expanded(
+                                  child: TextWidget(
+                                    text: data['address'],
+                                    fontSize: 13,
+                                    color: Colors.grey.shade600,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.email_rounded,
+                                  size: 16,
+                                  color: Colors.grey.shade600,
+                                ),
+                                const SizedBox(width: 5),
+                                Expanded(
+                                  child: TextWidget(
+                                    text: data['email'],
+                                    fontSize: 13,
+                                    color: Colors.grey.shade600,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Arrow icon
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              primary.withOpacity(0.1),
+                              secondary.withOpacity(0.1),
+                            ],
+                          ),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          size: 16,
+                          color: primary,
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+        ),
       ),
     );
   }
