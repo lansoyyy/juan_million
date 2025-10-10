@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:juan_million/firebase_options.dart';
+import 'package:juan_million/screens/business_home_screen.dart';
 import 'package:juan_million/screens/customer_home_screen.dart';
 import 'package:juan_million/screens/landing_screen.dart';
 
@@ -27,7 +28,7 @@ void main() async {
 
   runApp(MaterialApp(
     title: 'Juan 4 All',
-    home: CustomerHomeScreen(),
+    home: LandingScreen(),
   ));
 }
 

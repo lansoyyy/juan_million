@@ -72,24 +72,146 @@ class _WalletPageState extends State<WalletPage> {
         .collection('Business')
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .snapshots();
+
+    // Check if desktop
+    final isDesktop = MediaQuery.of(context).size.width > 800;
+
     return Scaffold(
-      backgroundColor: primary,
-      body: StreamBuilder<DocumentSnapshot>(
-          stream: userData,
-          builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-            if (!snapshot.hasData) {
-              return const Center(child: Text('Loading'));
-            } else if (snapshot.hasError) {
-              return const Center(child: Text('Something went wrong'));
-            } else if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            dynamic data = snapshot.data;
-            return SafeArea(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+      backgroundColor: isDesktop ? Colors.white : primary,
+      body: isDesktop
+          ? Row(
+              children: [
+                _buildDesktopSidebar(context),
+                Expanded(
+                  child: _buildContent(context, userData),
+                ),
+              ],
+            )
+          : _buildContent(context, userData),
+    );
+  }
+
+  Widget _buildDesktopSidebar(BuildContext context) {
+    return Container(
+      width: 280,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [blue, Colors.blue.shade900],
+        ),
+      ),
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextWidget(
+                    text: 'Juan Million',
+                    fontSize: 24,
+                    color: Colors.white,
+                    fontFamily: 'Bold',
+                  ),
+                  const SizedBox(height: 8),
+                  TextWidget(
+                    text: 'Business Dashboard',
+                    fontSize: 14,
+                    color: Colors.white70,
+                    fontFamily: 'Regular',
+                  ),
+                ],
+              ),
+            ),
+            const Divider(color: Colors.white24, height: 1),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                children: [
+                  _buildSidebarItem(
+                    icon: Icons.dashboard_rounded,
+                    label: 'Dashboard',
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  _buildSidebarItem(
+                    icon: Icons.account_balance_wallet_rounded,
+                    label: 'E-Wallet',
+                    isActive: true,
+                    onTap: () {},
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSidebarItem({
+    required IconData icon,
+    required String label,
+    bool isActive = false,
+    required VoidCallback onTap,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color:
+                  isActive ? Colors.white.withOpacity(0.2) : Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                Icon(icon, color: Colors.white, size: 22),
+                const SizedBox(width: 16),
+                TextWidget(
+                  text: label,
+                  fontSize: 15,
+                  color: Colors.white,
+                  fontFamily: isActive ? 'Bold' : 'Medium',
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContent(
+      BuildContext context, Stream<DocumentSnapshot> userData) {
+    final isDesktop = MediaQuery.of(context).size.width > 800;
+
+    return StreamBuilder<DocumentSnapshot>(
+        stream: userData,
+        builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: Text('Loading'));
+          } else if (snapshot.hasError) {
+            return const Center(child: Text('Something went wrong'));
+          } else if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          dynamic data = snapshot.data;
+          return SafeArea(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (!isDesktop)
                     Align(
                       alignment: Alignment.topLeft,
                       child: IconButton(
@@ -101,37 +223,118 @@ class _WalletPageState extends State<WalletPage> {
                             color: Colors.white,
                           )),
                     ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Center(
-                      child: TextWidget(
-                        text: 'Wallet',
-                        fontSize: 14,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Center(
-                      child: TextWidget(
-                        text: data['wallet'].toString(),
-                        fontFamily: 'Bold',
-                        fontSize: 75,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20, right: 20),
-                      child: Container(
-                        width: double.infinity,
-                        height: 75,
-                        decoration: BoxDecoration(
-                          color: Colors.white54,
-                          borderRadius: BorderRadius.circular(15),
+                  const SizedBox(height: 30),
+                  // Modern Wallet Balance Card
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 25),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(30),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Colors.white, Colors.green.shade50],
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            GestureDetector(
+                        borderRadius: BorderRadius.circular(25),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              color: primary.withOpacity(0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.account_balance_wallet_rounded,
+                              color: primary,
+                              size: 40,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          TextWidget(
+                            text: 'E-Wallet Balance',
+                            fontSize: 14,
+                            color: Colors.grey,
+                            fontFamily: 'Medium',
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              TextWidget(
+                                text: '₱',
+                                fontSize: 32,
+                                color: primary,
+                                fontFamily: 'Bold',
+                              ),
+                              const SizedBox(width: 5),
+                              TextWidget(
+                                text: data['wallet'].toString(),
+                                fontFamily: 'Bold',
+                                fontSize: 56,
+                                color: primary,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 15),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.green.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.check_circle,
+                                    color: Colors.green, size: 18),
+                                const SizedBox(width: 8),
+                                TextWidget(
+                                  text: 'Active',
+                                  fontSize: 14,
+                                  color: Colors.green,
+                                  fontFamily: 'Bold',
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 25),
+                  // Modern Action Cards
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 25),
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 15,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          // Transfer Card
+                          Expanded(
+                            child: GestureDetector(
                               onTap: () async {
                                 QuerySnapshot snapshot = await FirebaseFirestore
                                     .instance
@@ -430,27 +633,31 @@ class _WalletPageState extends State<WalletPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  const Icon(
+                                  Icon(
                                     Icons.sync_alt,
-                                    color: Colors.white,
+                                    color: primary,
                                     size: 30,
                                   ),
+                                  const SizedBox(height: 8),
                                   TextWidget(
                                     text: 'Transfer',
                                     fontSize: 12,
-                                    color: Colors.white,
+                                    color: Colors.black87,
+                                    fontFamily: 'Medium',
                                   ),
                                 ],
                               ),
                             ),
-                            const Padding(
-                              padding: EdgeInsets.only(top: 10, bottom: 10),
-                              child: VerticalDivider(
-                                color: Colors.white,
-                                thickness: 0.5,
-                              ),
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            child: VerticalDivider(
+                              color: Colors.grey,
+                              thickness: 0.5,
                             ),
-                            GestureDetector(
+                          ),
+                          Expanded(
+                            child: GestureDetector(
                               onTap: () async {
                                 // Navigator.of(context).push(MaterialPageRoute(
                                 //     builder: (context) => StorePage(
@@ -530,140 +737,139 @@ class _WalletPageState extends State<WalletPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  const Icon(
+                                  Icon(
                                     Icons.wallet,
-                                    color: Colors.white,
+                                    color: primary,
                                     size: 30,
                                   ),
+                                  const SizedBox(height: 8),
                                   TextWidget(
                                     text: 'Reload points',
                                     fontSize: 12,
-                                    color: Colors.white,
+                                    color: Colors.black87,
+                                    fontFamily: 'Medium',
                                   ),
                                 ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20, right: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TextWidget(
-                            text: 'Transactions',
-                            fontSize: 18,
-                            color: Colors.white,
-                            fontFamily: 'Bold',
                           ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          StreamBuilder<QuerySnapshot>(
-                              stream: FirebaseFirestore.instance
-                                  .collection('Wallets')
-                                  .where('from',
-                                      isEqualTo: FirebaseAuth
-                                          .instance.currentUser!.uid)
-                                  .snapshots(),
-                              builder: (BuildContext context,
-                                  AsyncSnapshot<QuerySnapshot> snapshot) {
-                                if (snapshot.hasError) {
-                                  print(snapshot.error);
-                                  return const Center(child: Text('Error'));
-                                }
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const Padding(
-                                    padding: EdgeInsets.only(top: 50),
-                                    child: Center(
-                                        child: CircularProgressIndicator(
-                                      color: Colors.black,
-                                    )),
-                                  );
-                                }
-
-                                final data = snapshot.requireData;
-                                return SizedBox(
-                                  height: 1000,
-                                  child: ListView.builder(
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    itemCount: data.docs.length,
-                                    itemBuilder: (context, index) {
-                                      return Padding(
-                                        padding: const EdgeInsets.all(5.0),
-                                        child: ListTile(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              15,
-                                            ),
-                                          ),
-                                          tileColor: Colors.white,
-                                          leading: Icon(
-                                            Icons.volunteer_activism_outlined,
-                                            color: secondary,
-                                            size: 32,
-                                          ),
-                                          title: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              TextWidget(
-                                                text: DateFormat.yMMMd()
-                                                    .add_jm()
-                                                    .format(data.docs[index]
-                                                            ['dateTime']
-                                                        .toDate()),
-                                                fontSize: 11,
-                                                color: Colors.grey,
-                                                fontFamily: 'Medium',
-                                              ),
-                                              TextWidget(
-                                                text:
-                                                    '${data.docs[index]['pts']}',
-                                                fontSize: 16,
-                                                color: Colors.black,
-                                                fontFamily: 'Medium',
-                                              ),
-                                              TextWidget(
-                                                text:
-                                                    '${data.docs[index]['type']}',
-                                                fontSize: 12,
-                                                color: Colors.black,
-                                                fontFamily: 'Medium',
-                                              ),
-                                              TextWidget(
-                                                text:
-                                                    'By: ${data.docs[index]['cashier']}',
-                                                fontSize: 11,
-                                                color: Colors.grey,
-                                                fontFamily: 'Medium',
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                );
-                              }),
                         ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 25),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 25),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextWidget(
+                          text: 'Transactions',
+                          fontSize: 18,
+                          color: isDesktop ? Colors.black : Colors.white,
+                          fontFamily: 'Bold',
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('Wallets')
+                                .where('from',
+                                    isEqualTo:
+                                        FirebaseAuth.instance.currentUser!.uid)
+                                .snapshots(),
+                            builder: (BuildContext context,
+                                AsyncSnapshot<QuerySnapshot> snapshot) {
+                              if (snapshot.hasError) {
+                                print(snapshot.error);
+                                return const Center(child: Text('Error'));
+                              }
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const Padding(
+                                  padding: EdgeInsets.only(top: 50),
+                                  child: Center(
+                                      child: CircularProgressIndicator(
+                                    color: Colors.black,
+                                  )),
+                                );
+                              }
+
+                              final data = snapshot.requireData;
+                              return SizedBox(
+                                height: 1000,
+                                child: ListView.builder(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: data.docs.length,
+                                  itemBuilder: (context, index) {
+                                    return Padding(
+                                      padding: const EdgeInsets.all(5.0),
+                                      child: ListTile(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            15,
+                                          ),
+                                        ),
+                                        tileColor: Colors.white,
+                                        leading: Icon(
+                                          Icons.volunteer_activism_outlined,
+                                          color: secondary,
+                                          size: 32,
+                                        ),
+                                        title: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            TextWidget(
+                                              text: DateFormat.yMMMd()
+                                                  .add_jm()
+                                                  .format(data.docs[index]
+                                                          ['dateTime']
+                                                      .toDate()),
+                                              fontSize: 11,
+                                              color: Colors.grey,
+                                              fontFamily: 'Medium',
+                                            ),
+                                            TextWidget(
+                                              text:
+                                                  '${data.docs[index]['pts']}',
+                                              fontSize: 16,
+                                              color: Colors.black,
+                                              fontFamily: 'Medium',
+                                            ),
+                                            TextWidget(
+                                              text:
+                                                  '${data.docs[index]['type']}',
+                                              fontSize: 12,
+                                              color: Colors.black,
+                                              fontFamily: 'Medium',
+                                            ),
+                                            TextWidget(
+                                              text:
+                                                  'By: ${data.docs[index]['cashier']}',
+                                              fontSize: 11,
+                                              color: Colors.grey,
+                                              fontFamily: 'Medium',
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              );
+                            }),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            );
-          }),
-    );
+            ),
+          );
+        });
   }
 
   final pts = TextEditingController();
