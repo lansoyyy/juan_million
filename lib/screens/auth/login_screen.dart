@@ -228,7 +228,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               login(context);
                             } else {
                               showToast(
-                                  'Cannot Proceed! Your app version is outdated!');
+                                  'Cannot Proceed! Your app version is outdated!',
+                                  context: context);
                             }
                           },
                           color: primary,
@@ -591,7 +592,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               login(context);
                             } else {
                               showToast(
-                                  'Cannot Proceed! Your app version is outdated!');
+                                  'Cannot Proceed! Your app version is outdated!',
+                                  context: context);
                             }
                           },
                           child: Center(
@@ -795,7 +797,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 },
               );
             } else {
-              showToast('Cannot proceed! Email not verified');
+              showToast('Cannot proceed! Email not verified', context: context);
             }
           } else {
             if (user.user!.emailVerified) {
@@ -834,29 +836,30 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                 );
               } else {
-                showToast('Request grant access!');
+                showToast('Request grant access!', context: context);
               }
             } else {
-              showToast('Cannot proceed! Email not verified');
+              showToast('Cannot proceed! Email not verified', context: context);
             }
           }
         } on FirebaseAuthException catch (e) {
           if (e.code == 'user-not-found') {
-            showToast("No user found with that email.");
+            showToast("No user found with that email.", context: context);
           } else if (e.code == 'wrong-password') {
-            showToast("Wrong password provided for that user.");
+            showToast("Wrong password provided for that user.",
+                context: context);
           } else if (e.code == 'invalid-email') {
-            showToast("Invalid email provided.");
+            showToast("Invalid email provided.", context: context);
           } else if (e.code == 'user-disabled') {
-            showToast("User account has been disabled.");
+            showToast("User account has been disabled.", context: context);
           } else {
-            showToast("An error occurred: ${e.message}");
+            showToast("An error occurred: ${e.message}", context: context);
           }
         } on Exception catch (e) {
-          showToast("An error occurred: $e");
+          showToast("An error occurred: $e", context: context);
         }
       } else {
-        showToast('Cannot proceed! Mobile Number not found');
+        showToast('Cannot proceed! Mobile Number not found', context: context);
       }
     } else {
       try {
@@ -895,7 +898,7 @@ class _LoginScreenState extends State<LoginScreen> {
               },
             );
           } else {
-            showToast('Cannot proceed! Email not verified');
+            showToast('Cannot proceed! Email not verified', context: context);
           }
         } else {
           if (user.user!.emailVerified) {
@@ -933,26 +936,26 @@ class _LoginScreenState extends State<LoginScreen> {
                 },
               );
             } else {
-              showToast('Request grant access!');
+              showToast('Request grant access!', context: context);
             }
           } else {
-            showToast('Cannot proceed! Email not verified');
+            showToast('Cannot proceed! Email not verified', context: context);
           }
         }
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {
-          showToast("No user found with that email.");
+          showToast("No user found with that email.", context: context);
         } else if (e.code == 'wrong-password') {
-          showToast("Wrong password provided for that user.");
+          showToast("Wrong password provided for that user.", context: context);
         } else if (e.code == 'invalid-email') {
-          showToast("Invalid email provided.");
+          showToast("Invalid email provided.", context: context);
         } else if (e.code == 'user-disabled') {
-          showToast("User account has been disabled.");
+          showToast("User account has been disabled.", context: context);
         } else {
-          showToast("An error occurred: ${e.message}");
+          showToast("An error occurred: ${e.message}", context: context);
         }
       } on Exception catch (e) {
-        showToast("An error occurred: $e");
+        showToast("An error occurred: $e", context: context);
       }
     }
   }
@@ -1209,7 +1212,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                           setState(() {
                                             isLoading = false;
                                           });
-                                          showToast('Mobile Number not found');
+                                          showToast('Mobile Number not found',
+                                              context: context);
                                         }
                                       } else {
                                         await FirebaseAuth.instance
@@ -1253,7 +1257,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                             'An error occurred while resetting the password.';
                                       }
 
-                                      showToast(errorMessage);
+                                      showToast(errorMessage, context: context);
                                     }
                                   }
                                 }),

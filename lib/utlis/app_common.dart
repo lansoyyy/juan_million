@@ -3,7 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:juan_million/widgets/toast_widget.dart';
 
 TextStyle headerTextStyle(
     {int? size,
@@ -87,22 +87,16 @@ Color getColorFromHex(String hexColor, {Color? defaultColor}) {
 }
 
 void toast(String? value,
-    {ToastGravity? gravity,
-    length = Toast.LENGTH_SHORT,
+    {int length = 2,
     Color? bgColor,
     Color? textColor,
-    bool print = false}) {
+    bool print = false,
+    BuildContext? context}) {
   if (value!.isEmpty || (!kIsWeb && Platform.isLinux)) {
     log(value);
   } else {
-    Fluttertoast.showToast(
-      msg: value,
-      gravity: gravity,
-      toastLength: length,
-      backgroundColor: bgColor,
-      textColor: textColor,
-      timeInSecForIosWeb: 2,
-    );
+    // Use our custom toast implementation that works on web
+    showToast(value, context: context);
     if (print) log(value);
   }
 }
