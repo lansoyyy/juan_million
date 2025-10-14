@@ -49,7 +49,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   left: 30, right: 30, top: 10, bottom: 10),
               child: GestureDetector(
                 onTap: () {
-                  showToast('Paypal is currently unavailable');
+                  showToast('Paypal is currently unavailable',
+                      context: context);
                 },
                 child: Container(
                   width: double.infinity,
@@ -142,7 +143,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   left: 30, right: 30, top: 10, bottom: 10),
               child: GestureDetector(
                 onTap: () {
-                  showToast('Apple Pay is currently unavailable');
+                  showToast('Apple Pay is currently unavailable',
+                      context: context);
                 },
                 child: Container(
                   width: double.infinity,
@@ -194,7 +196,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 width: 325,
                 label: 'Continue',
                 onPressed: () {
-                  showToast('Payment method not available!');
+                  showToast('Payment method not available!', context: context);
                 },
               ),
             ),

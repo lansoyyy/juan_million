@@ -42,9 +42,9 @@ class _SettingsPageState extends State<SettingsPage> {
         'ptsconversion': int.parse(pts.text)
         // 'ptsconversion': double.parse(pts.text),
       });
-      showToast('Business information updated!');
+      showToast('Business information updated!', context: context);
     } on FirebaseAuthException catch (e) {
-      showToast('Unauthorized to access this feature!');
+      showToast('Unauthorized to access this feature!', context: context);
       print("Error: ${e.message}");
     }
   }

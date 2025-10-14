@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:juan_million/models/municipality_model.dart';
 import 'package:juan_million/models/province_model.dart';
 import 'package:juan_million/models/region_model.dart';
@@ -919,7 +918,8 @@ class _AffiliateLocatorPageState extends State<AffiliateLocatorPage> {
                         'wallet': FieldValue.increment(-2000),
                       });
                     } else {
-                      showToast('Your wallet balance is not enough!');
+                      showToast('Your wallet balance is not enough!',
+                          context: context);
                     }
                   },
                   child: Text(

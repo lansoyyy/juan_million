@@ -48,7 +48,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
       Navigator.of(context)
           .push(MaterialPageRoute(builder: (context) => const SettingsPage()));
     } on FirebaseAuthException catch (e) {
-      showToast('Unauthorized to access this feature!');
+      showToast('Unauthorized to access this feature!', context: context);
       print("Error: ${e.message}");
     }
   }
@@ -122,7 +122,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
             // Update my points
             // Update business points
           } else {
-            showToast('Your wallet balance is not enough');
+            showToast('Your wallet balance is not enough', context: context);
           }
         }).whenComplete(() {
           addPoints(transferredPts, 1, cashier, 'Points received by member',
@@ -405,11 +405,13 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                 );
                                               } else {
                                                 showToast(
-                                                    "You don't have enough points.");
+                                                    "You don't have enough points.",
+                                                    context: context);
                                               }
                                             } else {
                                               showToast(
-                                                  'PIN Code does not exist!');
+                                                  'PIN Code does not exist!',
+                                                  context: context);
                                             }
 
                                             pin.clear();
@@ -744,7 +746,8 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                           doc['name']);
                                                     } else {
                                                       showToast(
-                                                          'PIN Code does not exist!');
+                                                          'PIN Code does not exist!',
+                                                          context: context);
                                                     }
                                                     pin.clear();
                                                   },
@@ -757,7 +760,8 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                     );
                                   } else {
                                     showToast(
-                                        'Please register your authorized user account');
+                                        'Please register your authorized user account',
+                                        context: context);
                                   }
                                 },
                               ),
@@ -1177,7 +1181,8 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                     'pts': FieldValue.increment(ptsToReload),
                                   });
 
-                                  showToast('Transaction was succesfull!');
+                                  showToast('Transaction was succesfull!',
+                                      context: context);
 
                                   addPoints(ptsToReload, 1, name,
                                       'Points from reload', '');
@@ -1198,12 +1203,14 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                 .instance.currentUser!.uid,
                                           )));
                                 } else {
-                                  showToast('Payment failed or canceled.');
+                                  showToast('Payment failed or canceled.',
+                                      context: context);
                                   Navigator.pop(context);
                                 }
                               } else {
                                 showToast(
-                                    'Cannot proceed! Insufficient e wallet');
+                                    'Cannot proceed! Insufficient e wallet',
+                                    context: context);
                               }
 
                               pts.clear();

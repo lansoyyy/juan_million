@@ -93,7 +93,7 @@ class _SignupScreen2State extends State<SignupScreen2> {
         setState(() {});
 
         Navigator.of(context).pop();
-        showToast('Image uploaded!');
+        showToast('Image uploaded!', context: context);
       } on firebase_storage.FirebaseException catch (error) {
         if (kDebugMode) {
           print(error);
@@ -454,7 +454,8 @@ class _SignupScreen2State extends State<SignupScreen2> {
                                       )));
                             });
                           } else {
-                            showToast('All fields are required!');
+                            showToast('All fields are required!',
+                                context: context);
                           }
                         },
                         color: primary,
@@ -800,7 +801,8 @@ class _SignupScreen2State extends State<SignupScreen2> {
                                         )));
                               });
                             } else {
-                              showToast('All fields are required!');
+                              showToast('All fields are required!',
+                                  context: context);
                             }
                           },
                           child: Center(

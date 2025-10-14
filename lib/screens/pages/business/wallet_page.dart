@@ -419,7 +419,9 @@ class _WalletPageState extends State<WalletPage> {
                                                                         false);
                                                                   } else {
                                                                     showToast(
-                                                                        'PIN Code does not exist!');
+                                                                        'PIN Code does not exist!',
+                                                                        context:
+                                                                            context);
                                                                   }
 
                                                                   pin.clear();
@@ -508,7 +510,9 @@ class _WalletPageState extends State<WalletPage> {
                                                                         false);
                                                                   } else {
                                                                     showToast(
-                                                                        'PIN Code does not exist!');
+                                                                        'PIN Code does not exist!',
+                                                                        context:
+                                                                            context);
                                                                   }
 
                                                                   pin.clear();
@@ -596,7 +600,9 @@ class _WalletPageState extends State<WalletPage> {
                                                                         true);
                                                                   } else {
                                                                     showToast(
-                                                                        'PIN Code does not exist!');
+                                                                        'PIN Code does not exist!',
+                                                                        context:
+                                                                            context);
                                                                   }
 
                                                                   pin.clear();
@@ -626,7 +632,8 @@ class _WalletPageState extends State<WalletPage> {
                                   );
                                 } else {
                                   showToast(
-                                      'Please register your authorized user account');
+                                      'Please register your authorized user account',
+                                      context: context);
                                 }
                               },
                               child: Column(
@@ -716,7 +723,8 @@ class _WalletPageState extends State<WalletPage> {
                                                         doc['name']);
                                                   } else {
                                                     showToast(
-                                                        'PIN Code does not exist!');
+                                                        'PIN Code does not exist!',
+                                                        context: context);
                                                   }
 
                                                   pin.clear();
@@ -730,7 +738,8 @@ class _WalletPageState extends State<WalletPage> {
                                   );
                                 } else {
                                   showToast(
-                                      'Please register your authorized user account');
+                                      'Please register your authorized user account',
+                                      context: context);
                                 }
                               },
                               child: Column(
@@ -948,7 +957,8 @@ class _WalletPageState extends State<WalletPage> {
                                   'pts':
                                       FieldValue.increment(int.parse(pts.text))
                                 });
-                                showToast('Transaction was succesfull!');
+                                showToast('Transaction was succesfull!',
+                                    context: context);
 
                                 addPoints(int.parse(pts.text), 1, name,
                                     'Points from reload', '');
@@ -969,7 +979,8 @@ class _WalletPageState extends State<WalletPage> {
                                         )));
                               } else {
                                 showToast(
-                                    'Cannot proceed! Insufficient e wallet');
+                                    'Cannot proceed! Insufficient e wallet',
+                                    context: context);
                               }
 
                               pts.clear();
@@ -1149,7 +1160,7 @@ class _WalletPageState extends State<WalletPage> {
               'wallet': FieldValue.increment(-int.parse(pts.text)),
             });
           } else {
-            showToast('Your wallet balance is not enough!');
+            showToast('Your wallet balance is not enough!', context: context);
           }
         }).whenComplete(() {
           // Add transaction

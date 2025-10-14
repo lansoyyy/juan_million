@@ -38,10 +38,10 @@ class _SignupScreenState extends State<SignupScreen> {
         if (password.text == confirmpassword.text) {
           register(context);
         } else {
-          showToast('Password do not match!');
+          showToast('Password do not match!', context: context);
         }
       } else {
-        showToast('All fields are required!');
+        showToast('All fields are required!', context: context);
       }
     } else {
       DocumentSnapshot doc = await FirebaseFirestore.instance
@@ -58,13 +58,14 @@ class _SignupScreenState extends State<SignupScreen> {
                 .update({'pts': FieldValue.increment(20)});
             register(context);
           } else {
-            showToast('Password do not match!');
+            showToast('Password do not match!', context: context);
           }
         } else {
-          showToast('All fields are required!');
+          showToast('All fields are required!', context: context);
         }
       } else {
-        showToast('Cannot proceed! Referral Code does not exist!');
+        showToast('Cannot proceed! Referral Code does not exist!',
+            context: context);
       }
     }
   }
@@ -395,7 +396,8 @@ class _SignupScreenState extends State<SignupScreen> {
               const SizedBox(height: 20),
               // Logo and header section
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
                 child: Column(
                   children: [
                     // Logo with shadow
@@ -596,13 +598,16 @@ class _SignupScreenState extends State<SignupScreen> {
                                     if (email.text != '' ||
                                         password.text != '' ||
                                         name.text != '') {
-                                      if (password.text == confirmpassword.text) {
+                                      if (password.text ==
+                                          confirmpassword.text) {
                                         register(context);
                                       } else {
-                                        showToast('Password do not match!');
+                                        showToast('Password do not match!',
+                                            context: context);
                                       }
                                     } else {
-                                      showToast('All fields are required!');
+                                      showToast('All fields are required!',
+                                          context: context);
                                     }
                                   } else {
                                     DocumentSnapshot doc =
@@ -625,14 +630,17 @@ class _SignupScreenState extends State<SignupScreen> {
                                           });
                                           register(context);
                                         } else {
-                                          showToast('Password do not match!');
+                                          showToast('Password do not match!',
+                                              context: context);
                                         }
                                       } else {
-                                        showToast('All fields are required!');
+                                        showToast('All fields are required!',
+                                            context: context);
                                       }
                                     } else {
                                       showToast(
-                                          'Cannot proceed! Referral Code does not exist!');
+                                          'Cannot proceed! Referral Code does not exist!',
+                                          context: context);
                                     }
                                   }
                                 }
@@ -725,26 +733,29 @@ class _SignupScreenState extends State<SignupScreen> {
         await FirebaseAuth.instance.currentUser!.sendEmailVerification();
 
         showToast(
-            "Registered Successfully! Verification was sent to your email");
+            "Registered Successfully! Verification was sent to your email",
+            context: context);
         Navigator.of(context).pushReplacement(MaterialPageRoute(
             builder: (context) => SignupScreen2(
                   id: user.user!.uid,
                 )));
       } on FirebaseAuthException catch (e) {
         if (e.code == 'weak-password') {
-          showToast('The password provided is too weak.');
+          showToast('The password provided is too weak.', context: context);
         } else if (e.code == 'email-already-in-use') {
-          showToast('The account already exists for that email.');
+          showToast('The account already exists for that email.',
+              context: context);
         } else if (e.code == 'invalid-email') {
-          showToast('The email address is not valid.');
+          showToast('The email address is not valid.', context: context);
         } else {
-          showToast(e.toString());
+          showToast(e.toString(), context: context);
         }
       } on Exception catch (e) {
-        showToast("An error occurred: $e");
+        showToast("An error occurred: $e", context: context);
       }
     } else {
-      showToast('Password should have atleast special character!');
+      showToast('Password should have atleast special character!',
+          context: context);
     }
   }
 }

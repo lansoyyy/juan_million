@@ -101,7 +101,7 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
         setState(() {});
 
         Navigator.of(context).pop();
-        showToast('Image uploaded!');
+        showToast('Image uploaded!', context: context);
       } on firebase_storage.FirebaseException catch (error) {
         if (kDebugMode) {
           print(error);
@@ -444,10 +444,12 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
                                   password.text != '') {
                                 register(context);
                               } else {
-                                showToast('All fields are required!');
+                                showToast('All fields are required!',
+                                    context: context);
                               }
                             } else {
-                              showToast('Password do not match!');
+                              showToast('Password do not match!',
+                                  context: context);
                             }
                           } else {
                             DocumentSnapshot doc = await FirebaseFirestore
@@ -470,14 +472,17 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
                                           {'pts': FieldValue.increment(20)});
                                   register(context);
                                 } else {
-                                  showToast('All fields are required!');
+                                  showToast('All fields are required!',
+                                      context: context);
                                 }
                               } else {
-                                showToast('Password do not match!');
+                                showToast('Password do not match!',
+                                    context: context);
                               }
                             } else {
                               showToast(
-                                  'Cannot proceed! Referral Code does not exist!');
+                                  'Cannot proceed! Referral Code does not exist!',
+                                  context: context);
                             }
                           }
                         },
@@ -925,10 +930,12 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
                                     password.text != '') {
                                   register(context);
                                 } else {
-                                  showToast('All fields are required!');
+                                  showToast('All fields are required!',
+                                      context: context);
                                 }
                               } else {
-                                showToast('Password do not match!');
+                                showToast('Password do not match!',
+                                    context: context);
                               }
                             } else {
                               DocumentSnapshot doc = await FirebaseFirestore
@@ -951,14 +958,17 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
                                             {'pts': FieldValue.increment(20)});
                                     register(context);
                                   } else {
-                                    showToast('All fields are required!');
+                                    showToast('All fields are required!',
+                                        context: context);
                                   }
                                 } else {
-                                  showToast('Password do not match!');
+                                  showToast('Password do not match!',
+                                      context: context);
                                 }
                               } else {
                                 showToast(
-                                    'Cannot proceed! Referral Code does not exist!');
+                                    'Cannot proceed! Referral Code does not exist!',
+                                    context: context);
                               }
                             }
                           },
@@ -1141,7 +1151,8 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
         await FirebaseAuth.instance.currentUser!.sendEmailVerification();
 
         showToast(
-            "Registered Successfully! Verification was sent to your email");
+            "Registered Successfully! Verification was sent to your email",
+            context: context);
 
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
@@ -1154,19 +1165,21 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
         );
       } on FirebaseAuthException catch (e) {
         if (e.code == 'weak-password') {
-          showToast('The password provided is too weak.');
+          showToast('The password provided is too weak.', context: context);
         } else if (e.code == 'email-already-in-use') {
-          showToast('The account already exists for that email.');
+          showToast('The account already exists for that email.',
+              context: context);
         } else if (e.code == 'invalid-email') {
-          showToast('The email address is not valid.');
+          showToast('The email address is not valid.', context: context);
         } else {
-          showToast(e.toString());
+          showToast(e.toString(), context: context);
         }
       } on Exception catch (e) {
-        showToast("An error occurred: $e");
+        showToast("An error occurred: $e", context: context);
       }
     } else {
-      showToast('Password should have atleast special character!');
+      showToast('Password should have atleast special character!',
+          context: context);
     }
   }
 
@@ -1208,7 +1221,8 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
           if (userExist) {
             Navigator.pop(context);
 
-            showToast('Your google account is already used! Try logging in.');
+            showToast('Your google account is already used! Try logging in.',
+                context: context);
           } else {
             // If the user doesn't exist, create a new user with Google credentials
             try {

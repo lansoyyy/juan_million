@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:juan_million/screens/auth/payment_screen.dart';
 import 'package:juan_million/screens/customer_home_screen.dart';
 import 'package:juan_million/screens/pages/customer/qr_scanned_page.dart';
@@ -421,16 +419,17 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                             qty))
                     .toInt()),
           });
-          showToast('Succesfully purchased!');
+          showToast('Succesfully purchased!', context: context);
 
           addPoints((widget.item['slots'] * 150) * qty, qty, '',
               'Points converted to Slots', '');
           Navigator.of(context).pop();
         } else {
-          showToast('Not enough balance on wallet!');
+          showToast('Not enough balance on wallet!', context: context);
         }
       } else {
-        showToast("You've reached the maximum slots as of today!");
+        showToast("You've reached the maximum slots as of today!",
+            context: context);
       }
     });
   }

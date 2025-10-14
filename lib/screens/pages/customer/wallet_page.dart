@@ -701,7 +701,8 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
                 );
               } else {
                 Navigator.pop(context);
-                showToast('Your points is not enough to proceed!');
+                showToast('Your points is not enough to proceed!',
+                    context: context);
               }
             } else {
               if (documentSnapshot['pts'] >= int.parse(pts.text)) {
@@ -737,7 +738,8 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
                 );
               } else {
                 Navigator.pop(context);
-                showToast('Your E wallet is not enough to proceed!');
+                showToast('Your E wallet is not enough to proceed!',
+                    context: context);
               }
             }
           }
