@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_barcode_scanner_plus/flutter_barcode_scanner_plus.dart';
+import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:juan_million/screens/pages/customer/affiliates_locator_page.dart';
 import 'package:juan_million/screens/pages/customer/inventory_page.dart';
@@ -10,6 +10,7 @@ import 'package:juan_million/screens/pages/customer/myqr_page.dart';
 import 'package:juan_million/screens/pages/customer/notif_page.dart';
 import 'package:juan_million/screens/pages/customer/points_page.dart';
 import 'package:juan_million/screens/pages/customer/qr_scanned_page.dart';
+import 'package:juan_million/screens/pages/customer/qr_scanner_screen.dart';
 import 'package:juan_million/screens/pages/customer/settings_page.dart';
 import 'package:juan_million/screens/pages/customer/wallet_page.dart';
 import 'package:juan_million/services/add_slots.dart';
@@ -31,12 +32,17 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
   Future<void> scanQRCode() async {
     try {
-      final qrCode = await FlutterBarcodeScanner.scanBarcode(
-        '#ff6666',
-        'Cancel',
-        true,
-        ScanMode.QR,
+      // Navigate to a new screen for QR scanning
+      final result = await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const QRScannerScreen(),
+        ),
       );
+
+      if (result == null) {
+        // User cancelled the scan
+        return;
+      }
 
       showDialog(
         context: context,
@@ -56,57 +62,53 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
       if (!mounted) return;
 
       setState(() {
-        this.qrCode = qrCode;
+        qrCode = result;
       });
 
-      if (qrCode != '-1') {
-        await FirebaseFirestore.instance
-            .collection('Points')
-            .doc(qrCode)
-            .get()
-            .then((DocumentSnapshot documentSnapshot) async {
-          if (documentSnapshot.exists) {
-            await FirebaseFirestore.instance
-                .collection('Users')
-                .doc(userId)
-                .update({
-              'pts': FieldValue.increment(documentSnapshot['pts']),
-            });
-            await FirebaseFirestore.instance
-                .collection('Business')
-                .doc(documentSnapshot['uid'])
-                .update({
-              'pts': FieldValue.increment(-documentSnapshot['pts']),
-            });
-            await FirebaseFirestore.instance
-                .collection('Points')
-                .doc(documentSnapshot.id)
-                .update({
-              'scanned': true,
-              'scannedId': userId,
-            });
-
-            await FirebaseFirestore.instance
-                .collection('Community Wallet')
-                .doc('wallet')
-                .update({
-              'pts': FieldValue.increment(documentSnapshot['pts']),
-            });
-          }
-          setState(() {
-            pts = documentSnapshot['pts'].toString();
-            store = documentSnapshot['uid'];
+      await FirebaseFirestore.instance
+          .collection('Points')
+          .doc(result)
+          .get()
+          .then((DocumentSnapshot documentSnapshot) async {
+        if (documentSnapshot.exists) {
+          await FirebaseFirestore.instance
+              .collection('Users')
+              .doc(userId)
+              .update({
+            'pts': FieldValue.increment(documentSnapshot['pts']),
           });
-        }).whenComplete(() {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => QRScannedPage(
-                    pts: pts,
-                    store: store,
-                  )));
+          await FirebaseFirestore.instance
+              .collection('Business')
+              .doc(documentSnapshot['uid'])
+              .update({
+            'pts': FieldValue.increment(-documentSnapshot['pts']),
+          });
+          await FirebaseFirestore.instance
+              .collection('Points')
+              .doc(documentSnapshot.id)
+              .update({
+            'scanned': true,
+            'scannedId': userId,
+          });
+
+          await FirebaseFirestore.instance
+              .collection('Community Wallet')
+              .doc('wallet')
+              .update({
+            'pts': FieldValue.increment(documentSnapshot['pts']),
+          });
+        }
+        setState(() {
+          pts = documentSnapshot['pts'].toString();
+          store = documentSnapshot['uid'];
         });
-      } else {
-        Navigator.pop(context);
-      }
+      }).whenComplete(() {
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => QRScannedPage(
+                  pts: pts,
+                  store: store,
+                )));
+      });
     } on PlatformException {
       qrCode = 'Failed to get platform version.';
     }

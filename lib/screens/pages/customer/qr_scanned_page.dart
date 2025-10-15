@@ -3,10 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_barcode_scanner_plus/flutter_barcode_scanner_plus.dart';
+import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:juan_million/screens/business_home_screen.dart';
 import 'package:juan_million/screens/customer_home_screen.dart';
+import 'package:juan_million/screens/pages/customer/qr_scanner_screen.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/button_widget.dart';
 import 'package:juan_million/widgets/text_widget.dart';
@@ -37,12 +38,17 @@ class _QRScannedPageState extends State<QRScannedPage> {
 
   Future<void> scanQRCode() async {
     try {
-      final qrCode = await FlutterBarcodeScanner.scanBarcode(
-        '#ff6666',
-        'Cancel',
-        true,
-        ScanMode.QR,
+      // Navigate to a new screen for QR scanning
+      final result = await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const QRScannerScreen(),
+        ),
       );
+
+      if (result == null) {
+        // User cancelled the scan
+        return;
+      }
 
       showDialog(
         context: context,
@@ -62,12 +68,12 @@ class _QRScannedPageState extends State<QRScannedPage> {
       if (!mounted) return;
 
       setState(() {
-        this.qrCode = qrCode;
+        qrCode = result;
       });
 
       await FirebaseFirestore.instance
           .collection('Points')
-          .doc(qrCode)
+          .doc(result)
           .get()
           .then((DocumentSnapshot documentSnapshot) async {
         if (documentSnapshot.exists) {

@@ -222,14 +222,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_barcode_scanner_plus:
-    dependency: "direct main"
-    description:
-      name: flutter_barcode_scanner_plus
-      sha256: "75bcf27d12ad6cd075dcfc8d838cffc254dab89cf9d33ec470faa1f9b4f97296"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.8"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -528,6 +520,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.2"
+  qr_code_scanner_plus:
+    dependency: "direct main"
+    description:
+      name: qr_code_scanner_plus
+      sha256: "41f4a834a48d670d25e3917cb9f1dbb4742298a0b4ab60d82416b295b73931e1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.13"
   qr_flutter:
     dependency: "direct main"
     description:

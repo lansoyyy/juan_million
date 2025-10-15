@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_barcode_scanner_plus/flutter_barcode_scanner_plus.dart';
+import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
+import 'package:juan_million/screens/pages/customer/qr_scanner_screen.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -134,12 +135,17 @@ class _MyQRBusinessPageState extends State<MyQRBusinessPage> {
 
   Future<void> scanQRCode() async {
     try {
-      final qrCode = await FlutterBarcodeScanner.scanBarcode(
-        '#ff6666',
-        'Cancel',
-        true,
-        ScanMode.QR,
+      // Navigate to a new screen for QR scanning
+      final result = await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const QRScannerScreen(),
+        ),
       );
+
+      if (result == null) {
+        // User cancelled the scan
+        return;
+      }
 
       showDialog(
         context: context,
@@ -159,14 +165,14 @@ class _MyQRBusinessPageState extends State<MyQRBusinessPage> {
       if (!mounted) return;
 
       setState(() {
-        this.qrCode = qrCode;
+        qrCode = result;
       });
 
       await FirebaseFirestore.instance
           .collection('Users')
           .doc(FirebaseAuth.instance.currentUser!.uid)
           .update({
-        'pts': FieldValue.increment(int.parse(qrCode)),
+        'pts': FieldValue.increment(int.parse(result)),
       }).whenComplete(() {
         // Add transaction
         Navigator.pop(context);

@@ -2,9 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_barcode_scanner_plus/flutter_barcode_scanner_plus.dart';
+import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:juan_million/screens/pages/customer/qr_scanned_page.dart';
+import 'package:juan_million/screens/pages/customer/qr_scanner_screen.dart';
 import 'package:juan_million/services/add_points.dart';
 import 'package:juan_million/services/add_wallet.dart';
 import 'package:juan_million/utlis/colors.dart';
@@ -1112,12 +1113,17 @@ class _WalletPageState extends State<WalletPage> {
 
   Future<void> scanQRCode(String cashier) async {
     try {
-      final qrCode = await FlutterBarcodeScanner.scanBarcode(
-        '#ff6666',
-        'Cancel',
-        true,
-        ScanMode.QR,
+      // Navigate to a new screen for QR scanning
+      final result = await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const QRScannerScreen(),
+        ),
       );
+
+      if (result == null) {
+        // User cancelled the scan
+        return;
+      }
 
       showDialog(
         context: context,
@@ -1137,41 +1143,37 @@ class _WalletPageState extends State<WalletPage> {
       if (!mounted) return;
 
       setState(() {
-        this.qrCode = qrCode;
+        qrCode = result;
       });
 
-      if (qrCode != '-1') {
-        await FirebaseFirestore.instance
-            .collection('Business')
-            .doc(FirebaseAuth.instance.currentUser!.uid)
-            .get()
-            .then((DocumentSnapshot documentSnapshot) async {
-          if (documentSnapshot['wallet'] > int.parse(pts.text)) {
-            await FirebaseFirestore.instance
-                .collection(selected)
-                .doc(qrCode)
-                .update({
-              'wallet': FieldValue.increment(int.parse(pts.text)),
-            });
-            await FirebaseFirestore.instance
-                .collection('Business')
-                .doc(FirebaseAuth.instance.currentUser!.uid)
-                .update({
-              'wallet': FieldValue.increment(-int.parse(pts.text)),
-            });
-          } else {
-            showToast('Your wallet balance is not enough!', context: context);
-          }
-        }).whenComplete(() {
-          // Add transaction
+      await FirebaseFirestore.instance
+          .collection('Business')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .get()
+          .then((DocumentSnapshot documentSnapshot) async {
+        if (documentSnapshot['wallet'] > int.parse(pts.text)) {
+          await FirebaseFirestore.instance
+              .collection(selected)
+              .doc(result)
+              .update({
+            'wallet': FieldValue.increment(int.parse(pts.text)),
+          });
+          await FirebaseFirestore.instance
+              .collection('Business')
+              .doc(FirebaseAuth.instance.currentUser!.uid)
+              .update({
+            'wallet': FieldValue.increment(-int.parse(pts.text)),
+          });
+        } else {
+          showToast('Your wallet balance is not enough!', context: context);
+        }
+      }).whenComplete(() {
+        // Add transaction
 
-          addWallet(int.parse(pts.text), FirebaseAuth.instance.currentUser!.uid,
-              qrCode, 'Receive & Transfers', cashier);
-          Navigator.of(context).pop();
-        });
-      } else {
-        Navigator.pop(context);
-      }
+        addWallet(int.parse(pts.text), FirebaseAuth.instance.currentUser!.uid,
+            result, 'Receive & Transfers', cashier);
+        Navigator.of(context).pop();
+      });
     } on PlatformException {
       qrCode = 'Failed to get platform version.';
     }
