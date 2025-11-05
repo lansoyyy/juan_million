@@ -494,7 +494,7 @@ class _AffiliateLocatorPageState extends State<AffiliateLocatorPage> {
       margin: EdgeInsets.only(bottom: isDesktop ? 0 : 15),
       child: GestureDetector(
         onTap: () {
-          // Navigate to store page or show details
+          _showBusinessDetailsDialog(data);
         },
         child: Container(
           decoration: BoxDecoration(
@@ -932,5 +932,219 @@ class _AffiliateLocatorPageState extends State<AffiliateLocatorPage> {
                 ),
               ],
             ));
+  }
+
+  void _showBusinessDetailsDialog(DocumentSnapshot businessData) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header with close button
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextWidget(
+                      text: 'Business Details',
+                      fontSize: 20,
+                      fontFamily: 'Bold',
+                      color: Colors.black87,
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: Icon(
+                        Icons.close_rounded,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 15),
+                
+                // Business logo
+                Center(
+                  child: Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          primary.withOpacity(0.1),
+                          secondary.withOpacity(0.1),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: Image.network(
+                        businessData['logo'] ?? '',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Icon(
+                            Icons.storefront_rounded,
+                            size: 60,
+                            color: primary,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                
+                // Business name
+                Center(
+                  child: TextWidget(
+                    text: businessData['name'] ?? 'N/A',
+                    fontSize: 22,
+                    fontFamily: 'Bold',
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                
+                // Business email
+                Center(
+                  child: TextWidget(
+                    text: businessData['email'] ?? 'N/A',
+                    fontSize: 14,
+                    fontFamily: 'Regular',
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                
+                // Business details section
+                _buildDetailSection('Address', businessData['address'] ?? 'N/A'),
+                _buildDetailSection('Description', businessData['desc'] ?? 'No description available'),
+                _buildDetailSection('Business Classification', businessData['clarification'] ?? 'N/A'),
+                _buildDetailSection('Representative', businessData['representative'] ?? 'N/A'),
+                _buildDetailSection('Phone', businessData['phone'] ?? 'Not provided'),
+                
+                const SizedBox(height: 15),
+                
+                // Business stats
+                Container(
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        primary.withOpacity(0.1),
+                        secondary.withOpacity(0.1),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildStatItem('Points', '${businessData['pts'] ?? 0}'),
+                      _buildStatItem('Wallet', '₱${businessData['wallet'] ?? 0}'),
+                      _buildStatItem('Inventory', '${businessData['inventory'] ?? 0}'),
+                    ],
+                  ),
+                ),
+                
+                const SizedBox(height: 15),
+                
+                // Verification status
+                Row(
+                  children: [
+                    Icon(
+                      businessData['verified'] == true
+                          ? Icons.verified_rounded
+                          : Icons.pending_rounded,
+                      color: businessData['verified'] == true
+                          ? Colors.green
+                          : Colors.orange,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    TextWidget(
+                      text: businessData['verified'] == true
+                          ? 'Verified Business'
+                          : 'Pending Verification',
+                      fontSize: 14,
+                      fontFamily: 'Medium',
+                      color: businessData['verified'] == true
+                          ? Colors.green
+                          : Colors.orange,
+                    ),
+                  ],
+                ),
+                
+                const SizedBox(height: 20),
+                
+                // Action buttons
+                Row(
+                  children: [
+                
+                    Expanded(
+                      child: ButtonWidget(
+                        label: 'Close',
+                        onPressed: () => Navigator.of(context).pop(),
+                        radius: 10,
+                        color: Colors.grey.shade300,
+                        textColor: Colors.black87,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailSection(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 10),
+        TextWidget(
+          text: label,
+          fontSize: 12,
+          fontFamily: 'Regular',
+          color: Colors.grey.shade600,
+        ),
+        const SizedBox(height: 3),
+        TextWidget(
+          text: value,
+          fontSize: 16,
+          fontFamily: 'Medium',
+          color: Colors.black87,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatItem(String label, String value) {
+    return Column(
+      children: [
+        TextWidget(
+          text: value,
+          fontSize: 18,
+          fontFamily: 'Bold',
+          color: primary,
+        ),
+        TextWidget(
+          text: label,
+          fontSize: 12,
+          fontFamily: 'Regular',
+          color: Colors.grey.shade600,
+        ),
+      ],
+    );
   }
 }

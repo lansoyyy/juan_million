@@ -757,10 +757,10 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   login(context) async {
-    if (isPhoneNumber(username.text)) {
+    if (isPhoneNumber(username.text.trim())) {
       var querySnapshot = await FirebaseFirestore.instance
           .collection('Users')
-          .where('number', isEqualTo: username.text)
+          .where('number', isEqualTo: username.text.trim())
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
@@ -864,7 +864,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       try {
         final user = await FirebaseAuth.instance.signInWithEmailAndPassword(
-            email: username.text, password: password.text);
+            email: username.text.trim(), password: password.text);
 
         if (widget.inCustomer) {
           if (user.user!.emailVerified) {
@@ -878,7 +878,7 @@ class _LoginScreenState extends State<LoginScreen> {
               // If user data doesn't exist, we need to get the user data from the Users collection using email
               var querySnapshot = await FirebaseFirestore.instance
                   .collection('Users')
-                  .where('email', isEqualTo: username.text)
+                  .where('email', isEqualTo: username.text.trim())
                   .get();
 
               if (querySnapshot.docs.isNotEmpty) {
@@ -912,7 +912,7 @@ class _LoginScreenState extends State<LoginScreen> {
               // If business data doesn't exist, we need to get the business data using email
               var businessQuerySnapshot = await FirebaseFirestore.instance
                   .collection('Business')
-                  .where('email', isEqualTo: username.text)
+                  .where('email', isEqualTo: username.text.trim())
                   .get();
 
               if (businessQuerySnapshot.docs.isNotEmpty) {
@@ -1188,13 +1188,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                     });
 
                                     try {
-                                      if (isPhoneNumber(emailController.text)) {
+                                      if (isPhoneNumber(emailController.text.trim())) {
                                         var querySnapshot =
                                             await FirebaseFirestore.instance
                                                 .collection('Users')
                                                 .where('number',
                                                     isEqualTo:
-                                                        emailController.text)
+                                                        emailController.text.trim())
                                                 .get();
 
                                         if (querySnapshot.docs.isNotEmpty) {
@@ -1218,14 +1218,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                       } else {
                                         await FirebaseAuth.instance
                                             .sendPasswordResetEmail(
-                                                email: emailController.text);
+                                                email: emailController.text.trim());
 
                                         setState(() {
                                           isLoading = false;
                                         });
                                         Navigator.pop(context);
                                         _showPasswordResetSuccessDialog(
-                                            context, emailController.text);
+                                            context, emailController.text.trim());
                                       }
                                     } catch (e) {
                                       setState(() {
