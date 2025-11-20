@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
+import 'package:juan_million/widgets/transaction_receipt_dialog.dart';
 
 class PointsPage extends StatefulWidget {
   const PointsPage({super.key});
@@ -366,197 +367,212 @@ class _PointsPageState extends State<PointsPage> {
                                   physics: const NeverScrollableScrollPhysics(),
                                   itemCount: data.docs.length,
                                   itemBuilder: (context, index) {
-                                    final isAdded =
-                                        data.docs[index]['type'] == 'Added';
-                                    return Container(
-                                      margin: const EdgeInsets.only(bottom: 15),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(20),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color:
-                                                Colors.black.withOpacity(0.08),
-                                            blurRadius: 15,
-                                            offset: const Offset(0, 5),
-                                          ),
-                                        ],
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(16),
-                                        child: Row(
-                                          children: [
-                                            Container(
-                                              padding: const EdgeInsets.all(12),
-                                              decoration: BoxDecoration(
-                                                color: isAdded
-                                                    ? Colors.green
-                                                        .withOpacity(0.1)
-                                                    : Colors.orange
-                                                        .withOpacity(0.1),
-                                                borderRadius:
-                                                    BorderRadius.circular(15),
-                                              ),
-                                              child: Icon(
-                                                isAdded
-                                                    ? Icons.add_circle_outline
-                                                    : Icons
-                                                        .remove_circle_outline,
-                                                color: isAdded
-                                                    ? Colors.green
-                                                    : Colors.orange,
-                                                size: 28,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 15),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      TextWidget(
-                                                        text:
-                                                            '${data.docs[index]['type']}',
-                                                        fontSize: 16,
-                                                        color: Colors.black87,
-                                                        fontFamily: 'Bold',
-                                                      ),
-                                                      Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                                horizontal: 12,
-                                                                vertical: 6),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          color: isAdded
-                                                              ? Colors.green
-                                                                  .withOpacity(
-                                                                      0.15)
-                                                              : Colors.orange
-                                                                  .withOpacity(
-                                                                      0.15),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(12),
-                                                        ),
-                                                        child: TextWidget(
-                                                          text: isAdded
-                                                              ? '+${data.docs[index]['pts'].round()}'
-                                                              : '-${data.docs[index]['pts'].round()}',
-                                                          fontSize: 14,
-                                                          color: isAdded
-                                                              ? Colors.green
-                                                              : Colors.orange,
-                                                          fontFamily: 'Bold',
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  const SizedBox(height: 8),
-                                                  Row(
-                                                    children: [
-                                                      Icon(Icons.access_time,
-                                                          size: 14,
-                                                          color: Colors.grey),
-                                                      const SizedBox(width: 5),
-                                                      TextWidget(
-                                                        text: DateFormat.yMMMd()
-                                                            .add_jm()
-                                                            .format(data
-                                                                .docs[index]
-                                                                    ['dateTime']
-                                                                .toDate()),
-                                                        fontSize: 12,
-                                                        color: Colors.grey,
-                                                        fontFamily: 'Regular',
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  data.docs[index]
-                                                              ['scannedId'] ==
-                                                          ''
-                                                      ? const SizedBox(
-                                                          height: 5)
-                                                      : StreamBuilder<
-                                                              DocumentSnapshot>(
-                                                          stream: FirebaseFirestore
-                                                              .instance
-                                                              .collection(
-                                                                  'Users')
-                                                              .doc(data.docs[
-                                                                      index]
-                                                                  ['scannedId'])
-                                                              .snapshots(),
-                                                          builder: (context,
-                                                              AsyncSnapshot<
-                                                                      DocumentSnapshot>
-                                                                  snapshot) {
-                                                            if (!snapshot.hasData ||
-                                                                snapshot
-                                                                    .hasError ||
-                                                                snapshot.connectionState ==
-                                                                    ConnectionState
-                                                                        .waiting) {
-                                                              return const SizedBox();
-                                                            }
-                                                            dynamic
-                                                                customerdata =
-                                                                snapshot.data;
-                                                            return Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      top: 5),
-                                                              child: Row(
-                                                                children: [
-                                                                  Icon(
-                                                                      Icons
-                                                                          .person_outline,
-                                                                      size: 14,
-                                                                      color: Colors
-                                                                          .grey),
-                                                                  const SizedBox(
-                                                                      width: 5),
-                                                                  TextWidget(
-                                                                    text: customerdata[
-                                                                        'name'],
-                                                                    fontSize:
-                                                                        12,
-                                                                    color: Colors
-                                                                        .grey,
-                                                                    fontFamily:
-                                                                        'Regular',
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            );
-                                                          }),
-                                                  const SizedBox(height: 5),
-                                                  Row(
-                                                    children: [
-                                                      Icon(Icons.badge_outlined,
-                                                          size: 14,
-                                                          color: Colors.grey),
-                                                      const SizedBox(width: 5),
-                                                      TextWidget(
-                                                        text:
-                                                            'By: ${data.docs[index]['cashier']}',
-                                                        fontSize: 12,
-                                                        color: Colors.grey,
-                                                        fontFamily: 'Regular',
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
+                                    final doc = data.docs[index];
+                                    final isAdded = doc['type'] == 'Added';
+                                    return GestureDetector(
+                                      onTap: () {
+                                        TransactionReceiptDialog
+                                            .showPointsReceipt(context, doc);
+                                      },
+                                      child: Container(
+                                        margin:
+                                            const EdgeInsets.only(bottom: 15),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black
+                                                  .withOpacity(0.08),
+                                              blurRadius: 15,
+                                              offset: const Offset(0, 5),
                                             ),
                                           ],
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(16),
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.all(12),
+                                                decoration: BoxDecoration(
+                                                  color: isAdded
+                                                      ? Colors.green
+                                                          .withOpacity(0.1)
+                                                      : Colors.orange
+                                                          .withOpacity(0.1),
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                ),
+                                                child: Icon(
+                                                  isAdded
+                                                      ? Icons.add_circle_outline
+                                                      : Icons
+                                                          .remove_circle_outline,
+                                                  color: isAdded
+                                                      ? Colors.green
+                                                      : Colors.orange,
+                                                  size: 28,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 15),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        TextWidget(
+                                                          text:
+                                                              '${doc['type']}',
+                                                          fontSize: 16,
+                                                          color: Colors.black87,
+                                                          fontFamily: 'Bold',
+                                                        ),
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      12,
+                                                                  vertical: 6),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: isAdded
+                                                                ? Colors.green
+                                                                    .withOpacity(
+                                                                        0.15)
+                                                                : Colors.orange
+                                                                    .withOpacity(
+                                                                        0.15),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        12),
+                                                          ),
+                                                          child: TextWidget(
+                                                            text: isAdded
+                                                                ? '+${doc['pts'].round()}'
+                                                                : '-${doc['pts'].round()}',
+                                                            fontSize: 14,
+                                                            color: isAdded
+                                                                ? Colors.green
+                                                                : Colors.orange,
+                                                            fontFamily: 'Bold',
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    const SizedBox(height: 8),
+                                                    Row(
+                                                      children: [
+                                                        Icon(Icons.access_time,
+                                                            size: 14,
+                                                            color: Colors.grey),
+                                                        const SizedBox(
+                                                            width: 5),
+                                                        TextWidget(
+                                                          text: DateFormat
+                                                                  .yMMMd()
+                                                              .add_jm()
+                                                              .format(doc[
+                                                                      'dateTime']
+                                                                  .toDate()),
+                                                          fontSize: 12,
+                                                          color: Colors.grey,
+                                                          fontFamily: 'Regular',
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    doc['scannedId'] == ''
+                                                        ? const SizedBox(
+                                                            height: 5)
+                                                        : StreamBuilder<
+                                                                DocumentSnapshot>(
+                                                            stream: FirebaseFirestore
+                                                                .instance
+                                                                .collection(
+                                                                    'Users')
+                                                                .doc(doc[
+                                                                    'scannedId'])
+                                                                .snapshots(),
+                                                            builder: (context,
+                                                                AsyncSnapshot<
+                                                                        DocumentSnapshot>
+                                                                    snapshot) {
+                                                              if (!snapshot
+                                                                      .hasData ||
+                                                                  snapshot
+                                                                      .hasError ||
+                                                                  snapshot.connectionState ==
+                                                                      ConnectionState
+                                                                          .waiting) {
+                                                                return const SizedBox();
+                                                              }
+                                                              dynamic
+                                                                  customerdata =
+                                                                  snapshot.data;
+                                                              return Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        top: 5),
+                                                                child: Row(
+                                                                  children: [
+                                                                    Icon(
+                                                                        Icons
+                                                                            .person_outline,
+                                                                        size:
+                                                                            14,
+                                                                        color: Colors
+                                                                            .grey),
+                                                                    const SizedBox(
+                                                                        width:
+                                                                            5),
+                                                                    TextWidget(
+                                                                      text: customerdata[
+                                                                          'name'],
+                                                                      fontSize:
+                                                                          12,
+                                                                      color: Colors
+                                                                          .grey,
+                                                                      fontFamily:
+                                                                          'Regular',
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              );
+                                                            }),
+                                                    const SizedBox(height: 5),
+                                                    Row(
+                                                      children: [
+                                                        Icon(
+                                                            Icons
+                                                                .badge_outlined,
+                                                            size: 14,
+                                                            color: Colors.grey),
+                                                        const SizedBox(
+                                                            width: 5),
+                                                        TextWidget(
+                                                          text:
+                                                              'By: ${doc['cashier']}',
+                                                          fontSize: 12,
+                                                          color: Colors.grey,
+                                                          fontFamily: 'Regular',
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     );

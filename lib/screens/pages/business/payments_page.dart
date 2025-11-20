@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
+import 'package:juan_million/widgets/transaction_receipt_dialog.dart';
 
 class PaymentsPage extends StatelessWidget {
   const PaymentsPage({super.key});
@@ -223,109 +224,97 @@ class PaymentsPage extends StatelessWidget {
                   ? DateFormat.yMMMd().add_jm().format(createdAt)
                   : '';
 
-              return Container(
-                margin: const EdgeInsets.only(bottom: 15),
-                child: Card(
-                  elevation: 5,
-                  shadowColor: Colors.black.withOpacity(0.1),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: TextWidget(
-                                text: description.isNotEmpty
-                                    ? description
-                                    : 'Transaction',
-                                fontSize: 16,
-                                fontFamily: 'Bold',
-                                color: Colors.black87,
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: _statusColor(status).withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: TextWidget(
-                                text: status,
-                                fontSize: 12,
-                                color: _statusColor(status),
-                                fontFamily: 'Bold',
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: blue.withOpacity(0.05),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Row(
+              return GestureDetector(
+                onTap: () {
+                  TransactionReceiptDialog.showPaymentReceipt(
+                      context, docs[index]);
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 15),
+                  child: Card(
+                    elevation: 5,
+                    shadowColor: Colors.black.withOpacity(0.1),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Icon(
-                                Icons.account_balance_wallet_rounded,
-                                color: blue,
-                                size: 24,
+                              Expanded(
+                                child: TextWidget(
+                                  text: description.isNotEmpty
+                                      ? description
+                                      : 'Transaction',
+                                  fontSize: 16,
+                                  fontFamily: 'Bold',
+                                  color: Colors.black87,
+                                ),
                               ),
-                              const SizedBox(width: 12),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  TextWidget(
-                                    text: 'Amount',
-                                    fontSize: 12,
-                                    color: Colors.grey,
-                                    fontFamily: 'Regular',
-                                  ),
-                                  const SizedBox(height: 4),
-                                  TextWidget(
-                                    text: '$currency $amount',
-                                    fontSize: 18,
-                                    color: blue,
-                                    fontFamily: 'Bold',
-                                  ),
-                                ],
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: _statusColor(status).withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: TextWidget(
+                                  text: status,
+                                  fontSize: 12,
+                                  color: _statusColor(status),
+                                  fontFamily: 'Bold',
+                                ),
                               ),
                             ],
                           ),
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Icon(Icons.tag, color: Colors.grey, size: 16),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: TextWidget(
-                                text: 'ID: $txnId',
-                                fontSize: 12,
-                                color: Colors.grey,
-                                fontFamily: 'Regular',
-                              ),
+                          const SizedBox(height: 12),
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: blue.withOpacity(0.05),
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                          ],
-                        ),
-                        if (createdStr.isNotEmpty) ...[
-                          const SizedBox(height: 8),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.account_balance_wallet_rounded,
+                                  color: blue,
+                                  size: 24,
+                                ),
+                                const SizedBox(width: 12),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TextWidget(
+                                      text: 'Amount',
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                      fontFamily: 'Regular',
+                                    ),
+                                    const SizedBox(height: 4),
+                                    TextWidget(
+                                      text: '$currency $amount',
+                                      fontSize: 18,
+                                      color: blue,
+                                      fontFamily: 'Bold',
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 12),
                           Row(
                             children: [
-                              Icon(Icons.access_time,
-                                  color: Colors.grey, size: 16),
+                              Icon(Icons.tag, color: Colors.grey, size: 16),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: TextWidget(
-                                  text: createdStr,
+                                  text: 'ID: $txnId',
                                   fontSize: 12,
                                   color: Colors.grey,
                                   fontFamily: 'Regular',
@@ -333,8 +322,26 @@ class PaymentsPage extends StatelessWidget {
                               ),
                             ],
                           ),
+                          if (createdStr.isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Icon(Icons.access_time,
+                                    color: Colors.grey, size: 16),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: TextWidget(
+                                    text: createdStr,
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                    fontFamily: 'Regular',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
                   ),
                 ),

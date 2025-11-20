@@ -12,6 +12,7 @@ import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:juan_million/widgets/textfield_widget.dart';
 import 'package:juan_million/widgets/toast_widget.dart';
+import 'package:juan_million/widgets/transaction_receipt_dialog.dart';
 
 class CustomerWalletPage extends StatefulWidget {
   const CustomerWalletPage({super.key});
@@ -427,6 +428,9 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
         ],
       ),
       child: ListTile(
+        onTap: () {
+          TransactionReceiptDialog.showWalletReceipt(context, transaction);
+        },
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         leading: Container(

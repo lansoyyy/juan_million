@@ -11,6 +11,7 @@ import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:juan_million/widgets/textfield_widget.dart';
 import 'package:juan_million/widgets/toast_widget.dart';
+import 'package:juan_million/widgets/transaction_receipt_dialog.dart';
 
 class CustomerPointsPage extends StatefulWidget {
   const CustomerPointsPage({super.key});
@@ -464,6 +465,9 @@ class _CustomerPointsPageState extends State<CustomerPointsPage> {
         ],
       ),
       child: ListTile(
+        onTap: () {
+          TransactionReceiptDialog.showPointsReceipt(context, transaction);
+        },
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         leading: Container(

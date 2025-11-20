@@ -13,6 +13,7 @@ import 'package:juan_million/widgets/button_widget.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:juan_million/widgets/textfield_widget.dart';
 import 'package:juan_million/widgets/toast_widget.dart';
+import 'package:juan_million/widgets/transaction_receipt_dialog.dart';
 
 class WalletPage extends StatefulWidget {
   const WalletPage({super.key});
@@ -813,9 +814,14 @@ class _WalletPageState extends State<WalletPage> {
                                   physics: const NeverScrollableScrollPhysics(),
                                   itemCount: data.docs.length,
                                   itemBuilder: (context, index) {
+                                    final doc = data.docs[index];
                                     return Padding(
                                       padding: const EdgeInsets.all(5.0),
                                       child: ListTile(
+                                        onTap: () {
+                                          TransactionReceiptDialog
+                                              .showWalletReceipt(context, doc);
+                                        },
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(
                                             15,
@@ -836,30 +842,26 @@ class _WalletPageState extends State<WalletPage> {
                                             TextWidget(
                                               text: DateFormat.yMMMd()
                                                   .add_jm()
-                                                  .format(data.docs[index]
-                                                          ['dateTime']
-                                                      .toDate()),
+                                                  .format(
+                                                      doc['dateTime'].toDate()),
                                               fontSize: 11,
                                               color: Colors.grey,
                                               fontFamily: 'Medium',
                                             ),
                                             TextWidget(
-                                              text:
-                                                  '${data.docs[index]['pts']}',
+                                              text: '${doc['pts']}',
                                               fontSize: 16,
                                               color: Colors.black,
                                               fontFamily: 'Medium',
                                             ),
                                             TextWidget(
-                                              text:
-                                                  '${data.docs[index]['type']}',
+                                              text: '${doc['type']}',
                                               fontSize: 12,
                                               color: Colors.black,
                                               fontFamily: 'Medium',
                                             ),
                                             TextWidget(
-                                              text:
-                                                  'By: ${data.docs[index]['cashier']}',
+                                              text: 'By: ${doc['cashier']}',
                                               fontSize: 11,
                                               color: Colors.grey,
                                               fontFamily: 'Medium',
