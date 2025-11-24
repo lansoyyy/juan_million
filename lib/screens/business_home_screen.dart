@@ -36,6 +36,9 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
   final email = TextEditingController();
   final password = TextEditingController();
 
+  late final String _currentBusinessId;
+  late final Stream<DocumentSnapshot> _businessData;
+
   Future<void> reauthenticateUser(String email, String password) async {
     User user = FirebaseAuth.instance.currentUser!;
     AuthCredential credential =
@@ -97,7 +100,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
           .get();
       await FirebaseFirestore.instance
           .collection('Business')
-          .doc(businessId)
+          .doc(_currentBusinessId)
           .get()
           .then((DocumentSnapshot documentSnapshot) async {
         print('Pts ${documentSnapshot['pts']}');
@@ -111,7 +114,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
           });
           await FirebaseFirestore.instance
               .collection('Business')
-              .doc(businessId)
+              .doc(_currentBusinessId)
               .update({
             'pts': FieldValue.increment(-transferredPts),
           });
@@ -146,14 +149,21 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
   }
 
   @override
+  void initState() {
+    _currentBusinessId = FirebaseAuth.instance.currentUser!.uid;
+    _businessData = FirebaseFirestore.instance
+        .collection('Business')
+        .doc(_currentBusinessId)
+        .snapshots();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth > 800;
 
-    final Stream<DocumentSnapshot> userData = FirebaseFirestore.instance
-        .collection('Business')
-        .doc(businessId)
-        .snapshots();
+    final Stream<DocumentSnapshot> userData = _businessData;
 
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
@@ -1113,12 +1123,12 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                               DocumentSnapshot doc = await FirebaseFirestore
                                   .instance
                                   .collection('Business')
-                                  .doc(businessId)
+                                  .doc(_currentBusinessId)
                                   .get();
 
                               if (doc['wallet'] >= int.parse(pts.text)) {
                                 // Prepare payment parameters
-                                final uid = businessId;
+                                final uid = _currentBusinessId;
                                 final email =
                                     FirebaseAuth.instance.currentUser!.email ??
                                         'noemail@example.com';

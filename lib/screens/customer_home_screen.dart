@@ -28,6 +28,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   String qrCode = 'Unknown';
   String store = '';
   String pts = '';
+  late final String _currentUserId;
+  late final Stream<DocumentSnapshot> _userData;
 
   Future<void> scanQRCode() async {
     try {
@@ -72,7 +74,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         if (documentSnapshot.exists) {
           await FirebaseFirestore.instance
               .collection('Users')
-              .doc(userId)
+              .doc(_currentUserId)
               .update({
             'pts': FieldValue.increment(documentSnapshot['pts']),
           });
@@ -87,7 +89,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               .doc(documentSnapshot.id)
               .update({
             'scanned': true,
-            'scannedId': userId,
+            'scannedId': _currentUserId,
           });
 
           await FirebaseFirestore.instance
@@ -116,13 +118,13 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   void checkPoints(int limit) async {
     FirebaseFirestore.instance
         .collection('Users')
-        .doc(userId)
+        .doc(_currentUserId)
         .get()
         .then((DocumentSnapshot documentSnapshot) async {
       if (documentSnapshot['pts'].toInt() >= limit) {
         await FirebaseFirestore.instance
             .collection('Slots')
-            .where('uid', isEqualTo: userId)
+            .where('uid', isEqualTo: _currentUserId)
             .where('dateTime',
                 isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime(
                     DateTime.now().year,
@@ -141,14 +143,20 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           int slotsLeft = 5 - currentSlots;
 
           if (slotsFromPoints > slotsLeft) {
-            FirebaseFirestore.instance.collection('Users').doc(userId).update({
+            FirebaseFirestore.instance
+                .collection('Users')
+                .doc(_currentUserId)
+                .update({
               'pts': FieldValue.increment(-slotsLeft * limit),
             });
             for (int i = 0; i < slotsLeft; i++) {
               addSlots();
             }
           } else {
-            FirebaseFirestore.instance.collection('Users').doc(userId).update({
+            FirebaseFirestore.instance
+                .collection('Users')
+                .doc(_currentUserId)
+                .update({
               'pts': FieldValue.increment(-slotsFromPoints * limit),
             });
             for (int i = 0; i < slotsFromPoints; i++) {
@@ -162,12 +170,14 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
   @override
   void initState() {
+    _currentUserId = FirebaseAuth.instance.currentUser!.uid;
+    _userData = FirebaseFirestore.instance
+        .collection('Users')
+        .doc(_currentUserId)
+        .snapshots();
     checkPoints(150);
     super.initState();
   }
-
-  final Stream<DocumentSnapshot> userData =
-      FirebaseFirestore.instance.collection('Users').doc(userId).snapshots();
 
   @override
   Widget build(BuildContext context) {
@@ -207,7 +217,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         ),
       ),
       body: StreamBuilder<DocumentSnapshot>(
-        stream: userData,
+        stream: _userData,
         builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
@@ -627,7 +637,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('Points')
-              .where('uid', isEqualTo: userId)
+              .where('uid', isEqualTo: _currentUserId)
               .limit(6)
               .snapshots(),
           builder: (context, snapshot) {
@@ -1124,7 +1134,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('Points')
-          .where('uid', isEqualTo: userId)
+          .where('uid', isEqualTo: _currentUserId)
           .limit(10)
           .snapshots(),
       builder: (context, snapshot) {
