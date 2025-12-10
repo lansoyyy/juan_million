@@ -312,14 +312,14 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                               TextWidget(
                                 text: 'Your current slot no.',
                                 fontSize: 14,
-                                color: Colors.white,
+                                color: Colors.black,
                                 fontFamily: 'Bold',
                               ),
                               const Expanded(child: SizedBox()),
                               TextWidget(
                                 text: '#$myIndex',
                                 fontSize: 14,
-                                color: Colors.white,
+                                color: Colors.black,
                                 fontFamily: 'Regular',
                               ),
                               IconButton(
@@ -382,7 +382,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                                 TextWidget(
                                   text: 'Slot Progress',
                                   fontSize: 18,
-                                  color: Colors.white,
+                                  color: Colors.black,
                                   fontFamily: 'Bold',
                                 ),
                                 StreamBuilder<DocumentSnapshot>(
@@ -410,7 +410,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                                         text:
                                             '${(double.parse((walletdata['pts'] / 4165).toString()) * 100).toStringAsFixed(0)}%',
                                         fontSize: 14,
-                                        color: Colors.white,
+                                        color: Colors.black,
                                         fontFamily: 'Regular',
                                       );
                                     }),

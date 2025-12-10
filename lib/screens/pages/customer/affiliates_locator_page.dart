@@ -403,13 +403,15 @@ class _AffiliateLocatorPageState extends State<AffiliateLocatorPage> {
                   stream: municipality == null
                       ? FirebaseFirestore.instance
                           .collection('Business')
+                          .where('verified', isEqualTo: true)
                           .where('clarification',
                               isEqualTo: _selectedSubCategory)
                           .snapshots()
                       : FirebaseFirestore.instance
                           .collection('Business')
-                          .where('clarification',
-                              isEqualTo: _selectedSubCategory)
+                          .where('verified', isEqualTo: true)
+                          // .where('clarification',
+                          //     isEqualTo: _selectedSubCategory)
                           .where('address',
                               isEqualTo:
                                   '${municipality!.name}, ${province!.name}')
@@ -968,7 +970,7 @@ class _AffiliateLocatorPageState extends State<AffiliateLocatorPage> {
                   ],
                 ),
                 const SizedBox(height: 15),
-                
+
                 // Business logo
                 Center(
                   child: Container(
@@ -1000,7 +1002,7 @@ class _AffiliateLocatorPageState extends State<AffiliateLocatorPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                
+
                 // Business name
                 Center(
                   child: TextWidget(
@@ -1011,7 +1013,7 @@ class _AffiliateLocatorPageState extends State<AffiliateLocatorPage> {
                   ),
                 ),
                 const SizedBox(height: 5),
-                
+
                 // Business email
                 Center(
                   child: TextWidget(
@@ -1022,16 +1024,21 @@ class _AffiliateLocatorPageState extends State<AffiliateLocatorPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                
+
                 // Business details section
-                _buildDetailSection('Address', businessData['address'] ?? 'N/A'),
-                _buildDetailSection('Description', businessData['desc'] ?? 'No description available'),
-                _buildDetailSection('Business Classification', businessData['clarification'] ?? 'N/A'),
-                _buildDetailSection('Representative', businessData['representative'] ?? 'N/A'),
-                _buildDetailSection('Phone', businessData['phone'] ?? 'Not provided'),
-                
+                _buildDetailSection(
+                    'Address', businessData['address'] ?? 'N/A'),
+                _buildDetailSection('Description',
+                    businessData['desc'] ?? 'No description available'),
+                _buildDetailSection('Business Classification',
+                    businessData['clarification'] ?? 'N/A'),
+                _buildDetailSection(
+                    'Representative', businessData['representative'] ?? 'N/A'),
+                _buildDetailSection(
+                    'Phone', businessData['phone'] ?? 'Not provided'),
+
                 const SizedBox(height: 15),
-                
+
                 // Business stats
                 Container(
                   padding: const EdgeInsets.all(15),
@@ -1048,14 +1055,16 @@ class _AffiliateLocatorPageState extends State<AffiliateLocatorPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       _buildStatItem('Points', '${businessData['pts'] ?? 0}'),
-                      _buildStatItem('Wallet', '₱${businessData['wallet'] ?? 0}'),
-                      _buildStatItem('Inventory', '${businessData['inventory'] ?? 0}'),
+                      _buildStatItem(
+                          'Wallet', '₱${businessData['wallet'] ?? 0}'),
+                      _buildStatItem(
+                          'Inventory', '${businessData['inventory'] ?? 0}'),
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 15),
-                
+
                 // Verification status
                 Row(
                   children: [
@@ -1081,13 +1090,12 @@ class _AffiliateLocatorPageState extends State<AffiliateLocatorPage> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Action buttons
                 Row(
                   children: [
-                
                     Expanded(
                       child: ButtonWidget(
                         label: 'Close',

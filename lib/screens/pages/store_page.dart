@@ -91,12 +91,28 @@ class _StorePageState extends State<StorePage> {
                         }
 
                         final data = snapshot.requireData;
+                        if (data.docs.isEmpty) {
+                          return SizedBox(
+                            height: 150,
+                            child: Center(
+                              child: TextWidget(
+                                text: 'No flash deals available',
+                                fontSize: 14,
+                                color: Colors.grey,
+                                fontFamily: 'Medium',
+                              ),
+                            ),
+                          );
+                        }
 
                         List finaldata = data.docs.reversed.toList();
+                        final int itemCount =
+                            finaldata.length >= 2 ? 2 : finaldata.length;
+
                         return SizedBox(
                           height: 300,
                           child: ListView.builder(
-                            itemCount: 2,
+                            itemCount: itemCount,
                             itemBuilder: (context, index) {
                               return Padding(
                                 padding: const EdgeInsets.all(5.0),
@@ -242,6 +258,20 @@ class _StorePageState extends State<StorePage> {
                         }
 
                         final data = snapshot.requireData;
+                        if (data.docs.isEmpty) {
+                          return SizedBox(
+                            height: 150,
+                            child: Center(
+                              child: TextWidget(
+                                text: 'No items available',
+                                fontSize: 14,
+                                color: Colors.grey,
+                                fontFamily: 'Medium',
+                              ),
+                            ),
+                          );
+                        }
+
                         return SizedBox(
                           height: 150,
                           width: 500,

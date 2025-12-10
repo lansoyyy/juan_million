@@ -637,7 +637,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('Points')
-              .where('uid', isEqualTo: _currentUserId)
+              .where('scannedId', isEqualTo: _currentUserId)
               .limit(6)
               .snapshots(),
           builder: (context, snapshot) {
@@ -687,16 +687,28 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               ),
               itemCount: data.docs.length,
               itemBuilder: (context, index) {
+                final doc = data.docs[index];
+                final docData = doc.data() as Map<String, dynamic>;
+                final dynamic rawPts = docData['pts'];
+                final double points = rawPts is num ? rawPts.toDouble() : 0.0;
+                final dynamic rawDateTime = docData['dateTime'];
+                final DateTime? dateTime =
+                    rawDateTime is Timestamp ? rawDateTime.toDate() : null;
+
                 return StreamBuilder<DocumentSnapshot>(
                   stream: FirebaseFirestore.instance
                       .collection('Business')
                       .doc(data.docs[index]['uid'])
                       .snapshots(),
                   builder: (context, businessSnapshot) {
-                    if (!businessSnapshot.hasData) {
+                    if (businessSnapshot.hasError ||
+                        !businessSnapshot.hasData) {
                       return const SizedBox();
                     }
                     dynamic businessData = businessSnapshot.data;
+                    if (!(businessData.exists)) {
+                      return const SizedBox();
+                    }
                     return Container(
                       padding: const EdgeInsets.all(25),
                       decoration: BoxDecoration(
@@ -745,8 +757,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               TextWidget(
-                                text: (data.docs[index]['pts'].ceilToDouble())
-                                    .toStringAsFixed(0),
+                                text: points.toStringAsFixed(0),
                                 fontSize: 32,
                                 fontFamily: 'Bold',
                                 color: primary,
@@ -764,9 +775,9 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                             ],
                           ),
                           TextWidget(
-                            text: DateFormat.yMMMd()
-                                .add_jm()
-                                .format(data.docs[index]['dateTime'].toDate()),
+                            text: dateTime != null
+                                ? DateFormat.yMMMd().add_jm().format(dateTime)
+                                : '-',
                             fontSize: 11,
                             fontFamily: 'Regular',
                             color: Colors.grey.shade500,
@@ -1134,7 +1145,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('Points')
-          .where('uid', isEqualTo: _currentUserId)
+          .where('scannedId', isEqualTo: _currentUserId)
           .limit(10)
           .snapshots(),
       builder: (context, snapshot) {
@@ -1179,16 +1190,27 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             scrollDirection: Axis.horizontal,
             itemCount: data.docs.length,
             itemBuilder: (context, index) {
+              final doc = data.docs[index];
+              final docData = doc.data() as Map<String, dynamic>;
+              final dynamic rawPts = docData['pts'];
+              final double points = rawPts is num ? rawPts.toDouble() : 0.0;
+              final dynamic rawDateTime = docData['dateTime'];
+              final DateTime? dateTime =
+                  rawDateTime is Timestamp ? rawDateTime.toDate() : null;
+
               return StreamBuilder<DocumentSnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('Business')
                     .doc(data.docs[index]['uid'])
                     .snapshots(),
                 builder: (context, businessSnapshot) {
-                  if (!businessSnapshot.hasData) {
+                  if (businessSnapshot.hasError || !businessSnapshot.hasData) {
                     return const SizedBox();
                   }
                   dynamic businessData = businessSnapshot.data;
+                  if (!(businessData.exists)) {
+                    return const SizedBox();
+                  }
                   return Container(
                     width: 180,
                     margin: const EdgeInsets.only(right: 15),
@@ -1239,8 +1261,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             TextWidget(
-                              text: (data.docs[index]['pts'].ceilToDouble())
-                                  .toStringAsFixed(0),
+                              text: points.toStringAsFixed(0),
                               fontSize: 36,
                               fontFamily: 'Bold',
                               color: primary,
@@ -1258,9 +1279,9 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                           ],
                         ),
                         TextWidget(
-                          text: DateFormat.yMMMd()
-                              .add_jm()
-                              .format(data.docs[index]['dateTime'].toDate()),
+                          text: dateTime != null
+                              ? DateFormat.yMMMd().add_jm().format(dateTime)
+                              : '-',
                           fontSize: 11,
                           fontFamily: 'Regular',
                           color: Colors.grey.shade500,
