@@ -400,22 +400,7 @@ class _AffiliateLocatorPageState extends State<AffiliateLocatorPage> {
             child: Padding(
               padding: const EdgeInsets.all(15.0),
               child: StreamBuilder<QuerySnapshot>(
-                  stream: municipality == null
-                      ? FirebaseFirestore.instance
-                          .collection('Business')
-                          .where('verified', isEqualTo: true)
-                          .where('clarification',
-                              isEqualTo: _selectedSubCategory)
-                          .snapshots()
-                      : FirebaseFirestore.instance
-                          .collection('Business')
-                          .where('verified', isEqualTo: true)
-                          // .where('clarification',
-                          //     isEqualTo: _selectedSubCategory)
-                          .where('address',
-                              isEqualTo:
-                                  '${municipality!.name}, ${province!.name}')
-                          .snapshots(),
+                  stream: _getBusinessQuery().snapshots(),
                   builder: (BuildContext context,
                       AsyncSnapshot<QuerySnapshot> snapshot) {
                     if (snapshot.hasError) {
@@ -430,8 +415,17 @@ class _AffiliateLocatorPageState extends State<AffiliateLocatorPage> {
                     }
 
                     final data = snapshot.requireData;
+                    final List<DocumentSnapshot> filteredDocs =
+                        data.docs.where((doc) {
+                      final Map<String, dynamic>? map =
+                          doc.data() as Map<String, dynamic>?;
+                      final dynamic verified = map?['verified'];
+                      return verified == true ||
+                          verified == 'true' ||
+                          verified == 1;
+                    }).toList();
 
-                    if (data.docs.isEmpty) {
+                    if (filteredDocs.isEmpty) {
                       return Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -469,16 +463,17 @@ class _AffiliateLocatorPageState extends State<AffiliateLocatorPage> {
                               mainAxisSpacing: 20,
                               childAspectRatio: 1.5,
                             ),
-                            itemCount: data.docs.length,
+                            itemCount: filteredDocs.length,
                             itemBuilder: (context, index) {
-                              return _buildBusinessCard(data.docs[index], true);
+                              return _buildBusinessCard(
+                                  filteredDocs[index], true);
                             },
                           )
                         : ListView.builder(
-                            itemCount: data.docs.length,
+                            itemCount: filteredDocs.length,
                             itemBuilder: (context, index) {
                               return _buildBusinessCard(
-                                  data.docs[index], false);
+                                  filteredDocs[index], false);
                             },
                           );
                   }),
@@ -487,6 +482,23 @@ class _AffiliateLocatorPageState extends State<AffiliateLocatorPage> {
         ],
       ),
     );
+  }
+
+  Query<Map<String, dynamic>> _getBusinessQuery() {
+    Query<Map<String, dynamic>> query = FirebaseFirestore.instance
+        .collection('Business')
+        .where('verified', isEqualTo: true);
+
+    if (municipality == null) {
+      if (_selectedSubCategory != null && _selectedSubCategory!.isNotEmpty) {
+        query = query.where('clarification', isEqualTo: _selectedSubCategory);
+      }
+    } else {
+      query = query.where('address',
+          isEqualTo: '${municipality!.name}, ${province!.name}');
+    }
+
+    return query;
   }
 
   Widget _buildBusinessCard(DocumentSnapshot data, bool isDesktop) {
@@ -1039,32 +1051,6 @@ class _AffiliateLocatorPageState extends State<AffiliateLocatorPage> {
 
                 const SizedBox(height: 15),
 
-                // Business stats
-                Container(
-                  padding: const EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        primary.withOpacity(0.1),
-                        secondary.withOpacity(0.1),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildStatItem('Points', '${businessData['pts'] ?? 0}'),
-                      _buildStatItem(
-                          'Wallet', '₱${businessData['wallet'] ?? 0}'),
-                      _buildStatItem(
-                          'Inventory', '${businessData['inventory'] ?? 0}'),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 15),
-
                 // Verification status
                 Row(
                   children: [
@@ -1132,25 +1118,6 @@ class _AffiliateLocatorPageState extends State<AffiliateLocatorPage> {
           fontSize: 16,
           fontFamily: 'Medium',
           color: Colors.black87,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStatItem(String label, String value) {
-    return Column(
-      children: [
-        TextWidget(
-          text: value,
-          fontSize: 18,
-          fontFamily: 'Bold',
-          color: primary,
-        ),
-        TextWidget(
-          text: label,
-          fontSize: 12,
-          fontFamily: 'Regular',
-          color: Colors.grey.shade600,
         ),
       ],
     );

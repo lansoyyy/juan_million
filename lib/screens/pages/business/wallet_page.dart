@@ -536,96 +536,6 @@ class _WalletPageState extends State<WalletPage> {
                                                   fontFamily: 'Bold',
                                                 ),
                                               ),
-                                              const Divider(),
-                                              ListTile(
-                                                onTap: () {
-                                                  setState(() {
-                                                    selected = 'Coordinator';
-                                                  });
-                                                  Navigator.pop(context);
-                                                  showDialog(
-                                                    context: context,
-                                                    builder: (context) {
-                                                      return Dialog(
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(20.0),
-                                                          child: Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            children: [
-                                                              TextFieldWidget(
-                                                                showEye: true,
-                                                                isObscure: true,
-                                                                fontStyle:
-                                                                    FontStyle
-                                                                        .normal,
-                                                                hint:
-                                                                    'PIN Code',
-                                                                borderColor:
-                                                                    blue,
-                                                                radius: 12,
-                                                                width: 350,
-                                                                prefixIcon:
-                                                                    Icons.lock,
-                                                                isRequred:
-                                                                    false,
-                                                                controller: pin,
-                                                                label:
-                                                                    'PIN Code',
-                                                              ),
-                                                              const SizedBox(
-                                                                height: 20,
-                                                              ),
-                                                              ButtonWidget(
-                                                                label:
-                                                                    'Confirm',
-                                                                onPressed:
-                                                                    () async {
-                                                                  Navigator.pop(
-                                                                      context);
-
-                                                                  DocumentSnapshot doc = await FirebaseFirestore
-                                                                      .instance
-                                                                      .collection(
-                                                                          'Cashiers')
-                                                                      .doc(pin
-                                                                          .text)
-                                                                      .get();
-
-                                                                  if (doc
-                                                                      .exists) {
-                                                                    showAmountDialog(
-                                                                        doc['name'],
-                                                                        true);
-                                                                  } else {
-                                                                    showToast(
-                                                                        'PIN Code does not exist!',
-                                                                        context:
-                                                                            context);
-                                                                  }
-
-                                                                  pin.clear();
-                                                                },
-                                                              )
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      );
-                                                    },
-                                                  );
-                                                },
-                                                leading: const Icon(
-                                                  Icons.person_4_rounded,
-                                                ),
-                                                title: TextWidget(
-                                                  text: 'To coordinator',
-                                                  fontSize: 14,
-                                                  fontFamily: 'Bold',
-                                                ),
-                                              ),
                                             ],
                                           ),
                                         ),
@@ -1098,8 +1008,8 @@ class _WalletPageState extends State<WalletPage> {
                 ),
                 MaterialButton(
                   onPressed: () async {
-                    scanQRCode(cashier);
                     Navigator.of(context).pop();
+                    scanQRCode(cashier);
                   },
                   child: const Text(
                     'Confirm',
@@ -1148,36 +1058,86 @@ class _WalletPageState extends State<WalletPage> {
         qrCode = result;
       });
 
-      await FirebaseFirestore.instance
-          .collection('Business')
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .get()
-          .then((DocumentSnapshot documentSnapshot) async {
-        if (documentSnapshot['wallet'] > int.parse(pts.text)) {
-          await FirebaseFirestore.instance
-              .collection(selected)
-              .doc(result)
-              .update({
-            'wallet': FieldValue.increment(int.parse(pts.text)),
-          });
-          await FirebaseFirestore.instance
-              .collection('Business')
-              .doc(FirebaseAuth.instance.currentUser!.uid)
-              .update({
-            'wallet': FieldValue.increment(-int.parse(pts.text)),
-          });
-        } else {
-          showToast('Your wallet balance is not enough!', context: context);
-        }
-      }).whenComplete(() {
-        // Add transaction
+      final int amountValue = int.tryParse(pts.text) ?? 0;
+      final int serviceCharge = (amountValue * 0.03).round();
+      final int totalDebit = amountValue + serviceCharge;
 
-        addWallet(int.parse(pts.text), FirebaseAuth.instance.currentUser!.uid,
-            result, 'Receive & Transfers', cashier);
-        Navigator.of(context).pop();
+      if (amountValue <= 0) {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+        showToast('Please enter a valid amount', context: context);
+        return;
+      }
+
+      final recipientDoc = await FirebaseFirestore.instance
+          .collection(selected)
+          .doc(result)
+          .get();
+
+      if (!recipientDoc.exists) {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+        showToast('Invalid recipient QR code', context: context);
+        return;
+      }
+
+      final businessDocRef = FirebaseFirestore.instance
+          .collection('Business')
+          .doc(FirebaseAuth.instance.currentUser!.uid);
+      final businessSnap = await businessDocRef.get();
+      final businessMap = businessSnap.data();
+      final int currentWallet =
+          (businessMap != null && businessMap['wallet'] is num)
+              ? (businessMap['wallet'] as num).toInt()
+              : 0;
+
+      if (currentWallet < totalDebit) {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+        showToast('Your wallet balance is not enough!', context: context);
+        return;
+      }
+
+      final batch = FirebaseFirestore.instance.batch();
+      batch.update(businessDocRef, {
+        'wallet': FieldValue.increment(-totalDebit),
       });
+      batch.update(
+        FirebaseFirestore.instance.collection(selected).doc(result),
+        {
+          'wallet': FieldValue.increment(amountValue),
+        },
+      );
+
+      await batch.commit();
+
+      await addWallet(
+        amountValue,
+        FirebaseAuth.instance.currentUser!.uid,
+        result,
+        'Receive & Transfers',
+        cashier,
+      );
+
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+
+      showToast('Transaction was successful!', context: context);
     } on PlatformException {
       qrCode = 'Failed to get platform version.';
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+      showToast('Failed to scan QR code', context: context);
+    } catch (_) {
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+      showToast('Transfer failed. Please try again.', context: context);
     }
   }
 }

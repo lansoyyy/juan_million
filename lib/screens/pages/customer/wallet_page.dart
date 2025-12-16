@@ -556,6 +556,7 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
                 ),
                 MaterialButton(
                   onPressed: () async {
+                    Navigator.of(context).pop();
                     showConfirmDialog(pts.text);
                   },
                   child: const Text(
@@ -605,7 +606,10 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
               ),
               actions: <Widget>[
                 MaterialButton(
-                  onPressed: () => Navigator.of(context).pop(true),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    showAmountDialog();
+                  },
                   child: const Text(
                     'Change',
                     style: TextStyle(
@@ -614,8 +618,8 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
                 ),
                 MaterialButton(
                   onPressed: () async {
-                    scanQRCode();
                     Navigator.of(context).pop();
+                    scanQRCode();
                   },
                   child: const Text(
                     'Confirm',
@@ -664,96 +668,94 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
         qrCode = result;
       });
 
-      await FirebaseFirestore.instance
-          .collection('Users')
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .get()
-          .then((DocumentSnapshot documentSnapshot) async {
-        if (documentSnapshot['pts'] >= int.parse(pts.text)) {
-          DocumentSnapshot doc1 = await FirebaseFirestore.instance
-              .collection('Users')
-              .doc(result)
-              .get();
+      final int amountValue = int.tryParse(pts.text) ?? 0;
+      final int serviceCharge = (amountValue * 0.05).round();
+      final int totalDebit = amountValue + serviceCharge;
 
-          if (doc1.exists) {
-            if (documentSnapshot['pts'] >= int.parse(pts.text)) {
-              await FirebaseFirestore.instance
-                  .collection('Users')
-                  .doc(FirebaseAuth.instance.currentUser!.uid)
-                  .update({
-                'pts': FieldValue.increment(-int.parse(pts.text)),
-              });
-              await FirebaseFirestore.instance
-                  .collection(selected)
-                  .doc(result)
-                  .update({
-                'pts': FieldValue.increment(int.parse(pts.text)),
-              }).whenComplete(
-                () {
-                  addWallet(
-                      int.parse(pts.text),
-                      result,
-                      FirebaseAuth.instance.currentUser!.uid,
-                      'Receive & Transfers',
-                      '');
-                  Navigator.of(context).pop();
-
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => QRScannedPage(
-                            fromWallet: true,
-                            inuser: true,
-                            pts: pts.text,
-                            store: FirebaseAuth.instance.currentUser!.uid,
-                          )));
-                },
-              );
-            } else {
-              Navigator.pop(context);
-              showToast('Your points is not enough to proceed!',
-                  context: context);
-            }
-          } else {
-            if (documentSnapshot['pts'] >= int.parse(pts.text)) {
-              await FirebaseFirestore.instance
-                  .collection('Users')
-                  .doc(FirebaseAuth.instance.currentUser!.uid)
-                  .update({
-                'wallet': FieldValue.increment(-int.parse(pts.text)),
-              });
-              await FirebaseFirestore.instance
-                  .collection(selected)
-                  .doc(result)
-                  .update({
-                'wallet': FieldValue.increment(int.parse(pts.text)),
-              }).whenComplete(
-                () {
-                  addWallet(
-                      int.parse(pts.text),
-                      result,
-                      FirebaseAuth.instance.currentUser!.uid,
-                      'Receive & Transfers',
-                      '');
-                  Navigator.of(context).pop();
-
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => QRScannedPage(
-                            fromWallet: true,
-                            inuser: true,
-                            pts: pts.text,
-                            store: FirebaseAuth.instance.currentUser!.uid,
-                          )));
-                },
-              );
-            } else {
-              Navigator.pop(context);
-              showToast('Your E wallet is not enough to proceed!',
-                  context: context);
-            }
-          }
+      if (amountValue <= 0) {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
         }
+        showToast('Please enter a valid amount', context: context);
+        return;
+      }
+
+      final recipientDoc = await FirebaseFirestore.instance
+          .collection(selected)
+          .doc(result)
+          .get();
+
+      if (!recipientDoc.exists) {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+        showToast('Invalid recipient QR code', context: context);
+        return;
+      }
+
+      final userDocRef = FirebaseFirestore.instance
+          .collection('Users')
+          .doc(FirebaseAuth.instance.currentUser!.uid);
+      final userSnap = await userDocRef.get();
+      final userMap = userSnap.data();
+      final int currentWallet = (userMap != null && userMap['wallet'] is num)
+          ? (userMap['wallet'] as num).toInt()
+          : 0;
+
+      if (currentWallet < totalDebit) {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+        showToast('Your E wallet is not enough to proceed!', context: context);
+        return;
+      }
+
+      final batch = FirebaseFirestore.instance.batch();
+      batch.update(userDocRef, {
+        'wallet': FieldValue.increment(-totalDebit),
       });
+      batch.update(
+        FirebaseFirestore.instance.collection(selected).doc(result),
+        {
+          'wallet': FieldValue.increment(amountValue),
+        },
+      );
+
+      await batch.commit();
+
+      await addWallet(
+        amountValue,
+        result,
+        FirebaseAuth.instance.currentUser!.uid,
+        'Receive & Transfers',
+        '',
+      );
+
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => QRScannedPage(
+            fromWallet: true,
+            inuser: true,
+            pts: pts.text,
+            store: FirebaseAuth.instance.currentUser!.uid,
+          ),
+        ),
+      );
     } on PlatformException {
       qrCode = 'Failed to get platform version.';
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+      showToast('Failed to scan QR code', context: context);
+    } catch (_) {
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+      showToast('Transfer failed. Please try again.', context: context);
     }
   }
 }
