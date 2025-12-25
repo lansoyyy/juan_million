@@ -88,63 +88,86 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
       );
 
       if (!mounted) return;
-
-      Navigator.pop(context);
       setState(() {
         qrCode = result;
       });
 
-      DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
-          .collection('Users')
-          .doc(result)
-          .get();
-      await FirebaseFirestore.instance
+      final userRef =
+          FirebaseFirestore.instance.collection('Users').doc(result);
+      final businessRef = FirebaseFirestore.instance
           .collection('Business')
-          .doc(_currentBusinessId)
-          .get()
-          .then((DocumentSnapshot documentSnapshot) async {
-        print('Pts ${documentSnapshot['pts']}');
-        print('Pts $result');
-        if (documentSnapshot['pts'] >= transferredPts) {
-          await FirebaseFirestore.instance
-              .collection('Users')
-              .doc(result)
-              .update({
-            'pts': FieldValue.increment(transferredPts),
-          });
-          await FirebaseFirestore.instance
-              .collection('Business')
-              .doc(_currentBusinessId)
-              .update({
-            'pts': FieldValue.increment(-transferredPts),
-          });
+          .doc(_currentBusinessId);
+      final communityRef = FirebaseFirestore.instance
+          .collection('Community Wallet')
+          .doc('wallet');
 
-          await FirebaseFirestore.instance
-              .collection('Community Wallet')
-              .doc('wallet')
-              .update({
-            // 'wallet': FieldValue.increment(total),
-            'pts': FieldValue.increment(transferredPts),
-          });
-          // Update my points
-          // Update business points
-        } else {
-          showToast('Your wallet balance is not enough', context: context);
+      final userSnap = await userRef.get();
+      if (!userSnap.exists) {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
         }
-      }).whenComplete(() {
-        addPoints(transferredPts, 1, cashier, 'Points received by member',
-            documentSnapshot.id);
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => QRScannedPage(
-                  fromScan: true,
-                  inuser: false,
-                  fromWallet: true,
-                  pts: transferredPts.toString(),
-                  store: result,
-                )));
+        showToast('Invalid recipient QR code', context: context);
+        return;
+      }
+
+      final businessSnap = await businessRef.get();
+      final businessData = businessSnap.data();
+      final businessMap = (businessData is Map) ? businessData : null;
+      final ptsField = businessMap != null ? businessMap['pts'] : null;
+      final int currentPts = (ptsField is num) ? ptsField.toInt() : 0;
+
+      if (currentPts < transferredPts) {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+        showToast('Your points balance is not enough', context: context);
+        return;
+      }
+
+      final batch = FirebaseFirestore.instance.batch();
+      batch.update(userRef, {
+        'pts': FieldValue.increment(transferredPts),
       });
+      batch.update(businessRef, {
+        'pts': FieldValue.increment(-transferredPts),
+      });
+      batch.update(communityRef, {
+        'pts': FieldValue.increment(transferredPts),
+      });
+      await batch.commit();
+
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+
+      await addPoints(
+        transferredPts,
+        1,
+        cashier,
+        'Points received by member',
+        userSnap.id,
+      );
+
+      if (!mounted) return;
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => QRScannedPage(
+                fromScan: true,
+                inuser: false,
+                fromWallet: true,
+                pts: transferredPts.toString(),
+                store: result,
+              )));
     } on PlatformException {
       qrCode = 'Failed to get platform version.';
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+      showToast('Failed to scan QR code', context: context);
+    } catch (_) {
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+      showToast('Transfer failed. Please try again.', context: context);
     }
   }
 
@@ -304,7 +327,14 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                               Navigator.pop(context);
                                             });
 
-                                            if (doc.exists) {
+                                            final cashierUid = doc.data() is Map
+                                                ? (doc.data() as Map)['uid']
+                                                : null;
+
+                                            if (doc.exists &&
+                                                cashierUid ==
+                                                    FirebaseAuth.instance
+                                                        .currentUser!.uid) {
                                               if (mydata['pts'] > 1) {
                                                 showDialog(
                                                   context: context,
@@ -420,8 +450,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                     context: context);
                                               }
                                             } else {
-                                              showToast(
-                                                  'PIN Code does not exist!',
+                                              showToast('Wrong PIN Code',
                                                   context: context);
                                             }
 
@@ -757,7 +786,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                           doc['name']);
                                                     } else {
                                                       showToast(
-                                                          'PIN Code does not exist!',
+                                                          'Wrong PIN Code',
                                                           context: context);
                                                     }
                                                     pin.clear();
@@ -1405,7 +1434,113 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                             icon: Icons.qr_code_scanner_rounded,
                             label: 'Scan QR',
                             onTap: () {
-                              // QR scan logic here
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return Dialog(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(20),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              TextWidget(
+                                                text: 'Scan QR',
+                                                fontSize: 18,
+                                                fontFamily: 'Bold',
+                                                color: Colors.black87,
+                                              ),
+                                              IconButton(
+                                                onPressed: () =>
+                                                    Navigator.pop(context),
+                                                icon: const Icon(Icons.close),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 20),
+                                          TextFieldWidget(
+                                            showEye: true,
+                                            isObscure: true,
+                                            fontStyle: FontStyle.normal,
+                                            hint: 'PIN Code',
+                                            borderColor: blue,
+                                            radius: 12,
+                                            width: 350,
+                                            prefixIcon: Icons.lock,
+                                            isRequred: false,
+                                            controller: pin,
+                                            label: 'PIN Code',
+                                          ),
+                                          const SizedBox(height: 20),
+                                          TextFieldWidget(
+                                            controller: amount,
+                                            label: 'Amount',
+                                            inputType: const TextInputType
+                                                .numberWithOptions(
+                                                decimal: true),
+                                          ),
+                                          const SizedBox(height: 20),
+                                          ButtonWidget(
+                                            label: 'Continue',
+                                            onPressed: () async {
+                                              final cashierSnap =
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection('Cashiers')
+                                                      .doc(pin.text)
+                                                      .get();
+
+                                              final cashierUid =
+                                                  cashierSnap.data()?['uid'];
+
+                                              if (!cashierSnap.exists ||
+                                                  cashierUid !=
+                                                      _currentBusinessId) {
+                                                showToast('Wrong PIN Code',
+                                                    context: context);
+                                                pin.clear();
+                                                return;
+                                              }
+
+                                              final ptsToTransfer = ((double
+                                                              .tryParse(amount
+                                                                  .text) ??
+                                                          0) *
+                                                      mydata['ptsconversion'] *
+                                                      0.01)
+                                                  .toInt();
+
+                                              if (ptsToTransfer <= 0) {
+                                                showToast(
+                                                    'Please enter a valid amount',
+                                                    context: context);
+                                                return;
+                                              }
+
+                                              Navigator.of(context).pop();
+                                              scanQRCode(
+                                                ptsToTransfer,
+                                                cashierSnap['name'],
+                                              );
+                                              pin.clear();
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
                             },
                           ),
                         ],

@@ -414,14 +414,25 @@ class _WalletPageState extends State<WalletPage> {
                                                                           .text)
                                                                       .get();
 
-                                                                  if (doc
-                                                                      .exists) {
+                                                                  final cashierUid = doc
+                                                                              .data()
+                                                                          is Map
+                                                                      ? (doc.data()
+                                                                              as Map)[
+                                                                          'uid']
+                                                                      : null;
+                                                                  if (doc.exists &&
+                                                                      cashierUid ==
+                                                                          FirebaseAuth
+                                                                              .instance
+                                                                              .currentUser!
+                                                                              .uid) {
                                                                     showAmountDialog(
                                                                         doc['name'],
                                                                         false);
                                                                   } else {
                                                                     showToast(
-                                                                        'PIN Code does not exist!',
+                                                                        'Wrong PIN Code',
                                                                         context:
                                                                             context);
                                                                   }
@@ -505,14 +516,25 @@ class _WalletPageState extends State<WalletPage> {
                                                                           .text)
                                                                       .get();
 
-                                                                  if (doc
-                                                                      .exists) {
+                                                                  final cashierUid = doc
+                                                                              .data()
+                                                                          is Map
+                                                                      ? (doc.data()
+                                                                              as Map)[
+                                                                          'uid']
+                                                                      : null;
+                                                                  if (doc.exists &&
+                                                                      cashierUid ==
+                                                                          FirebaseAuth
+                                                                              .instance
+                                                                              .currentUser!
+                                                                              .uid) {
                                                                     showAmountDialog(
                                                                         doc['name'],
                                                                         false);
                                                                   } else {
                                                                     showToast(
-                                                                        'PIN Code does not exist!',
+                                                                        'Wrong PIN Code',
                                                                         context:
                                                                             context);
                                                                   }
@@ -630,12 +652,21 @@ class _WalletPageState extends State<WalletPage> {
                                                           .doc(pin.text)
                                                           .get();
 
-                                                  if (doc.exists) {
+                                                  final cashierUid =
+                                                      doc.data() is Map
+                                                          ? (doc.data()
+                                                              as Map)['uid']
+                                                          : null;
+                                                  if (doc.exists &&
+                                                      cashierUid ==
+                                                          FirebaseAuth
+                                                              .instance
+                                                              .currentUser!
+                                                              .uid) {
                                                     reloadPointsDialog(
                                                         doc['name']);
                                                   } else {
-                                                    showToast(
-                                                        'PIN Code does not exist!',
+                                                    showToast('Wrong PIN Code',
                                                         context: context);
                                                   }
 

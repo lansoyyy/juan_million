@@ -13,6 +13,11 @@ Future<bool?> _showCustomToast(String msg, {BuildContext? context}) async {
   final currentContext = context ?? _getContext();
   if (currentContext == null) return false;
 
+  final bool isError = !(msg.toLowerCase().contains('success') ||
+      msg.toLowerCase().contains('succes') ||
+      msg.toLowerCase().contains('successful') ||
+      msg.toLowerCase().contains('completed'));
+
   // Create an overlay entry
   final overlay = Overlay.of(currentContext);
   late OverlayEntry overlayEntry;
@@ -27,7 +32,7 @@ Future<bool?> _showCustomToast(String msg, {BuildContext? context}) async {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           decoration: BoxDecoration(
-            color: Colors.red,
+            color: isError ? Colors.red : const Color(0xFF4CAF50),
             borderRadius: BorderRadius.circular(8),
             boxShadow: [
               BoxShadow(
@@ -39,7 +44,10 @@ Future<bool?> _showCustomToast(String msg, {BuildContext? context}) async {
           ),
           child: Row(
             children: [
-              const Icon(Icons.error_outline, color: Colors.white),
+              Icon(
+                isError ? Icons.error_outline : Icons.check_circle_outline,
+                color: Colors.white,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
