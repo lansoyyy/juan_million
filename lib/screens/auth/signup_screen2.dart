@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:juan_million/models/municipality_model.dart';
 import 'package:juan_million/models/province_model.dart';
 import 'package:juan_million/models/region_model.dart';
+import 'package:juan_million/screens/auth/login_screen.dart';
 import 'package:juan_million/screens/auth/package_screen.dart';
 import 'package:juan_million/screens/business_home_screen.dart';
 import 'package:juan_million/screens/pages/business/packages_page.dart';
@@ -113,6 +114,15 @@ class _SignupScreen2State extends State<SignupScreen2> {
   String? _selectedCategory;
   String? _selectedSubCategory;
 
+  Future<bool> _onWillPop() async {
+    if (Navigator.of(context).canPop()) {
+      return true;
+    }
+    Navigator.of(context).pushReplacement(MaterialPageRoute(
+        builder: (context) => LoginScreen(inCustomer: false)));
+    return false;
+  }
+
   final Map<String, List<String>> _categoryOptions = {
     'Retail': [
       'Grocery Store',
@@ -155,8 +165,11 @@ class _SignupScreen2State extends State<SignupScreen2> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isWeb = screenWidth > 800;
 
-    return Scaffold(
-      body: isWeb ? _buildWebLayout(context) : _buildMobileLayout(context),
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        body: isWeb ? _buildWebLayout(context) : _buildMobileLayout(context),
+      ),
     );
   }
 

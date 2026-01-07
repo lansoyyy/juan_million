@@ -5,13 +5,13 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:juan_million/screens/pages/business/cashier_screen.dart';
 import 'package:juan_million/screens/pages/business/inventory_page.dart';
+import 'package:juan_million/screens/pages/business/myqr_page.dart';
 import 'package:juan_million/screens/pages/business/points_page.dart';
 import 'package:juan_million/screens/pages/business/settings_page.dart';
 import 'package:juan_million/screens/pages/business/wallet_page.dart';
 import 'package:juan_million/screens/pages/business/payments_page.dart';
 import 'package:juan_million/screens/pages/customer/qr_scanned_page.dart';
 import 'package:juan_million/screens/pages/customer/qr_scanner_screen.dart';
-import 'package:juan_million/services/add_points.dart';
 import 'package:juan_million/utlis/app_constants.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/dragonpay_screen.dart';
@@ -124,6 +124,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
         return;
       }
 
+      final pointsDoc = FirebaseFirestore.instance.collection('Points').doc();
       final batch = FirebaseFirestore.instance.batch();
       batch.update(userRef, {
         'pts': FieldValue.increment(transferredPts),
@@ -134,19 +135,23 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
       batch.update(communityRef, {
         'pts': FieldValue.increment(transferredPts),
       });
+
+      batch.set(pointsDoc, {
+        'pts': transferredPts,
+        'qty': 1,
+        'cashier': cashier,
+        'uid': FirebaseAuth.instance.currentUser!.uid,
+        'id': pointsDoc.id,
+        'scanned': true,
+        'scannedId': userSnap.id,
+        'dateTime': DateTime.now(),
+        'type': 'Points received by member',
+      });
       await batch.commit();
 
       if (Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
       }
-
-      await addPoints(
-        transferredPts,
-        1,
-        cashier,
-        'Points received by member',
-        userSnap.id,
-      );
 
       if (!mounted) return;
       Navigator.of(context).push(MaterialPageRoute(
@@ -467,6 +472,15 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                         ),
                         const SizedBox(width: 12),
                         _buildHeaderAction(
+                          Icons.qr_code_rounded,
+                          () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) =>
+                                    const MyQRBusinessPage()));
+                          },
+                        ),
+                        const SizedBox(width: 12),
+                        _buildHeaderAction(
                           Icons.settings_rounded,
                           () {
                             Navigator.of(context).push(MaterialPageRoute(
@@ -782,8 +796,23 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                             .get();
 
                                                     if (doc.exists) {
-                                                      reloadPointsDialog(
-                                                          doc['name']);
+                                                      final cashierUid =
+                                                          doc.data() is Map
+                                                              ? (doc.data()
+                                                                  as Map)['uid']
+                                                              : null;
+                                                      if (cashierUid ==
+                                                          FirebaseAuth
+                                                              .instance
+                                                              .currentUser!
+                                                              .uid) {
+                                                        reloadPointsDialog(
+                                                            doc['name']);
+                                                      } else {
+                                                        showToast(
+                                                            'Wrong PIN Code',
+                                                            context: context);
+                                                      }
                                                     } else {
                                                       showToast(
                                                           'Wrong PIN Code',
@@ -1211,34 +1240,68 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                 });
 
                                 if (success) {
-                                  await FirebaseFirestore.instance
+                                  final businessRef = FirebaseFirestore.instance
                                       .collection('Business')
                                       .doc(FirebaseAuth
-                                          .instance.currentUser!.uid)
-                                      .update({
+                                          .instance.currentUser!.uid);
+
+                                  final currentData = doc.data();
+                                  final int currentPts = (currentData is Map &&
+                                          currentData['pts'] is num)
+                                      ? (currentData['pts'] as num).toInt()
+                                      : 0;
+
+                                  final walletDoc = FirebaseFirestore.instance
+                                      .collection('Wallets')
+                                      .doc();
+                                  final pointsDoc = FirebaseFirestore.instance
+                                      .collection('Points')
+                                      .doc();
+
+                                  final batch =
+                                      FirebaseFirestore.instance.batch();
+                                  batch.update(businessRef, {
                                     'wallet':
                                         FieldValue.increment(-ptsToReload),
                                     'pts': FieldValue.increment(ptsToReload),
                                   });
 
+                                  batch.set(walletDoc, {
+                                    'pts': ptsToReload,
+                                    'from':
+                                        FirebaseAuth.instance.currentUser!.uid,
+                                    'uid':
+                                        FirebaseAuth.instance.currentUser!.uid,
+                                    'id': walletDoc.id,
+                                    'dateTime': DateTime.now(),
+                                    'type': 'Reload points',
+                                    'cashier': name,
+                                  });
+
+                                  batch.set(pointsDoc, {
+                                    'pts': ptsToReload,
+                                    'qty': 1,
+                                    'cashier': name,
+                                    'uid':
+                                        FirebaseAuth.instance.currentUser!.uid,
+                                    'id': pointsDoc.id,
+                                    'scanned': true,
+                                    'scannedId': '',
+                                    'dateTime': DateTime.now(),
+                                    'type': 'Points from reload',
+                                  });
+
+                                  await batch.commit();
+
                                   showToast('Transaction was succesfull!',
                                       context: context);
-
-                                  addPoints(ptsToReload, 1, name,
-                                      'Points from reload', '');
-
-                                  DocumentSnapshot doc1 =
-                                      await FirebaseFirestore.instance
-                                          .collection('Business')
-                                          .doc(FirebaseAuth
-                                              .instance.currentUser!.uid)
-                                          .get();
 
                                   Navigator.pop(context);
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (context) => QRScannedPage(
                                             inuser: false,
-                                            pts: doc1['pts'].toString(),
+                                            pts: (currentPts + ptsToReload)
+                                                .toString(),
                                             store: FirebaseAuth
                                                 .instance.currentUser!.uid,
                                           )));
@@ -1430,6 +1493,16 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                       ),
                       Row(
                         children: [
+                          _buildHeaderButton(
+                            icon: Icons.qr_code_rounded,
+                            label: 'My QR',
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) =>
+                                      const MyQRBusinessPage()));
+                            },
+                          ),
+                          const SizedBox(width: 12),
                           _buildHeaderButton(
                             icon: Icons.qr_code_scanner_rounded,
                             label: 'Scan QR',

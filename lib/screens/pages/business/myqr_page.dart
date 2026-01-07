@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:juan_million/screens/pages/customer/qr_scanner_screen.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -15,6 +13,8 @@ class MyQRBusinessPage extends StatefulWidget {
 }
 
 class _MyQRBusinessPageState extends State<MyQRBusinessPage> {
+  bool _showBalance = false;
+
   @override
   Widget build(BuildContext context) {
     final Stream<DocumentSnapshot> userData = FirebaseFirestore.instance
@@ -93,19 +93,32 @@ class _MyQRBusinessPageState extends State<MyQRBusinessPage> {
                           height: 20,
                         ),
                         Center(
-                          child: TextWidget(
-                            text: 'P${mydata['wallet'].toString()}.00',
-                            fontSize: 18,
-                            color: Colors.white,
-                            fontFamily: 'Bold',
-                          ),
-                        ),
-                        Center(
-                          child: TextWidget(
-                            text: 'Wallet Balance',
-                            fontSize: 9,
-                            color: Colors.white,
-                            fontFamily: 'Medium',
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _showBalance = !_showBalance;
+                              });
+                            },
+                            child: Column(
+                              children: [
+                                TextWidget(
+                                  text: _showBalance
+                                      ? 'P${mydata['wallet'].toString()}.00'
+                                      : 'P••••.00',
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                  fontFamily: 'Bold',
+                                ),
+                                TextWidget(
+                                  text: _showBalance
+                                      ? 'Tap to hide'
+                                      : 'Wallet Balance (tap to reveal)',
+                                  fontSize: 9,
+                                  color: Colors.white,
+                                  fontFamily: 'Medium',
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                         const SizedBox(
@@ -126,58 +139,5 @@ class _MyQRBusinessPageState extends State<MyQRBusinessPage> {
             );
           }),
     );
-  }
-
-  String qrCode = 'Unknown';
-  String store = '';
-  String pts = '';
-
-  Future<void> scanQRCode() async {
-    try {
-      // Navigate to a new screen for QR scanning
-      final result = await Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => const QRScannerScreen(),
-        ),
-      );
-
-      if (result == null) {
-        // User cancelled the scan
-        return;
-      }
-
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return const AlertDialog(
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CircularProgressIndicator(),
-              ],
-            ),
-          );
-        },
-      );
-
-      if (!mounted) return;
-
-      setState(() {
-        qrCode = result;
-      });
-
-      await FirebaseFirestore.instance
-          .collection('Users')
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .update({
-        'pts': FieldValue.increment(int.parse(result)),
-      }).whenComplete(() {
-        // Add transaction
-        Navigator.pop(context);
-      });
-    } on PlatformException {
-      qrCode = 'Failed to get platform version.';
-    }
   }
 }

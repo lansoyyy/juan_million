@@ -1,10 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:juan_million/screens/auth/payment_screen.dart';
-import 'package:juan_million/screens/customer_home_screen.dart';
-import 'package:juan_million/screens/pages/customer/qr_scanned_page.dart';
-import 'package:juan_million/services/add_points.dart';
 import 'package:juan_million/utlis/app_constants.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/button_widget.dart';
@@ -12,9 +8,9 @@ import 'package:juan_million/widgets/text_widget.dart';
 import 'package:juan_million/widgets/toast_widget.dart';
 
 class PaymentSelectionScreen extends StatefulWidget {
-  dynamic item;
+  final dynamic item;
 
-  bool? inbusiness;
+  final bool inbusiness;
 
   PaymentSelectionScreen({
     super.key,
@@ -27,10 +23,28 @@ class PaymentSelectionScreen extends StatefulWidget {
 }
 
 class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
+  int _earnedPointsForQty(int qty) {
+    final dynamic rawSlots = widget.item['slots'];
+    final double slots = rawSlots is num ? rawSlots.toDouble() : 0.0;
+
+    final int basePoints =
+        (slots == 0.066 ? (0.0665 * 150) : (slots * 150)).round();
+    return basePoints * qty;
+  }
+
+  int _totalCostForQty(int qty) {
+    final dynamic rawPrice = widget.item['price'];
+    final int price = rawPrice is num
+        ? rawPrice.toDouble().round()
+        : int.tryParse('$rawPrice') ?? 0;
+    final int discount = (price * 0.10).toInt() * qty;
+    return (price * qty) - discount;
+  }
+
   @override
   Widget build(BuildContext context) {
     final Stream<DocumentSnapshot> userData = FirebaseFirestore.instance
-        .collection(widget.inbusiness! ? 'Business' : 'Users')
+        .collection(widget.inbusiness ? 'Business' : 'Users')
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .snapshots();
 
@@ -354,7 +368,7 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
   }
 
   buypoints(int qty, data) async {
-    await FirebaseFirestore.instance
+    final slotsSnapshot = await FirebaseFirestore.instance
         .collection('Slots')
         .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
         .where('dateTime',
@@ -366,71 +380,65 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                     DateTime.now().month,
                     DateTime.now().day + 1)
                 .subtract(const Duration(seconds: 1))))
-        .get()
-        .then((snapshot) async {
-      int currentSlots = snapshot.docs.length;
-      int slotsLeft = 5 - currentSlots;
+        .get();
 
-      if (slotsLeft >= widget.item['slots'].round() * qty) {
-        if (data['wallet'] >=
-            ((double.parse((widget.item['price']).toString()).round() * qty) -
-                    (((widget.item['slots'] *
-                                    (widget.item['price'] /
-                                        widget.item['slots'])) *
-                                0.10)
-                            .toInt() *
-                        qty))
-                .toInt()) {
-          if (widget.item['price'] == 20) {
-            await FirebaseFirestore.instance
-                .collection('Community Wallet')
-                .doc('wallet')
-                .update({
-              // 'wallet': FieldValue.increment(total),
-              'pts': FieldValue.increment(10 * qty),
-            });
-          } else {
-            await FirebaseFirestore.instance
-                .collection('Community Wallet')
-                .doc('wallet')
-                .update({
-              // 'wallet': FieldValue.increment(total),
-              'pts': FieldValue.increment(
-                  ((widget.item['slots'] * 150) * qty).round()),
-            });
-          }
+    final int currentSlots = slotsSnapshot.docs.length;
+    final int slotsLeft = 5 - currentSlots;
 
-          await FirebaseFirestore.instance
-              .collection(widget.inbusiness! ? 'Business' : 'Users')
-              .doc(FirebaseAuth.instance.currentUser!.uid)
-              .update({
-            'pts': widget.item['slots'] == 0.066
-                ? FieldValue.increment(((0.0665 * 150) * qty).round())
-                : FieldValue.increment(
-                    ((widget.item['slots'] * 150) * qty).round()),
-            'wallet': FieldValue.increment(
-                -((double.parse((widget.item['price']).toString()).round() *
-                            qty) -
-                        (((widget.item['slots'] *
-                                        (widget.item['price'] /
-                                            widget.item['slots'])) *
-                                    0.10)
-                                .toInt() *
-                            qty))
-                    .toInt()),
-          });
-          showToast('Succesfully purchased!', context: context);
+    if (slotsLeft < widget.item['slots'].round() * qty) {
+      showToast("You've reached the maximum slots as of today!",
+          context: context);
+      return;
+    }
 
-          addPoints((widget.item['slots'] * 150) * qty, qty, '',
-              'Points converted to Slots', '');
-          Navigator.of(context).pop();
-        } else {
-          showToast('Not enough balance on wallet!', context: context);
-        }
-      } else {
-        showToast("You've reached the maximum slots as of today!",
-            context: context);
-      }
+    final int totalCost = _totalCostForQty(qty);
+    if ((data['wallet'] is num ? (data['wallet'] as num).toInt() : 0) <
+        totalCost) {
+      showToast('Not enough balance on wallet!', context: context);
+      return;
+    }
+
+    final int earnedPoints = _earnedPointsForQty(qty);
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+    final ownerCollection = widget.inbusiness ? 'Business' : 'Users';
+    final ownerRef =
+        FirebaseFirestore.instance.collection(ownerCollection).doc(userId);
+    final communityRef =
+        FirebaseFirestore.instance.collection('Community Wallet').doc('wallet');
+    final pointsDoc = FirebaseFirestore.instance.collection('Points').doc();
+    final walletDoc = FirebaseFirestore.instance.collection('Wallets').doc();
+
+    final batch = FirebaseFirestore.instance.batch();
+    batch.update(communityRef, {
+      'pts': FieldValue.increment(earnedPoints),
     });
+    batch.update(ownerRef, {
+      'pts': FieldValue.increment(earnedPoints),
+      'wallet': FieldValue.increment(-totalCost),
+    });
+    batch.set(pointsDoc, {
+      'pts': earnedPoints,
+      'qty': qty,
+      'cashier': '',
+      'uid': userId,
+      'id': pointsDoc.id,
+      'scanned': true,
+      'scannedId': userId,
+      'dateTime': DateTime.now(),
+      'type': 'Points converted to Slots',
+    });
+    batch.set(walletDoc, {
+      'pts': totalCost,
+      'from': userId,
+      'uid': userId,
+      'id': walletDoc.id,
+      'dateTime': DateTime.now(),
+      'type': 'Purchase points',
+      'cashier': '',
+    });
+    await batch.commit();
+
+    showToast('Succesfully purchased!', context: context);
+    Navigator.of(context).pop();
   }
 }

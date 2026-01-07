@@ -16,6 +16,7 @@ import 'package:juan_million/services/add_slots.dart';
 import 'package:juan_million/utlis/app_constants.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
+import 'package:juan_million/widgets/toast_widget.dart';
 
 class CustomerHomeScreen extends StatefulWidget {
   const CustomerHomeScreen({super.key});
@@ -66,52 +67,96 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         qrCode = result;
       });
 
-      await FirebaseFirestore.instance
-          .collection('Points')
-          .doc(result)
-          .get()
-          .then((DocumentSnapshot documentSnapshot) async {
-        if (documentSnapshot.exists) {
-          await FirebaseFirestore.instance
-              .collection('Users')
-              .doc(_currentUserId)
-              .update({
-            'pts': FieldValue.increment(documentSnapshot['pts']),
-          });
-          await FirebaseFirestore.instance
-              .collection('Business')
-              .doc(documentSnapshot['uid'])
-              .update({
-            'pts': FieldValue.increment(-documentSnapshot['pts']),
-          });
-          await FirebaseFirestore.instance
-              .collection('Points')
-              .doc(documentSnapshot.id)
-              .update({
-            'scanned': true,
-            'scannedId': _currentUserId,
-          });
-
-          await FirebaseFirestore.instance
-              .collection('Community Wallet')
-              .doc('wallet')
-              .update({
-            'pts': FieldValue.increment(documentSnapshot['pts']),
-          });
+      final pointsRef =
+          FirebaseFirestore.instance.collection('Points').doc(result);
+      final pointsSnap = await pointsRef.get();
+      if (!pointsSnap.exists) {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
         }
-        setState(() {
-          pts = documentSnapshot['pts'].toString();
-          store = documentSnapshot['uid'];
-        });
-      }).whenComplete(() {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => QRScannedPage(
-                  pts: pts,
-                  store: store,
-                )));
+        showToast('Invalid QR code', context: context);
+        return;
+      }
+
+      final Map<String, dynamic>? data = pointsSnap.data();
+      if (data == null) {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+        showToast('Invalid QR code', context: context);
+        return;
+      }
+
+      final bool alreadyScanned = data['scanned'] == true;
+      if (alreadyScanned) {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+        showToast('This QR code was already claimed', context: context);
+        return;
+      }
+
+      final dynamic rawPts = data['pts'];
+      final int ptsValue = rawPts is num ? rawPts.toInt() : 0;
+      final String businessId = data['uid']?.toString() ?? '';
+      if (ptsValue <= 0 || businessId.isEmpty) {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+        showToast('Invalid QR code', context: context);
+        return;
+      }
+
+      final userRef =
+          FirebaseFirestore.instance.collection('Users').doc(_currentUserId);
+      final businessRef =
+          FirebaseFirestore.instance.collection('Business').doc(businessId);
+      final communityRef = FirebaseFirestore.instance
+          .collection('Community Wallet')
+          .doc('wallet');
+
+      final batch = FirebaseFirestore.instance.batch();
+      batch.update(userRef, {
+        'pts': FieldValue.increment(ptsValue),
       });
+      batch.update(businessRef, {
+        'pts': FieldValue.increment(-ptsValue),
+      });
+      batch.update(pointsRef, {
+        'scanned': true,
+        'scannedId': _currentUserId,
+      });
+      batch.update(communityRef, {
+        'pts': FieldValue.increment(ptsValue),
+      });
+      await batch.commit();
+
+      setState(() {
+        pts = ptsValue.toString();
+        store = businessId;
+      });
+
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+
+      if (!mounted) return;
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => QRScannedPage(
+                pts: pts,
+                store: store,
+              )));
     } on PlatformException {
       qrCode = 'Failed to get platform version.';
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+      showToast('Failed to scan QR code', context: context);
+    } catch (_) {
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+      showToast('Scan failed. Please try again.', context: context);
     }
   }
 
@@ -701,13 +746,15 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                       .doc(data.docs[index]['uid'])
                       .snapshots(),
                   builder: (context, businessSnapshot) {
-                    if (businessSnapshot.hasError ||
-                        !businessSnapshot.hasData) {
-                      return const SizedBox();
-                    }
-                    dynamic businessData = businessSnapshot.data;
-                    if (!(businessData.exists)) {
-                      return const SizedBox();
+                    String sourceName = 'Juan Million';
+                    if (businessSnapshot.hasData) {
+                      final snap = businessSnapshot.data!;
+                      if (snap.exists) {
+                        final b = snap.data();
+                        if (b is Map && b['name'] != null) {
+                          sourceName = b['name'].toString();
+                        }
+                      }
                     }
                     return Container(
                       padding: const EdgeInsets.all(25),
@@ -740,7 +787,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: TextWidget(
-                                    text: businessData['name'],
+                                    text: sourceName,
                                     fontSize: 12,
                                     fontFamily: 'Bold',
                                     color: primary,
@@ -1204,12 +1251,15 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                     .doc(data.docs[index]['uid'])
                     .snapshots(),
                 builder: (context, businessSnapshot) {
-                  if (businessSnapshot.hasError || !businessSnapshot.hasData) {
-                    return const SizedBox();
-                  }
-                  dynamic businessData = businessSnapshot.data;
-                  if (!(businessData.exists)) {
-                    return const SizedBox();
+                  String sourceName = 'Juan Million';
+                  if (businessSnapshot.hasData) {
+                    final snap = businessSnapshot.data!;
+                    if (snap.exists) {
+                      final b = snap.data();
+                      if (b is Map && b['name'] != null) {
+                        sourceName = b['name'].toString();
+                      }
+                    }
                   }
                   return Container(
                     width: 180,
@@ -1244,7 +1294,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                   borderRadius: BorderRadius.circular(15),
                                 ),
                                 child: TextWidget(
-                                  text: businessData['name'],
+                                  text: sourceName,
                                   fontSize: 11,
                                   fontFamily: 'Bold',
                                   color: primary,

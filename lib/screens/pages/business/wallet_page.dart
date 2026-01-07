@@ -6,8 +6,6 @@ import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:juan_million/screens/pages/customer/qr_scanned_page.dart';
 import 'package:juan_million/screens/pages/customer/qr_scanner_screen.dart';
-import 'package:juan_million/services/add_points.dart';
-import 'package:juan_million/services/add_wallet.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/button_widget.dart';
 import 'package:juan_million/widgets/text_widget.dart';
@@ -346,229 +344,227 @@ class _WalletPageState extends State<WalletPage> {
                                             .instance.currentUser!.uid)
                                     .get();
 
-                                if (snapshot.docs.isNotEmpty) {
-                                  showModalBottomSheet(
-                                    context: context,
-                                    builder: (context) {
-                                      return SizedBox(
-                                        height: 230,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(10.0),
-                                          child: Column(
-                                            children: [
-                                              ListTile(
-                                                onTap: () {
-                                                  setState(() {
-                                                    selected = 'Users';
-                                                  });
-                                                  Navigator.pop(context);
-                                                  showDialog(
-                                                    context: context,
-                                                    builder: (context) {
-                                                      return Dialog(
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(20.0),
-                                                          child: Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            children: [
-                                                              TextFieldWidget(
-                                                                showEye: true,
-                                                                isObscure: true,
-                                                                fontStyle:
-                                                                    FontStyle
-                                                                        .normal,
-                                                                hint:
-                                                                    'PIN Code',
-                                                                borderColor:
-                                                                    blue,
-                                                                radius: 12,
-                                                                width: 350,
-                                                                prefixIcon:
-                                                                    Icons.lock,
-                                                                isRequred:
-                                                                    false,
-                                                                controller: pin,
-                                                                label:
-                                                                    'PIN Code',
-                                                              ),
-                                                              const SizedBox(
-                                                                height: 20,
-                                                              ),
-                                                              ButtonWidget(
-                                                                label:
-                                                                    'Confirm',
-                                                                onPressed:
-                                                                    () async {
-                                                                  Navigator.pop(
-                                                                      context);
+                                final bool hasCashier =
+                                    snapshot.docs.isNotEmpty;
+                                showModalBottomSheet(
+                                  context: context,
+                                  builder: (context) {
+                                    return SizedBox(
+                                      height: 230,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: Column(
+                                          children: [
+                                            ListTile(
+                                              onTap: () {
+                                                setState(() {
+                                                  selected = 'Users';
+                                                });
+                                                Navigator.pop(context);
+                                                if (!hasCashier) {
+                                                  showAmountDialog(
+                                                      'Owner', false);
+                                                  return;
+                                                }
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return Dialog(
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(20.0),
+                                                        child: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: [
+                                                            TextFieldWidget(
+                                                              showEye: true,
+                                                              isObscure: true,
+                                                              fontStyle:
+                                                                  FontStyle
+                                                                      .normal,
+                                                              hint: 'PIN Code',
+                                                              borderColor: blue,
+                                                              radius: 12,
+                                                              width: 350,
+                                                              prefixIcon:
+                                                                  Icons.lock,
+                                                              isRequred: false,
+                                                              controller: pin,
+                                                              label: 'PIN Code',
+                                                            ),
+                                                            const SizedBox(
+                                                              height: 20,
+                                                            ),
+                                                            ButtonWidget(
+                                                              label: 'Confirm',
+                                                              onPressed:
+                                                                  () async {
+                                                                Navigator.pop(
+                                                                    context);
 
-                                                                  DocumentSnapshot doc = await FirebaseFirestore
-                                                                      .instance
-                                                                      .collection(
-                                                                          'Cashiers')
-                                                                      .doc(pin
-                                                                          .text)
-                                                                      .get();
+                                                                DocumentSnapshot
+                                                                    doc =
+                                                                    await FirebaseFirestore
+                                                                        .instance
+                                                                        .collection(
+                                                                            'Cashiers')
+                                                                        .doc(pin
+                                                                            .text)
+                                                                        .get();
 
-                                                                  final cashierUid = doc
-                                                                              .data()
-                                                                          is Map
-                                                                      ? (doc.data()
-                                                                              as Map)[
-                                                                          'uid']
-                                                                      : null;
-                                                                  if (doc.exists &&
-                                                                      cashierUid ==
-                                                                          FirebaseAuth
-                                                                              .instance
-                                                                              .currentUser!
-                                                                              .uid) {
-                                                                    showAmountDialog(
-                                                                        doc['name'],
-                                                                        false);
-                                                                  } else {
-                                                                    showToast(
-                                                                        'Wrong PIN Code',
-                                                                        context:
-                                                                            context);
-                                                                  }
+                                                                final cashierUid = doc
+                                                                            .data()
+                                                                        is Map
+                                                                    ? (doc.data()
+                                                                            as Map)[
+                                                                        'uid']
+                                                                    : null;
+                                                                if (doc.exists &&
+                                                                    cashierUid ==
+                                                                        FirebaseAuth
+                                                                            .instance
+                                                                            .currentUser!
+                                                                            .uid) {
+                                                                  showAmountDialog(
+                                                                      doc['name'],
+                                                                      false);
+                                                                } else {
+                                                                  showToast(
+                                                                      'Wrong PIN Code',
+                                                                      context:
+                                                                          context);
+                                                                }
 
-                                                                  pin.clear();
-                                                                },
-                                                              )
-                                                            ],
-                                                          ),
+                                                                pin.clear();
+                                                              },
+                                                            )
+                                                          ],
                                                         ),
-                                                      );
-                                                    },
-                                                  );
-                                                },
-                                                leading: const Icon(
-                                                  Icons.person,
-                                                ),
-                                                title: TextWidget(
-                                                  text: 'To member',
-                                                  fontSize: 14,
-                                                  fontFamily: 'Bold',
-                                                ),
+                                                      ),
+                                                    );
+                                                  },
+                                                );
+                                              },
+                                              leading: const Icon(
+                                                Icons.person,
                                               ),
-                                              const Divider(),
-                                              ListTile(
-                                                onTap: () {
-                                                  setState(() {
-                                                    selected = 'Business';
-                                                  });
-                                                  Navigator.pop(context);
+                                              title: TextWidget(
+                                                text: 'To member',
+                                                fontSize: 14,
+                                                fontFamily: 'Bold',
+                                              ),
+                                            ),
+                                            const Divider(),
+                                            ListTile(
+                                              onTap: () {
+                                                setState(() {
+                                                  selected = 'Business';
+                                                });
+                                                Navigator.pop(context);
+                                                if (!hasCashier) {
+                                                  showAmountDialog(
+                                                      'Owner', false);
+                                                  return;
+                                                }
 
-                                                  showDialog(
-                                                    context: context,
-                                                    builder: (context) {
-                                                      return Dialog(
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(20.0),
-                                                          child: Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            children: [
-                                                              TextFieldWidget(
-                                                                showEye: true,
-                                                                isObscure: true,
-                                                                fontStyle:
-                                                                    FontStyle
-                                                                        .normal,
-                                                                hint:
-                                                                    'PIN Code',
-                                                                borderColor:
-                                                                    blue,
-                                                                radius: 12,
-                                                                width: 350,
-                                                                prefixIcon:
-                                                                    Icons.lock,
-                                                                isRequred:
-                                                                    false,
-                                                                controller: pin,
-                                                                label:
-                                                                    'PIN Code',
-                                                              ),
-                                                              const SizedBox(
-                                                                height: 20,
-                                                              ),
-                                                              ButtonWidget(
-                                                                label:
-                                                                    'Confirm',
-                                                                onPressed:
-                                                                    () async {
-                                                                  Navigator.pop(
-                                                                      context);
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return Dialog(
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(20.0),
+                                                        child: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: [
+                                                            TextFieldWidget(
+                                                              showEye: true,
+                                                              isObscure: true,
+                                                              fontStyle:
+                                                                  FontStyle
+                                                                      .normal,
+                                                              hint: 'PIN Code',
+                                                              borderColor: blue,
+                                                              radius: 12,
+                                                              width: 350,
+                                                              prefixIcon:
+                                                                  Icons.lock,
+                                                              isRequred: false,
+                                                              controller: pin,
+                                                              label: 'PIN Code',
+                                                            ),
+                                                            const SizedBox(
+                                                              height: 20,
+                                                            ),
+                                                            ButtonWidget(
+                                                              label: 'Confirm',
+                                                              onPressed:
+                                                                  () async {
+                                                                Navigator.pop(
+                                                                    context);
 
-                                                                  DocumentSnapshot doc = await FirebaseFirestore
-                                                                      .instance
-                                                                      .collection(
-                                                                          'Cashiers')
-                                                                      .doc(pin
-                                                                          .text)
-                                                                      .get();
+                                                                DocumentSnapshot
+                                                                    doc =
+                                                                    await FirebaseFirestore
+                                                                        .instance
+                                                                        .collection(
+                                                                            'Cashiers')
+                                                                        .doc(pin
+                                                                            .text)
+                                                                        .get();
 
-                                                                  final cashierUid = doc
-                                                                              .data()
-                                                                          is Map
-                                                                      ? (doc.data()
-                                                                              as Map)[
-                                                                          'uid']
-                                                                      : null;
-                                                                  if (doc.exists &&
-                                                                      cashierUid ==
-                                                                          FirebaseAuth
-                                                                              .instance
-                                                                              .currentUser!
-                                                                              .uid) {
-                                                                    showAmountDialog(
-                                                                        doc['name'],
-                                                                        false);
-                                                                  } else {
-                                                                    showToast(
-                                                                        'Wrong PIN Code',
-                                                                        context:
-                                                                            context);
-                                                                  }
+                                                                final cashierUid = doc
+                                                                            .data()
+                                                                        is Map
+                                                                    ? (doc.data()
+                                                                            as Map)[
+                                                                        'uid']
+                                                                    : null;
+                                                                if (doc.exists &&
+                                                                    cashierUid ==
+                                                                        FirebaseAuth
+                                                                            .instance
+                                                                            .currentUser!
+                                                                            .uid) {
+                                                                  showAmountDialog(
+                                                                      doc['name'],
+                                                                      false);
+                                                                } else {
+                                                                  showToast(
+                                                                      'Wrong PIN Code',
+                                                                      context:
+                                                                          context);
+                                                                }
 
-                                                                  pin.clear();
-                                                                },
-                                                              )
-                                                            ],
-                                                          ),
+                                                                pin.clear();
+                                                              },
+                                                            )
+                                                          ],
                                                         ),
-                                                      );
-                                                    },
-                                                  );
-                                                },
-                                                leading: const Icon(
-                                                  Icons.business,
-                                                ),
-                                                title: TextWidget(
-                                                  text: 'To affiliate',
-                                                  fontSize: 14,
-                                                  fontFamily: 'Bold',
-                                                ),
+                                                      ),
+                                                    );
+                                                  },
+                                                );
+                                              },
+                                              leading: const Icon(
+                                                Icons.business,
                                               ),
-                                            ],
-                                          ),
+                                              title: TextWidget(
+                                                text: 'To affiliate',
+                                                fontSize: 14,
+                                                fontFamily: 'Bold',
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      );
-                                    },
-                                  );
-                                } else {
-                                  showToast(
-                                      'Please register your authorized user account',
-                                      context: context);
-                                }
+                                      ),
+                                    );
+                                  },
+                                );
                               },
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -613,77 +609,72 @@ class _WalletPageState extends State<WalletPage> {
                                             .instance.currentUser!.uid)
                                     .get();
 
-                                if (snapshot.docs.isNotEmpty) {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return Dialog(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(20.0),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              TextFieldWidget(
-                                                showEye: true,
-                                                isObscure: true,
-                                                fontStyle: FontStyle.normal,
-                                                hint: 'PIN Code',
-                                                borderColor: blue,
-                                                radius: 12,
-                                                width: 350,
-                                                prefixIcon: Icons.lock,
-                                                isRequred: false,
-                                                controller: pin,
-                                                label: 'PIN Code',
-                                              ),
-                                              const SizedBox(
-                                                height: 20,
-                                              ),
-                                              ButtonWidget(
-                                                label: 'Confirm',
-                                                onPressed: () async {
-                                                  Navigator.pop(context);
-
-                                                  DocumentSnapshot doc =
-                                                      await FirebaseFirestore
-                                                          .instance
-                                                          .collection(
-                                                              'Cashiers')
-                                                          .doc(pin.text)
-                                                          .get();
-
-                                                  final cashierUid =
-                                                      doc.data() is Map
-                                                          ? (doc.data()
-                                                              as Map)['uid']
-                                                          : null;
-                                                  if (doc.exists &&
-                                                      cashierUid ==
-                                                          FirebaseAuth
-                                                              .instance
-                                                              .currentUser!
-                                                              .uid) {
-                                                    reloadPointsDialog(
-                                                        doc['name']);
-                                                  } else {
-                                                    showToast('Wrong PIN Code',
-                                                        context: context);
-                                                  }
-
-                                                  pin.clear();
-                                                },
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  );
-                                } else {
-                                  showToast(
-                                      'Please register your authorized user account',
-                                      context: context);
+                                if (snapshot.docs.isEmpty) {
+                                  reloadPointsDialog('Owner');
+                                  return;
                                 }
+
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return Dialog(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(20.0),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            TextFieldWidget(
+                                              showEye: true,
+                                              isObscure: true,
+                                              fontStyle: FontStyle.normal,
+                                              hint: 'PIN Code',
+                                              borderColor: blue,
+                                              radius: 12,
+                                              width: 350,
+                                              prefixIcon: Icons.lock,
+                                              isRequred: false,
+                                              controller: pin,
+                                              label: 'PIN Code',
+                                            ),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            ButtonWidget(
+                                              label: 'Confirm',
+                                              onPressed: () async {
+                                                Navigator.pop(context);
+
+                                                DocumentSnapshot doc =
+                                                    await FirebaseFirestore
+                                                        .instance
+                                                        .collection('Cashiers')
+                                                        .doc(pin.text)
+                                                        .get();
+
+                                                final cashierUid = doc.data()
+                                                        is Map
+                                                    ? (doc.data() as Map)['uid']
+                                                    : null;
+                                                if (doc.exists &&
+                                                    cashierUid ==
+                                                        FirebaseAuth.instance
+                                                            .currentUser!.uid) {
+                                                  reloadPointsDialog(
+                                                      doc['name']);
+                                                } else {
+                                                  showToast('Wrong PIN Code',
+                                                      context: context);
+                                                }
+
+                                                pin.clear();
+                                              },
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
                               },
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -885,39 +876,79 @@ class _WalletPageState extends State<WalletPage> {
                       onPressed: pts.text == ''
                           ? () {}
                           : () async {
-                              DocumentSnapshot doc = await FirebaseFirestore
-                                  .instance
-                                  .collection('Business')
-                                  .doc(FirebaseAuth.instance.currentUser!.uid)
-                                  .get();
+                              final int ptsToReload =
+                                  int.tryParse(pts.text.trim()) ?? 0;
+                              if (ptsToReload <= 0) {
+                                showToast('Please enter a valid amount',
+                                    context: context);
+                                return;
+                              }
 
-                              if (doc['wallet'] >= int.parse(pts.text)) {
-                                await FirebaseFirestore.instance
-                                    .collection('Business')
-                                    .doc(FirebaseAuth.instance.currentUser!.uid)
-                                    .update({
-                                  'wallet': FieldValue.increment(
-                                      -int.parse(pts.text)),
-                                  'pts':
-                                      FieldValue.increment(int.parse(pts.text))
+                              final businessRef = FirebaseFirestore.instance
+                                  .collection('Business')
+                                  .doc(FirebaseAuth.instance.currentUser!.uid);
+                              final doc = await businessRef.get();
+                              final data = doc.data();
+                              final int currentWallet =
+                                  (data != null && data['wallet'] is num)
+                                      ? (data['wallet'] as num).toInt()
+                                      : 0;
+                              final int currentPts =
+                                  (data != null && data['pts'] is num)
+                                      ? (data['pts'] as num).toInt()
+                                      : 0;
+
+                              if (currentWallet >= ptsToReload) {
+                                final walletDoc = FirebaseFirestore.instance
+                                    .collection('Wallets')
+                                    .doc();
+                                final pointsDoc = FirebaseFirestore.instance
+                                    .collection('Points')
+                                    .doc();
+
+                                final batch =
+                                    FirebaseFirestore.instance.batch();
+
+                                batch.update(businessRef, {
+                                  'wallet': FieldValue.increment(-ptsToReload),
+                                  'pts': FieldValue.increment(ptsToReload)
                                 });
+
+                                batch.set(walletDoc, {
+                                  'pts': ptsToReload,
+                                  'from':
+                                      FirebaseAuth.instance.currentUser!.uid,
+                                  'uid': FirebaseAuth.instance.currentUser!.uid,
+                                  'id': walletDoc.id,
+                                  'dateTime': DateTime.now(),
+                                  'type': 'Reload points',
+                                  'cashier': name,
+                                });
+
+                                batch.set(pointsDoc, {
+                                  'pts': ptsToReload,
+                                  'qty': 1,
+                                  'cashier': name,
+                                  'uid': FirebaseAuth.instance.currentUser!.uid,
+                                  'id': pointsDoc.id,
+                                  'scanned': true,
+                                  'scannedId': '',
+                                  'dateTime': DateTime.now(),
+                                  'type': 'Points from reload',
+                                });
+
+                                await batch.commit();
+
                                 showToast('Transaction was succesfull!',
                                     context: context);
 
-                                addPoints(int.parse(pts.text), 1, name,
-                                    'Points from reload', '');
-
-                                DocumentSnapshot doc1 = await FirebaseFirestore
-                                    .instance
-                                    .collection('Business')
-                                    .doc(FirebaseAuth.instance.currentUser!.uid)
-                                    .get();
-
+                                if (!mounted) return;
                                 Navigator.pop(context);
                                 Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) => QRScannedPage(
                                           inuser: false,
-                                          pts: doc1['pts'].toString(),
+                                          pts: (currentPts + ptsToReload)
+                                              .toString(),
                                           store: FirebaseAuth
                                               .instance.currentUser!.uid,
                                         )));
@@ -1133,6 +1164,7 @@ class _WalletPageState extends State<WalletPage> {
       }
 
       final batch = FirebaseFirestore.instance.batch();
+      final walletDoc = FirebaseFirestore.instance.collection('Wallets').doc();
       batch.update(businessDocRef, {
         'wallet': FieldValue.increment(-totalDebit),
       });
@@ -1143,21 +1175,24 @@ class _WalletPageState extends State<WalletPage> {
         },
       );
 
-      await batch.commit();
+      batch.set(walletDoc, {
+        'pts': amountValue,
+        'from': FirebaseAuth.instance.currentUser!.uid,
+        'uid': result,
+        'id': walletDoc.id,
+        'dateTime': DateTime.now(),
+        'type': 'Receive & Transfers',
+        'cashier': cashier,
+      });
 
-      await addWallet(
-        amountValue,
-        FirebaseAuth.instance.currentUser!.uid,
-        result,
-        'Receive & Transfers',
-        cashier,
-      );
+      await batch.commit();
 
       if (Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
       }
 
       showToast('Transaction was successful!', context: context);
+      pts.clear();
     } on PlatformException {
       qrCode = 'Failed to get platform version.';
       if (Navigator.of(context).canPop()) {

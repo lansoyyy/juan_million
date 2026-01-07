@@ -6,6 +6,7 @@ import 'package:juan_million/screens/auth/customer_signup_screen.dart';
 import 'package:juan_million/screens/auth/signup_screen.dart';
 import 'package:juan_million/screens/business_home_screen.dart';
 import 'package:juan_million/screens/customer_home_screen.dart';
+import 'package:juan_million/screens/landing_screen.dart';
 import 'package:juan_million/services/add_user.dart';
 import 'package:juan_million/utlis/app_common.dart';
 import 'package:juan_million/utlis/app_constants.dart';
@@ -40,8 +41,20 @@ class _LoginScreenState extends State<LoginScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isWeb = screenWidth > 800;
 
-    return Scaffold(
-      body: isWeb ? _buildWebLayout(context) : _buildMobileLayout(context),
+    Future<bool> onWillPop() async {
+      if (Navigator.of(context).canPop()) {
+        return true;
+      }
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const LandingScreen()));
+      return false;
+    }
+
+    return WillPopScope(
+      onWillPop: onWillPop,
+      child: Scaffold(
+        body: isWeb ? _buildWebLayout(context) : _buildMobileLayout(context),
+      ),
     );
   }
 
@@ -141,7 +154,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       MouseRegion(
                         cursor: SystemMouseCursors.click,
                         child: GestureDetector(
-                          onTap: () => Navigator.pop(context),
+                          onTap: () {
+                            if (Navigator.of(context).canPop()) {
+                              Navigator.pop(context);
+                            } else {
+                              Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const LandingScreen()));
+                            }
+                          },
                           child: Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
@@ -1188,13 +1210,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                     });
 
                                     try {
-                                      if (isPhoneNumber(emailController.text.trim())) {
+                                      if (isPhoneNumber(
+                                          emailController.text.trim())) {
                                         var querySnapshot =
                                             await FirebaseFirestore.instance
                                                 .collection('Users')
                                                 .where('number',
-                                                    isEqualTo:
-                                                        emailController.text.trim())
+                                                    isEqualTo: emailController
+                                                        .text
+                                                        .trim())
                                                 .get();
 
                                         if (querySnapshot.docs.isNotEmpty) {
@@ -1218,14 +1242,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                       } else {
                                         await FirebaseAuth.instance
                                             .sendPasswordResetEmail(
-                                                email: emailController.text.trim());
+                                                email: emailController.text
+                                                    .trim());
 
                                         setState(() {
                                           isLoading = false;
                                         });
                                         Navigator.pop(context);
-                                        _showPasswordResetSuccessDialog(
-                                            context, emailController.text.trim());
+                                        _showPasswordResetSuccessDialog(context,
+                                            emailController.text.trim());
                                       }
                                     } catch (e) {
                                       setState(() {

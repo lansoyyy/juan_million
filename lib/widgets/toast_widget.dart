@@ -13,10 +13,17 @@ Future<bool?> _showCustomToast(String msg, {BuildContext? context}) async {
   final currentContext = context ?? _getContext();
   if (currentContext == null) return false;
 
-  final bool isError = !(msg.toLowerCase().contains('success') ||
-      msg.toLowerCase().contains('succes') ||
-      msg.toLowerCase().contains('successful') ||
-      msg.toLowerCase().contains('completed'));
+  final lowerMsg = msg.toLowerCase();
+  final bool isError = lowerMsg.contains('error') ||
+      lowerMsg.contains('failed') ||
+      lowerMsg.contains('cannot') ||
+      lowerMsg.contains("can't") ||
+      lowerMsg.contains('wrong') ||
+      lowerMsg.contains('invalid') ||
+      lowerMsg.contains('insufficient') ||
+      lowerMsg.contains('not enough') ||
+      lowerMsg.contains('unauthorized') ||
+      lowerMsg.contains('denied');
 
   // Create an overlay entry
   final overlay = Overlay.of(currentContext);

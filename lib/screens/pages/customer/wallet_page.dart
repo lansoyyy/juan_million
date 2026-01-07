@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:juan_million/screens/pages/customer/qr_scanned_page.dart';
 import 'package:juan_million/screens/pages/customer/qr_scanner_screen.dart';
 import 'package:juan_million/screens/pages/store_page.dart';
-import 'package:juan_million/services/add_wallet.dart';
 import 'package:juan_million/utlis/app_constants.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
@@ -711,6 +710,7 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
       }
 
       final batch = FirebaseFirestore.instance.batch();
+      final walletDoc = FirebaseFirestore.instance.collection('Wallets').doc();
       batch.update(userDocRef, {
         'wallet': FieldValue.increment(-totalDebit),
       });
@@ -721,26 +721,30 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
         },
       );
 
-      await batch.commit();
+      batch.set(walletDoc, {
+        'pts': amountValue,
+        'from': FirebaseAuth.instance.currentUser!.uid,
+        'uid': result,
+        'id': walletDoc.id,
+        'dateTime': DateTime.now(),
+        'type': 'Receive & Transfers',
+        'cashier': '',
+      });
 
-      await addWallet(
-        amountValue,
-        result,
-        FirebaseAuth.instance.currentUser!.uid,
-        'Receive & Transfers',
-        '',
-      );
+      await batch.commit();
 
       if (Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
       }
 
+      final amountStr = amountValue.toString();
+      pts.clear();
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => QRScannedPage(
             fromWallet: true,
             inuser: true,
-            pts: pts.text,
+            pts: amountStr,
             store: FirebaseAuth.instance.currentUser!.uid,
           ),
         ),

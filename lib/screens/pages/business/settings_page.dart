@@ -74,7 +74,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
             name.text = data['name'].toString();
             email.text = data['email'].toString();
-            pts.text = data['ptsconversion'].toStringAsFixed(0);
+            final dynamic rawPtsConversion = data['ptsconversion'];
+            final double ptsConversion =
+                rawPtsConversion is num ? rawPtsConversion.toDouble() : 0;
+            pts.text = ptsConversion.toStringAsFixed(0);
 
             password.text = '*******';
 

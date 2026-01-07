@@ -58,10 +58,21 @@ class TextFieldWidget extends StatefulWidget {
 class _TextFieldWidgetState extends State<TextFieldWidget> {
   @override
   Widget build(BuildContext context) {
+    final availableWidth = MediaQuery.of(context).size.width - 40;
+    final double effectiveWidth;
+    if (widget.width == null) {
+      effectiveWidth = availableWidth;
+    } else if (widget.width!.isInfinite) {
+      effectiveWidth = availableWidth;
+    } else {
+      effectiveWidth =
+          widget.width! > availableWidth ? availableWidth : widget.width!;
+    }
+
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 20),
       child: SizedBox(
-        width: widget.width,
+        width: effectiveWidth,
         height: widget.height,
         child: TextFormField(
           enabled: widget.isEnabled,

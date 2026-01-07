@@ -54,8 +54,11 @@ class _CustomerSettingsPageState extends State<CustomerSettingsPage> {
 
             String isNumber = data['email'].toString().split('@')[0];
 
-            fname.text = data['name'].toString().split(' ')[0];
-            lname.text = data['name'].toString().split(' ')[1];
+            final nameParts =
+                data['name'].toString().trim().split(RegExp(r'\s+'));
+            fname.text = nameParts.isNotEmpty ? nameParts.first : '';
+            lname.text =
+                nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
             number.text = isPhoneNumber(isNumber) ? isNumber : data['number'];
             email.text = isPhoneNumber(isNumber) ? '' : data['email'];
             password.text = '*******';
@@ -70,8 +73,9 @@ class _CustomerSettingsPageState extends State<CustomerSettingsPage> {
   // Desktop Layout
   Widget _buildDesktopLayout(dynamic data, BuildContext context) {
     String isNumber = data['email'].toString().split('@')[0];
-    fname.text = data['name'].toString().split(' ')[0];
-    lname.text = data['name'].toString().split(' ')[1];
+    final nameParts = data['name'].toString().trim().split(RegExp(r'\s+'));
+    fname.text = nameParts.isNotEmpty ? nameParts.first : '';
+    lname.text = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
     number.text = isPhoneNumber(isNumber) ? isNumber : data['number'];
     email.text = isPhoneNumber(isNumber) ? '' : data['email'];
     password.text = '*******';
@@ -459,8 +463,9 @@ class _CustomerSettingsPageState extends State<CustomerSettingsPage> {
   // Mobile Layout
   Widget _buildMobileLayout(dynamic data, BuildContext context) {
     String isNumber = data['email'].toString().split('@')[0];
-    fname.text = data['name'].toString().split(' ')[0];
-    lname.text = data['name'].toString().split(' ')[1];
+    final nameParts = data['name'].toString().trim().split(RegExp(r'\s+'));
+    fname.text = nameParts.isNotEmpty ? nameParts.first : '';
+    lname.text = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
     number.text = isPhoneNumber(isNumber) ? isNumber : data['number'];
     email.text = isPhoneNumber(isNumber) ? '' : data['email'];
     password.text = '*******';

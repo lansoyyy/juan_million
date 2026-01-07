@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -20,6 +18,8 @@ class MyQRPage extends StatefulWidget {
 }
 
 class _MyQRPageState extends State<MyQRPage> {
+  bool _showBalance = false;
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -221,64 +221,84 @@ class _MyQRPageState extends State<MyQRPage> {
                                       const SizedBox(height: 25),
 
                                       // Balance Display
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 25,
-                                          vertical: 20,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            colors: [
-                                              primary.withOpacity(0.1),
-                                              secondary.withOpacity(0.1),
-                                            ],
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            _showBalance = !_showBalance;
+                                          });
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 25,
+                                            vertical: 20,
                                           ),
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                        child: Column(
-                                          children: [
-                                            TextWidget(
-                                              text: widget.isPoints!
-                                                  ? 'Points Balance'
-                                                  : 'Wallet Balance',
-                                              fontSize: 14,
-                                              color: Colors.grey.shade600,
-                                              fontFamily: 'Medium',
-                                            ),
-                                            const SizedBox(height: 8),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                TextWidget(
-                                                  text: widget.isPoints!
-                                                      ? '${mydata['pts'].toString()}'
-                                                      : '₱${mydata['wallet'].toString()}',
-                                                  fontSize: isDesktop ? 42 : 36,
-                                                  color: primary,
-                                                  fontFamily: 'Bold',
-                                                ),
-                                                if (widget.isPoints!) ...[
-                                                  const SizedBox(width: 8),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            top: 8),
-                                                    child: TextWidget(
-                                                      text: 'pts',
-                                                      fontSize: 18,
-                                                      color: primary
-                                                          .withOpacity(0.7),
-                                                      fontFamily: 'Bold',
-                                                    ),
-                                                  ),
-                                                ],
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                primary.withOpacity(0.1),
+                                                secondary.withOpacity(0.1),
                                               ],
                                             ),
-                                          ],
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          ),
+                                          child: Column(
+                                            children: [
+                                              TextWidget(
+                                                text: widget.isPoints!
+                                                    ? 'Points Balance'
+                                                    : 'Wallet Balance',
+                                                fontSize: 14,
+                                                color: Colors.grey.shade600,
+                                                fontFamily: 'Medium',
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  TextWidget(
+                                                    text: _showBalance
+                                                        ? (widget.isPoints!
+                                                            ? '${mydata['pts'].toString()}'
+                                                            : '₱${mydata['wallet'].toString()}')
+                                                        : '••••',
+                                                    fontSize:
+                                                        isDesktop ? 42 : 36,
+                                                    color: primary,
+                                                    fontFamily: 'Bold',
+                                                  ),
+                                                  if (widget.isPoints! &&
+                                                      _showBalance) ...[
+                                                    const SizedBox(width: 8),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 8),
+                                                      child: TextWidget(
+                                                        text: 'pts',
+                                                        fontSize: 18,
+                                                        color: primary
+                                                            .withOpacity(0.7),
+                                                        fontFamily: 'Bold',
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ],
+                                              ),
+                                              const SizedBox(height: 6),
+                                              TextWidget(
+                                                text: _showBalance
+                                                    ? 'Tap to hide'
+                                                    : 'Tap to reveal',
+                                                fontSize: 11,
+                                                color: Colors.grey.shade600,
+                                                fontFamily: 'Regular',
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
 

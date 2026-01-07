@@ -1,16 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:juan_million/screens/auth/payment_screen.dart';
 import 'package:juan_million/screens/pages/payment_selection_screen.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/button_widget.dart';
 import 'package:juan_million/widgets/text_widget.dart';
-import 'package:paymongo_sdk/paymongo_sdk.dart';
 
 class StorePage extends StatefulWidget {
-  bool? inbusiness;
+  final bool inbusiness;
   StorePage({
     super.key,
     this.inbusiness = false,

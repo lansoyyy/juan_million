@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:juan_million/screens/auth/login_screen.dart';
 import 'package:juan_million/screens/auth/signup_screen2.dart';
 import 'package:juan_million/screens/pages/terms_conditions_page.dart';
 import 'package:juan_million/services/add_business.dart';
@@ -31,6 +32,15 @@ class _SignupScreenState extends State<SignupScreen> {
   final ref = TextEditingController();
 
   bool _value = true;
+
+  Future<bool> _onWillPop() async {
+    if (Navigator.of(context).canPop()) {
+      return true;
+    }
+    Navigator.of(context).pushReplacement(MaterialPageRoute(
+        builder: (context) => LoginScreen(inCustomer: false)));
+    return false;
+  }
 
   void _handleNext() async {
     if (ref.text == '') {
@@ -75,8 +85,11 @@ class _SignupScreenState extends State<SignupScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isWeb = screenWidth > 800;
 
-    return Scaffold(
-      body: isWeb ? _buildWebLayout(context) : _buildMobileLayout(context),
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        body: isWeb ? _buildWebLayout(context) : _buildMobileLayout(context),
+      ),
     );
   }
 
@@ -174,7 +187,16 @@ class _SignupScreenState extends State<SignupScreen> {
                       MouseRegion(
                         cursor: SystemMouseCursors.click,
                         child: GestureDetector(
-                          onTap: () => Navigator.pop(context),
+                          onTap: () async {
+                            if (Navigator.of(context).canPop()) {
+                              Navigator.pop(context);
+                            } else {
+                              Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          LoginScreen(inCustomer: false)));
+                            }
+                          },
                           child: Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
@@ -333,11 +355,18 @@ class _SignupScreenState extends State<SignupScreen> {
                           ),
                           TextButton(
                             onPressed: () {
-                              Navigator.pop(context);
+                              if (Navigator.of(context).canPop()) {
+                                Navigator.pop(context);
+                              } else {
+                                Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            LoginScreen(inCustomer: false)));
+                              }
                             },
                             child: TextWidget(
                               text: 'Sign In',
-                              fontSize: 14,
+                              fontSize: 16,
                               fontFamily: 'Bold',
                               color: primary,
                             ),
@@ -675,7 +704,14 @@ class _SignupScreenState extends State<SignupScreen> {
                     const SizedBox(width: 4),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pop(context);
+                        if (Navigator.of(context).canPop()) {
+                          Navigator.pop(context);
+                        } else {
+                          Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      LoginScreen(inCustomer: false)));
+                        }
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(

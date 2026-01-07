@@ -118,13 +118,25 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
   Province? province;
   Municipality? municipality;
 
+  Future<bool> _onWillPop() async {
+    if (Navigator.of(context).canPop()) {
+      return true;
+    }
+    Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => LoginScreen(inCustomer: true)));
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isWeb = screenWidth > 800;
 
-    return Scaffold(
-      body: isWeb ? _buildWebLayout(context) : _buildMobileLayout(context),
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        body: isWeb ? _buildWebLayout(context) : _buildMobileLayout(context),
+      ),
     );
   }
 
@@ -222,7 +234,16 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
                     MouseRegion(
                       cursor: SystemMouseCursors.click,
                       child: GestureDetector(
-                        onTap: () => Navigator.pop(context),
+                        onTap: () {
+                          if (Navigator.of(context).canPop()) {
+                            Navigator.pop(context);
+                          } else {
+                            Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        LoginScreen(inCustomer: true)));
+                          }
+                        },
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
@@ -1086,7 +1107,14 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
                     const SizedBox(width: 4),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pop(context);
+                        if (Navigator.of(context).canPop()) {
+                          Navigator.pop(context);
+                        } else {
+                          Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      LoginScreen(inCustomer: true)));
+                        }
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(
