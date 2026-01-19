@@ -368,28 +368,10 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
   }
 
   buypoints(int qty, data) async {
-    final slotsSnapshot = await FirebaseFirestore.instance
-        .collection('Slots')
-        .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-        .where('dateTime',
-            isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime(
-                DateTime.now().year, DateTime.now().month, DateTime.now().day)))
-        .where('dateTime',
-            isLessThanOrEqualTo: Timestamp.fromDate(DateTime(
-                    DateTime.now().year,
-                    DateTime.now().month,
-                    DateTime.now().day + 1)
-                .subtract(const Duration(seconds: 1))))
-        .get();
-
-    final int currentSlots = slotsSnapshot.docs.length;
-    final int slotsLeft = 5 - currentSlots;
-
-    if (slotsLeft < widget.item['slots'].round() * qty) {
-      showToast("You've reached the maximum slots as of today!",
-          context: context);
-      return;
-    }
+    final dynamic rawSlots = widget.item['slots'];
+    final double itemSlots = rawSlots is num ? rawSlots.toDouble() : 0.0;
+    final bool isPointsItem = (itemSlots - 0.066).abs() < 0.0001;
+    final int purchasedSlots = isPointsItem ? 0 : itemSlots.round() * qty;
 
     final int totalCost = _totalCostForQty(qty);
     if ((data['wallet'] is num ? (data['wallet'] as num).toInt() : 0) <
@@ -405,35 +387,51 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
         FirebaseFirestore.instance.collection(ownerCollection).doc(userId);
     final communityRef =
         FirebaseFirestore.instance.collection('Community Wallet').doc('wallet');
-    final pointsDoc = FirebaseFirestore.instance.collection('Points').doc();
     final walletDoc = FirebaseFirestore.instance.collection('Wallets').doc();
 
     final batch = FirebaseFirestore.instance.batch();
     batch.update(communityRef, {
       'pts': FieldValue.increment(earnedPoints),
     });
-    batch.update(ownerRef, {
-      'pts': FieldValue.increment(earnedPoints),
-      'wallet': FieldValue.increment(-totalCost),
-    });
-    batch.set(pointsDoc, {
-      'pts': earnedPoints,
-      'qty': qty,
-      'cashier': '',
-      'uid': userId,
-      'id': pointsDoc.id,
-      'scanned': true,
-      'scannedId': userId,
-      'dateTime': DateTime.now(),
-      'type': 'Points converted to Slots',
-    });
+
+    if (isPointsItem) {
+      batch.update(ownerRef, {
+        'pts': FieldValue.increment(earnedPoints),
+        'wallet': FieldValue.increment(-totalCost),
+      });
+
+      final pointsDoc = FirebaseFirestore.instance.collection('Points').doc();
+      batch.set(pointsDoc, {
+        'pts': earnedPoints,
+        'qty': qty,
+        'cashier': '',
+        'uid': userId,
+        'id': pointsDoc.id,
+        'scanned': true,
+        'scannedId': userId,
+        'dateTime': DateTime.now(),
+        'type': 'Purchase points',
+      });
+    } else {
+      batch.update(ownerRef, {
+        'wallet': FieldValue.increment(-totalCost),
+      });
+
+      for (int i = 0; i < purchasedSlots; i++) {
+        final slotRef = FirebaseFirestore.instance.collection('Slots').doc();
+        batch.set(slotRef, {
+          'uid': userId,
+          'dateTime': DateTime.now(),
+        });
+      }
+    }
     batch.set(walletDoc, {
       'pts': totalCost,
       'from': userId,
       'uid': userId,
       'id': walletDoc.id,
       'dateTime': DateTime.now(),
-      'type': 'Purchase points',
+      'type': isPointsItem ? 'Purchase points' : 'Purchase slots',
       'cashier': '',
     });
     await batch.commit();

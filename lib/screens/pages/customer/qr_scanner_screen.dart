@@ -17,6 +17,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
   QRViewController? controller;
   bool isScanning = true;
   final ImagePicker _imagePicker = ImagePicker();
+  final TextEditingController _manualCodeController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +46,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
             ),
         ],
       ),
-      body: kIsWeb ? _buildWebScanner() : _buildMobileScanner(),
+      body: kIsWeb ? _buildWebFallback() : _buildMobileScanner(),
     );
   }
 
@@ -82,72 +83,90 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
     );
   }
 
-  Widget _buildWebScanner() {
-    return Column(
-      children: [
-        Expanded(
-          flex: 5,
-          child: Center(
-            child: AspectRatio(
-              aspectRatio: 1,
-              child: QRView(
-                key: qrKey,
-                onQRViewCreated: _onQRViewCreated,
-                overlay: QrScannerOverlayShape(
-                  borderColor: primary,
-                  borderRadius: 10,
-                  borderLength: 30,
-                  borderWidth: 10,
-                  cutOutSize: 250,
+  Widget _buildWebFallback() {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 520),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'QR camera scanning may not work reliably on desktop web.\nYou can still continue by entering the code manually or uploading an image.',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.85),
+                  fontSize: 14,
                 ),
+                textAlign: TextAlign.center,
               ),
-            ),
-          ),
-        ),
-        Expanded(
-          flex: 3,
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'If the camera does not work, you can still scan using an image or enter the code manually.',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
-                    fontSize: 14,
+              const SizedBox(height: 20),
+              TextField(
+                controller: _manualCodeController,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: 'Paste / type QR code value',
+                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+                  filled: true,
+                  fillColor: Colors.white.withOpacity(0.08),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  textAlign: TextAlign.center,
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide:
+                        BorderSide(color: Colors.white.withOpacity(0.2)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: primary.withOpacity(0.8)),
+                  ),
                 ),
-                const SizedBox(height: 20),
-                ElevatedButton.icon(
-                  onPressed: _pickImageFromGallery,
-                  icon: const Icon(Icons.upload_file),
-                  label: const Text('Upload QR Code Image'),
+                autofocus: true,
+              ),
+              const SizedBox(height: 14),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    final code = _manualCodeController.text.trim();
+                    if (code.isEmpty) return;
+                    Navigator.pop(context, code);
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primary,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 30, vertical: 15),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text('Submit'),
+                ),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: _pickImageFromGallery,
+                  icon: const Icon(Icons.upload_file, color: Colors.white),
+                  label: const Text(
+                    'Upload QR Code Image',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: Colors.white.withOpacity(0.25)),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
-                TextButton.icon(
-                  onPressed: _showManualInputDialog,
-                  icon: const Icon(Icons.keyboard),
-                  label: const Text('Enter Code Manually'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.white.withOpacity(0.7),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 
@@ -161,8 +180,6 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
       );
 
       if (image != null) {
-        // For web, we'll show a dialog asking the user to enter the QR code manually
-        // since direct QR code scanning from images is limited on web
         _showManualInputDialog();
       }
     } catch (e) {
@@ -235,6 +252,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
   @override
   void dispose() {
     controller?.dispose();
+    _manualCodeController.dispose();
     super.dispose();
   }
 }
