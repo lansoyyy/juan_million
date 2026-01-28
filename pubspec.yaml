@@ -46,11 +46,13 @@ dependencies:
   # qr_code_dart_scan: # Removed due to compatibility issues
   paymongo_sdk:
   image_picker:
+  image: ^4.1.7
   google_sign_in:
   local_auth:
   crypto:
   url_launcher:
   webview_flutter:
+  zxing2: ^0.2.4
 
 dev_dependencies:
   flutter_test:

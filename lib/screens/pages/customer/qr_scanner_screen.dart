@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:image/image.dart' as img;
 import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:zxing2/qrcode.dart';
 
 class QRScannerScreen extends StatefulWidget {
   const QRScannerScreen({super.key});
@@ -37,6 +39,12 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
               onPressed: () async {
                 await controller?.toggleFlash();
               },
+            ),
+          if (kIsWeb)
+            IconButton(
+              icon: const Icon(Icons.camera_alt),
+              onPressed: _takePhoto,
+              tooltip: 'Take Photo',
             ),
           if (kIsWeb)
             IconButton(
@@ -148,6 +156,25 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
+                  onPressed: _takePhoto,
+                  icon: const Icon(Icons.camera_alt, color: Colors.white),
+                  label: const Text(
+                    'Take Photo',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: Colors.white.withOpacity(0.25)),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
                   onPressed: _pickImageFromGallery,
                   icon: const Icon(Icons.upload_file, color: Colors.white),
                   label: const Text(
@@ -170,17 +197,80 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
     );
   }
 
+  Future<void> _takePhoto() async {
+    await _pickAndDecodeImage(ImageSource.camera);
+  }
+
   Future<void> _pickImageFromGallery() async {
+    await _pickAndDecodeImage(ImageSource.gallery);
+  }
+
+  Future<void> _pickAndDecodeImage(ImageSource source) async {
     try {
       final XFile? image = await _imagePicker.pickImage(
-        source: ImageSource.gallery,
+        source: source,
         maxWidth: 800,
         maxHeight: 800,
         imageQuality: 85,
       );
 
       if (image != null) {
-        _showManualInputDialog();
+        bool loadingShown = false;
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) {
+            return const AlertDialog(
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(),
+                ],
+              ),
+            );
+          },
+        );
+        loadingShown = true;
+
+        final bytes = await image.readAsBytes();
+        final decodedImage = img.decodeImage(bytes);
+        if (decodedImage == null) {
+          if (loadingShown && mounted) {
+            Navigator.of(context).pop();
+          }
+          _showManualInputDialog();
+          return;
+        }
+
+        final luminanceSource = RGBLuminanceSource(
+          decodedImage.width,
+          decodedImage.height,
+          decodedImage
+              .convert(numChannels: 4)
+              .getBytes(order: img.ChannelOrder.abgr)
+              .buffer
+              .asInt32List(),
+        );
+        final bitmap = BinaryBitmap(GlobalHistogramBinarizer(luminanceSource));
+
+        final reader = QRCodeReader();
+        Result? result;
+        try {
+          result = reader.decode(bitmap);
+        } catch (_) {
+          result = null;
+        }
+
+        if (!mounted) return;
+        if (loadingShown) {
+          Navigator.of(context).pop();
+        }
+        if (result != null && (result.text).trim().isNotEmpty) {
+          Navigator.pop(context, result.text);
+        } else {
+          _showManualInputDialog();
+        }
       }
     } catch (e) {
       _showErrorDialog('Failed to process image: $e');

@@ -30,6 +30,23 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final password = TextEditingController();
 
+  Future<bool> _ensurePasswordSignInAvailable(String email) async {
+    try {
+      final methods =
+          await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
+      if (methods.isNotEmpty && !methods.contains('password')) {
+        showToast(
+          'This email is registered using Google Sign-In. Please tap "Continue with Google".',
+          context: context,
+        );
+        return false;
+      }
+    } catch (_) {
+      // If this fails, we still allow sign-in attempt to surface the real auth error.
+    }
+    return true;
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -787,9 +804,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (querySnapshot.docs.isNotEmpty) {
         try {
+          final String resolvedEmail =
+              (querySnapshot.docs.first['email'] ?? '').toString().trim();
+          if (resolvedEmail.isNotEmpty) {
+            final ok = await _ensurePasswordSignInAvailable(resolvedEmail);
+            if (!ok) return;
+          }
+
           final user = await FirebaseAuth.instance.signInWithEmailAndPassword(
-              email: querySnapshot.docs.first['email'],
-              password: password.text);
+              email: resolvedEmail, password: password.text.trim());
 
           if (widget.inCustomer) {
             if (user.user!.emailVerified) {
@@ -870,6 +893,9 @@ class _LoginScreenState extends State<LoginScreen> {
           } else if (e.code == 'wrong-password') {
             showToast("Wrong password provided for that user.",
                 context: context);
+          } else if (e.code == 'invalid-credential' ||
+              e.code == 'invalid-login-credentials') {
+            showToast('Incorrect email or password.', context: context);
           } else if (e.code == 'invalid-email') {
             showToast("Invalid email provided.", context: context);
           } else if (e.code == 'user-disabled') {
@@ -885,8 +911,14 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } else {
       try {
+        final String email = username.text.trim();
+        if (email.isNotEmpty) {
+          final ok = await _ensurePasswordSignInAvailable(email);
+          if (!ok) return;
+        }
+
         final user = await FirebaseAuth.instance.signInWithEmailAndPassword(
-            email: username.text.trim(), password: password.text);
+            email: email, password: password.text.trim());
 
         if (widget.inCustomer) {
           if (user.user!.emailVerified) {
@@ -969,6 +1001,9 @@ class _LoginScreenState extends State<LoginScreen> {
           showToast("No user found with that email.", context: context);
         } else if (e.code == 'wrong-password') {
           showToast("Wrong password provided for that user.", context: context);
+        } else if (e.code == 'invalid-credential' ||
+            e.code == 'invalid-login-credentials') {
+          showToast('Incorrect email or password.', context: context);
         } else if (e.code == 'invalid-email') {
           showToast("Invalid email provided.", context: context);
         } else if (e.code == 'user-disabled') {
