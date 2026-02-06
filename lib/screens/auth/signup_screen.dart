@@ -11,6 +11,7 @@ import 'package:juan_million/services/add_referal.dart';
 import 'package:juan_million/utlis/app_common.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/button_widget.dart';
+import 'package:juan_million/widgets/password_validation_indicator.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:juan_million/widgets/textfield_widget.dart';
 import 'package:juan_million/widgets/toast_widget.dart';
@@ -263,6 +264,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         controller: password,
                         label: 'Password',
                       ),
+                      PasswordValidationIndicator(password: password.text),
                       const SizedBox(height: 20),
                       // Confirm Password
                       TextFieldWidget(
@@ -525,6 +527,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       controller: password,
                       label: 'Password',
                     ),
+                    PasswordValidationIndicator(password: password.text),
                     const SizedBox(height: 20),
                     TextFieldWidget(
                       showEye: true,

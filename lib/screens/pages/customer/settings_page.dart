@@ -29,6 +29,25 @@ class _CustomerSettingsPageState extends State<CustomerSettingsPage> {
   final password = TextEditingController();
 
   final pts = TextEditingController();
+
+  // Track if controllers have been initialized
+  bool _controllersInitialized = false;
+
+  void _initializeControllers(dynamic data) {
+    if (_controllersInitialized) return;
+
+    String isNumber = data['email'].toString().split('@')[0];
+    final nameParts = data['name'].toString().trim().split(RegExp(r'\s+'));
+
+    fname.text = nameParts.isNotEmpty ? nameParts.first : '';
+    lname.text = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+    number.text = isPhoneNumber(isNumber) ? isNumber : data['number'];
+    email.text = isPhoneNumber(isNumber) ? '' : data['email'];
+    password.text = '*******';
+
+    _controllersInitialized = true;
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -52,16 +71,7 @@ class _CustomerSettingsPageState extends State<CustomerSettingsPage> {
             }
             dynamic data = snapshot.data;
 
-            String isNumber = data['email'].toString().split('@')[0];
-
-            final nameParts =
-                data['name'].toString().trim().split(RegExp(r'\s+'));
-            fname.text = nameParts.isNotEmpty ? nameParts.first : '';
-            lname.text =
-                nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
-            number.text = isPhoneNumber(isNumber) ? isNumber : data['number'];
-            email.text = isPhoneNumber(isNumber) ? '' : data['email'];
-            password.text = '*******';
+            _initializeControllers(data);
 
             return isDesktop
                 ? _buildDesktopLayout(data, context)
@@ -72,14 +82,6 @@ class _CustomerSettingsPageState extends State<CustomerSettingsPage> {
 
   // Desktop Layout
   Widget _buildDesktopLayout(dynamic data, BuildContext context) {
-    String isNumber = data['email'].toString().split('@')[0];
-    final nameParts = data['name'].toString().trim().split(RegExp(r'\s+'));
-    fname.text = nameParts.isNotEmpty ? nameParts.first : '';
-    lname.text = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
-    number.text = isPhoneNumber(isNumber) ? isNumber : data['number'];
-    email.text = isPhoneNumber(isNumber) ? '' : data['email'];
-    password.text = '*******';
-
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -462,14 +464,6 @@ class _CustomerSettingsPageState extends State<CustomerSettingsPage> {
 
   // Mobile Layout
   Widget _buildMobileLayout(dynamic data, BuildContext context) {
-    String isNumber = data['email'].toString().split('@')[0];
-    final nameParts = data['name'].toString().trim().split(RegExp(r'\s+'));
-    fname.text = nameParts.isNotEmpty ? nameParts.first : '';
-    lname.text = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
-    number.text = isPhoneNumber(isNumber) ? isNumber : data['number'];
-    email.text = isPhoneNumber(isNumber) ? '' : data['email'];
-    password.text = '*******';
-
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

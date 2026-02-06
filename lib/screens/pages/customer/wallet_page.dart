@@ -23,42 +23,42 @@ class CustomerWalletPage extends StatefulWidget {
 class _CustomerWalletPageState extends State<CustomerWalletPage> {
   @override
   void initState() {
-    // TODO: implement initState
-
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return Dialog(
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextWidget(
-                      text: 'Screen Description:',
-                      fontSize: 16,
-                      fontFamily: 'Bold',
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    TextWidget(
-                      text: '''
-"Welcome to your E-Wallet! Use your cash earnings to shop with our affiliate stores, buy booster points, or cash out at the nearest partner store."
-
-''',
-                      fontSize: 14,
-                      maxLines: 20,
-                    ),
-                  ],
+        if (mounted) {
+          showDialog(
+            context: context,
+            barrierDismissible: true,
+            builder: (context) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
                 ),
-              ),
-            );
-          },
-        );
+                title: TextWidget(
+                  text: 'Screen Description',
+                  fontSize: 18,
+                  fontFamily: 'Bold',
+                ),
+                content: TextWidget(
+                  text:
+                      'Welcome to your E-Wallet! Use your cash earnings to shop with our affiliate stores, buy booster points, or cash out at the nearest partner store.',
+                  fontSize: 14,
+                  maxLines: 5,
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text(
+                      'Got it',
+                      style: TextStyle(fontFamily: 'Bold'),
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+        }
       },
     );
   }

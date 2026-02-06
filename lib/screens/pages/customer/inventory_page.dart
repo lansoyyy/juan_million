@@ -18,42 +18,43 @@ class CustomerInventoryPage extends StatefulWidget {
 class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
   @override
   void initState() {
-    // TODO: implement initState
     checkPoints(4163);
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return Dialog(
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextWidget(
-                      text: 'Screen Description:',
-                      fontSize: 16,
-                      fontFamily: 'Bold',
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    TextWidget(
-                      text: '''
-"This screen shows how many bonus slots you have. To check your current position, click the Slots menu. You can also track sequence updates and see who received the bonus prize." 
-
-''',
-                      fontSize: 14,
-                      maxLines: 20,
-                    ),
-                  ],
+        if (mounted) {
+          showDialog(
+            context: context,
+            barrierDismissible: true,
+            builder: (context) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
                 ),
-              ),
-            );
-          },
-        );
+                title: TextWidget(
+                  text: 'Screen Description',
+                  fontSize: 18,
+                  fontFamily: 'Bold',
+                ),
+                content: TextWidget(
+                  text:
+                      'This screen shows how many bonus slots you have. To check your current position, click the Slots menu. You can also track sequence updates and see who received the bonus prize.',
+                  fontSize: 14,
+                  maxLines: 5,
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text(
+                      'Got it',
+                      style: TextStyle(fontFamily: 'Bold'),
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+        }
       },
     );
   }
@@ -451,7 +452,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                       TextWidget(
                         text: 'Community',
                         fontSize: 24,
-                        color: Colors.white,
+                        color: Colors.black,
                         fontFamily: 'Bold',
                       ),
                       const SizedBox(
@@ -576,6 +577,29 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                             }
 
                             final data = snapshot.requireData;
+
+                            if (data.docs.isEmpty) {
+                              return SizedBox(
+                                height: isDesktop ? 400 : 300,
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.people_outline,
+                                          size: 64,
+                                          color: Colors.grey.shade300),
+                                      const SizedBox(height: 15),
+                                      TextWidget(
+                                        text: 'No ranks yet',
+                                        fontSize: 18,
+                                        fontFamily: 'Medium',
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }
 
                             if (data.docs.isNotEmpty) {
                               uid = data.docs.first['uid'];

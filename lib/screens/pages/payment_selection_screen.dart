@@ -373,6 +373,38 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
     final bool isPointsItem = (itemSlots - 0.066).abs() < 0.0001;
     final int purchasedSlots = isPointsItem ? 0 : itemSlots.round() * qty;
 
+    // Check daily slot limit (5 slots per day) for slot purchases
+    if (!isPointsItem && purchasedSlots > 0) {
+      final userId = FirebaseAuth.instance.currentUser!.uid;
+      final todaySlots = await FirebaseFirestore.instance
+          .collection('Slots')
+          .where('uid', isEqualTo: userId)
+          .where('dateTime',
+              isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime(
+                  DateTime.now().year,
+                  DateTime.now().month,
+                  DateTime.now().day)))
+          .where('dateTime',
+              isLessThanOrEqualTo: Timestamp.fromDate(DateTime(
+                      DateTime.now().year,
+                      DateTime.now().month,
+                      DateTime.now().day + 1)
+                  .subtract(const Duration(seconds: 1))))
+          .get();
+
+      final int currentSlots = todaySlots.docs.length;
+      if (currentSlots >= 5) {
+        showToast('Daily limit reached: You can only purchase 5 slots per day.',
+            context: context);
+        return;
+      }
+      if (currentSlots + purchasedSlots > 5) {
+        showToast('You can only purchase ${5 - currentSlots} more slots today.',
+            context: context);
+        return;
+      }
+    }
+
     final int totalCost = _totalCostForQty(qty);
     if ((data['wallet'] is num ? (data['wallet'] as num).toInt() : 0) <
         totalCost) {

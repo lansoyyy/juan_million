@@ -20,6 +20,7 @@ import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/address_widget.dart';
 import 'package:juan_million/widgets/button_widget.dart';
 import 'package:juan_million/widgets/text_widget.dart';
+import 'package:juan_million/widgets/password_validation_indicator.dart';
 import 'package:juan_million/widgets/textfield_widget.dart';
 import 'package:juan_million/widgets/toast_widget.dart';
 import 'package:path/path.dart' as path;
@@ -423,6 +424,7 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
                       controller: password,
                       label: 'Password',
                     ),
+                    PasswordValidationIndicator(password: password.text),
                     const SizedBox(height: 20),
                     TextFieldWidget(
                       showEye: true,
@@ -891,6 +893,7 @@ class _CustomerSignupScreenState extends State<CustomerSignupScreen> {
                       controller: password,
                       label: 'Password',
                     ),
+                    PasswordValidationIndicator(password: password.text),
                     const SizedBox(height: 20),
                     TextFieldWidget(
                       showEye: true,
