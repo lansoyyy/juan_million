@@ -3,18 +3,23 @@ import 'package:flutter/material.dart';
 // Global key to access the navigator context
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-Future<bool?> showToast(String msg, {BuildContext? context}) async {
+Future<bool?> showToast(String msg,
+    {BuildContext? context, ToastType type = ToastType.success}) async {
   // Use a custom overlay for all platforms to avoid web compatibility issues
-  return _showCustomToast(msg, context: context);
+  return _showCustomToast(msg, context: context, type: type);
 }
 
-Future<bool?> _showCustomToast(String msg, {BuildContext? context}) async {
+enum ToastType { success, error, warning }
+
+Future<bool?> _showCustomToast(String msg,
+    {BuildContext? context, ToastType type = ToastType.success}) async {
   // Get the current context
   final currentContext = context ?? _getContext();
   if (currentContext == null) return false;
 
   final lowerMsg = msg.toLowerCase();
-  final bool isError = lowerMsg.contains('error') ||
+  final bool isError = type == ToastType.error ||
+      lowerMsg.contains('error') ||
       lowerMsg.contains('failed') ||
       lowerMsg.contains('cannot') ||
       lowerMsg.contains("can't") ||
@@ -24,6 +29,23 @@ Future<bool?> _showCustomToast(String msg, {BuildContext? context}) async {
       lowerMsg.contains('not enough') ||
       lowerMsg.contains('unauthorized') ||
       lowerMsg.contains('denied');
+
+  final bool isWarning = type == ToastType.warning ||
+      lowerMsg.contains('limit') ||
+      lowerMsg.contains('maximum') ||
+      lowerMsg.contains('reached');
+
+  Color getBackgroundColor() {
+    if (isError) return Colors.red;
+    if (isWarning) return Colors.orange;
+    return const Color(0xFF4CAF50);
+  }
+
+  IconData getIcon() {
+    if (isError) return Icons.error_outline;
+    if (isWarning) return Icons.warning_amber_rounded;
+    return Icons.check_circle_outline;
+  }
 
   // Create an overlay entry
   final overlay = Overlay.of(currentContext);
@@ -39,7 +61,7 @@ Future<bool?> _showCustomToast(String msg, {BuildContext? context}) async {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           decoration: BoxDecoration(
-            color: isError ? Colors.red : const Color(0xFF4CAF50),
+            color: getBackgroundColor(),
             borderRadius: BorderRadius.circular(8),
             boxShadow: [
               BoxShadow(
@@ -52,7 +74,7 @@ Future<bool?> _showCustomToast(String msg, {BuildContext? context}) async {
           child: Row(
             children: [
               Icon(
-                isError ? Icons.error_outline : Icons.check_circle_outline,
+                getIcon(),
                 color: Colors.white,
               ),
               const SizedBox(width: 12),

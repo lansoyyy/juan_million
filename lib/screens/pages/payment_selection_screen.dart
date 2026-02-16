@@ -395,12 +395,12 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
       final int currentSlots = todaySlots.docs.length;
       if (currentSlots >= 5) {
         showToast('Daily limit reached: You can only purchase 5 slots per day.',
-            context: context);
+            context: context, type: ToastType.warning);
         return;
       }
       if (currentSlots + purchasedSlots > 5) {
         showToast('You can only purchase ${5 - currentSlots} more slots today.',
-            context: context);
+            context: context, type: ToastType.warning);
         return;
       }
     }

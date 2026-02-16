@@ -276,9 +276,50 @@ class _QRScannedPageState extends State<QRScannedPage> {
                           ),
                         ),
                         const Divider(),
-                        const SizedBox(
-                          height: 10,
-                        ),
+                        const SizedBox(height: 10),
+                        // Reference Number Section - like GCash/bank transfers
+                        widget.fromWallet!
+                            ? Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade100,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border:
+                                      Border.all(color: Colors.grey.shade300),
+                                ),
+                                child: Column(
+                                  children: [
+                                    TextWidget(
+                                      text: 'Reference Number',
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                      fontFamily: 'Regular',
+                                    ),
+                                    const SizedBox(height: 4),
+                                    TextWidget(
+                                      text:
+                                          'REF-${DateTime.now().millisecondsSinceEpoch.toString().substring(5, 15)}',
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                      fontFamily: 'Bold',
+                                    ),
+                                    const SizedBox(height: 8),
+                                    TextWidget(
+                                      text: DateFormat.yMMMd()
+                                          .add_jm()
+                                          .format(DateTime.now()),
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                      fontFamily: 'Regular',
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : const SizedBox(),
+                        widget.fromWallet!
+                            ? const SizedBox(height: 15)
+                            : const SizedBox(),
                         widget.fromWallet!
                             ? const SizedBox()
                             : !widget.inuser!
