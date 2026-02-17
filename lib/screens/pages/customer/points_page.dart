@@ -689,6 +689,16 @@ class _CustomerPointsPageState extends State<CustomerPointsPage> {
       final recipientRef =
           FirebaseFirestore.instance.collection(selected).doc(result);
 
+      // Prevent self-transfer
+      if (result == FirebaseAuth.instance.currentUser!.uid) {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+        showToast('Cannot transfer to your own account!',
+            context: context, type: ToastType.error);
+        return;
+      }
+
       final senderSnap = await senderRef.get();
       final recipientSnap = await recipientRef.get();
 
@@ -709,7 +719,8 @@ class _CustomerPointsPageState extends State<CustomerPointsPage> {
         if (Navigator.of(context).canPop()) {
           Navigator.of(context).pop();
         }
-        showToast('Your points is not enough to proceed!', context: context);
+        showToast('Your points is not enough to proceed!',
+            context: context, type: ToastType.error);
         return;
       }
 

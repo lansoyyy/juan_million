@@ -861,13 +861,13 @@ class _AffiliateLocatorPageState extends State<AffiliateLocatorPage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         TextWidget(
-                          text: data['representative'],
+                          text: 'Representative',
                           fontSize: 10,
                           fontFamily: 'Regular',
                           color: Colors.grey,
                         ),
                         TextWidget(
-                          text: 'Address',
+                          text: data['representative'] ?? 'N/A',
                           fontSize: 16,
                           fontFamily: 'Bold',
                         ),

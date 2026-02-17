@@ -408,7 +408,8 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
     final int totalCost = _totalCostForQty(qty);
     if ((data['wallet'] is num ? (data['wallet'] as num).toInt() : 0) <
         totalCost) {
-      showToast('Not enough balance on wallet!', context: context);
+      showToast('Not enough balance on wallet!',
+          context: context, type: ToastType.error);
       return;
     }
 

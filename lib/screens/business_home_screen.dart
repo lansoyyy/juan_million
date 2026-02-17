@@ -51,7 +51,8 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
       Navigator.of(context)
           .push(MaterialPageRoute(builder: (context) => const SettingsPage()));
     } on FirebaseAuthException catch (e) {
-      showToast('Unauthorized to access this feature!', context: context);
+      showToast('Unauthorized to access this feature!',
+          context: context, type: ToastType.error);
       print("Error: ${e.message}");
     }
   }
@@ -106,7 +107,8 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
         if (Navigator.of(context).canPop()) {
           Navigator.of(context).pop();
         }
-        showToast('Invalid recipient QR code', context: context);
+        showToast('Invalid recipient QR code',
+            context: context, type: ToastType.error);
         return;
       }
 
@@ -120,7 +122,8 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
         if (Navigator.of(context).canPop()) {
           Navigator.of(context).pop();
         }
-        showToast('Your points balance is not enough', context: context);
+        showToast('Your points balance is not enough',
+            context: context, type: ToastType.error);
         return;
       }
 
@@ -167,12 +170,14 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
       if (Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
       }
-      showToast('Failed to scan QR code', context: context);
+      showToast('Failed to scan QR code',
+          context: context, type: ToastType.error);
     } catch (_) {
       if (Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
       }
-      showToast('Transfer failed. Please try again.', context: context);
+      showToast('Transfer failed. Please try again.',
+          context: context, type: ToastType.error);
     }
   }
 
@@ -452,11 +457,13 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                               } else {
                                                 showToast(
                                                     "You don't have enough points.",
-                                                    context: context);
+                                                    context: context,
+                                                    type: ToastType.error);
                                               }
                                             } else {
                                               showToast('Wrong PIN Code',
-                                                  context: context);
+                                                  context: context,
+                                                  type: ToastType.error);
                                             }
 
                                             pin.clear();
@@ -811,12 +818,16 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                       } else {
                                                         showToast(
                                                             'Wrong PIN Code',
-                                                            context: context);
+                                                            context: context,
+                                                            type: ToastType
+                                                                .error);
                                                       }
                                                     } else {
                                                       showToast(
                                                           'Wrong PIN Code',
-                                                          context: context);
+                                                          context: context,
+                                                          type:
+                                                              ToastType.error);
                                                     }
                                                     pin.clear();
                                                   },
@@ -830,7 +841,8 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                   } else {
                                     showToast(
                                         'Please register your authorized user account',
-                                        context: context);
+                                        context: context,
+                                        type: ToastType.error);
                                   }
                                 },
                               ),
@@ -1184,7 +1196,14 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                   .doc(_currentBusinessId)
                                   .get();
 
-                              if (doc['wallet'] >= int.parse(pts.text)) {
+                              final currentData = doc.data();
+                              final dynamic rawWallet = currentData is Map
+                                  ? currentData['wallet']
+                                  : null;
+                              final int walletBalance =
+                                  rawWallet is num ? rawWallet.toInt() : 0;
+
+                              if (walletBalance >= int.parse(pts.text)) {
                                 // Prepare payment parameters
                                 final uid = _currentBusinessId;
                                 final email =
@@ -1307,13 +1326,14 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                           )));
                                 } else {
                                   showToast('Payment failed or canceled.',
-                                      context: context);
+                                      context: context, type: ToastType.error);
                                   Navigator.pop(context);
                                 }
                               } else {
                                 showToast(
                                     'Cannot proceed! Insufficient e wallet',
-                                    context: context);
+                                    context: context,
+                                    type: ToastType.error);
                               }
 
                               pts.clear();
@@ -1580,7 +1600,8 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                   cashierUid !=
                                                       _currentBusinessId) {
                                                 showToast('Wrong PIN Code',
-                                                    context: context);
+                                                    context: context,
+                                                    type: ToastType.error);
                                                 pin.clear();
                                                 return;
                                               }
@@ -1596,7 +1617,8 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                               if (ptsToTransfer <= 0) {
                                                 showToast(
                                                     'Please enter a valid amount',
-                                                    context: context);
+                                                    context: context,
+                                                    type: ToastType.error);
                                                 return;
                                               }
 

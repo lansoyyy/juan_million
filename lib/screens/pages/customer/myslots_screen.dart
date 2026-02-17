@@ -68,6 +68,15 @@ class MySlotsScreen extends StatelessWidget {
                     child: ListView.builder(
                       itemCount: data.docs.length,
                       itemBuilder: (context, index) {
+                        // Calculate user's sequential slot number (1, 2, 3, etc.)
+                        int userSlotNumber = 0;
+                        for (int i = 0; i <= index; i++) {
+                          if (data.docs[i]['uid'] ==
+                              FirebaseAuth.instance.currentUser!.uid) {
+                            userSlotNumber++;
+                          }
+                        }
+
                         return data.docs[index]['uid'] !=
                                 FirebaseAuth.instance.currentUser!.uid
                             ? const SizedBox()
@@ -125,7 +134,7 @@ class MySlotsScreen extends StatelessWidget {
                                               ),
                                             ),
                                             TextWidget(
-                                              text: '#${index + 1}',
+                                              text: '#$userSlotNumber',
                                               fontSize: 18,
                                               color: Colors.black,
                                               fontFamily: 'Bold',

@@ -126,23 +126,32 @@ class _PackagesPaymentPageState extends State<PackagesPaymentPage> {
                                 width: 225,
                                 label: 'Continue',
                                 onPressed: () async {
-                                  await FirebaseFirestore.instance
-                                      .collection('Business')
-                                      .doc(widget.id)
-                                      .update({
-                                    'packagePayment': widget.data['price'],
-                                    'packageWallet': widget.data['wallet'],
-                                  }).whenComplete(() {
-                                    Navigator.of(context).pushAndRemoveUntil(
-                                      MaterialPageRoute(
-                                          builder: (context) => LoginScreen(
-                                                inCustomer: false,
-                                              )),
-                                      (route) {
-                                        return false;
-                                      },
-                                    );
-                                  });
+                                  try {
+                                    await FirebaseFirestore.instance
+                                        .collection('Business')
+                                        .doc(widget.id)
+                                        .update({
+                                      'packagePayment': widget.data['price'],
+                                      'packageWallet': widget.data['wallet'],
+                                    });
+
+                                    if (mounted) {
+                                      Navigator.of(context).pushAndRemoveUntil(
+                                        MaterialPageRoute(
+                                            builder: (context) => LoginScreen(
+                                                  inCustomer: false,
+                                                )),
+                                        (route) => false,
+                                      );
+                                    }
+                                  } catch (e) {
+                                    if (Navigator.of(context).canPop()) {
+                                      Navigator.of(context).pop();
+                                    }
+                                    showToast('Payment failed: ${e.toString()}',
+                                        context: context,
+                                        type: ToastType.error);
+                                  }
                                 },
                               )
                             ],

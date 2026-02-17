@@ -88,14 +88,10 @@ class _CustomerNotifPageState extends State<CustomerNotifPage> {
           ),
           // Content
           Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('Points')
-                    .where('uid',
-                        isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-                    .snapshots(),
+            child: StreamBuilder<List<QueryDocumentSnapshot>>(
+                stream: _getCombinedNotificationStream(),
                 builder: (BuildContext context,
-                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                    AsyncSnapshot<List<QueryDocumentSnapshot>> snapshot) {
                   if (snapshot.hasError) {
                     print('error');
                     return const Center(child: Text('Error'));
@@ -104,16 +100,16 @@ class _CustomerNotifPageState extends State<CustomerNotifPage> {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  final data = snapshot.requireData;
+                  final allData = snapshot.data ?? [];
 
                   // Filter notifications based on selected filter
                   List<QueryDocumentSnapshot> filteredDocs = [];
                   DateTime now = DateTime.now();
 
                   if (_filterType == 'all') {
-                    filteredDocs = data.docs.toList();
+                    filteredDocs = allData.toList();
                   } else if (_filterType == 'today') {
-                    filteredDocs = data.docs.where((doc) {
+                    filteredDocs = allData.where((doc) {
                       final dynamic rawDateTime = doc['dateTime'];
                       if (rawDateTime is! Timestamp) return false;
                       DateTime docDate = rawDateTime.toDate();
@@ -122,14 +118,14 @@ class _CustomerNotifPageState extends State<CustomerNotifPage> {
                           docDate.year == now.year;
                     }).toList();
                   } else if (_filterType == 'week') {
-                    filteredDocs = data.docs.where((doc) {
+                    filteredDocs = allData.where((doc) {
                       final dynamic rawDateTime = doc['dateTime'];
                       if (rawDateTime is! Timestamp) return false;
                       DateTime docDate = rawDateTime.toDate();
                       return now.difference(docDate).inDays <= 7;
                     }).toList();
                   } else if (_filterType == 'month') {
-                    filteredDocs = data.docs.where((doc) {
+                    filteredDocs = allData.where((doc) {
                       final dynamic rawDateTime = doc['dateTime'];
                       if (rawDateTime is! Timestamp) return false;
                       DateTime docDate = rawDateTime.toDate();
@@ -138,6 +134,7 @@ class _CustomerNotifPageState extends State<CustomerNotifPage> {
                     }).toList();
                   }
 
+                  // Sort by dateTime descending
                   filteredDocs.sort((a, b) {
                     final dynamic aDateTime = a['dateTime'];
                     final dynamic bDateTime = b['dateTime'];
@@ -412,5 +409,40 @@ class _CustomerNotifPageState extends State<CustomerNotifPage> {
         ),
       ),
     );
+  }
+
+  Stream<List<QueryDocumentSnapshot>> _getCombinedNotificationStream() async* {
+    final pointsQuery = FirebaseFirestore.instance
+        .collection('Points')
+        .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .limit(20);
+
+    final walletsQuery = FirebaseFirestore.instance
+        .collection('Wallets')
+        .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .limit(20);
+
+    await for (final pointsSnap in pointsQuery.snapshots()) {
+      final walletsSnap = await walletsQuery.get();
+
+      final combined = <QueryDocumentSnapshot>[];
+      combined.addAll(pointsSnap.docs);
+      combined.addAll(walletsSnap.docs);
+
+      // Sort by dateTime descending
+      combined.sort((a, b) {
+        final aData = a.data() as Map<String, dynamic>;
+        final bData = b.data() as Map<String, dynamic>;
+        final aTime = aData['dateTime'] is Timestamp
+            ? (aData['dateTime'] as Timestamp).toDate()
+            : DateTime(2000);
+        final bTime = bData['dateTime'] is Timestamp
+            ? (bData['dateTime'] as Timestamp).toDate()
+            : DateTime(2000);
+        return bTime.compareTo(aTime);
+      });
+
+      yield combined.take(20).toList();
+    }
   }
 }

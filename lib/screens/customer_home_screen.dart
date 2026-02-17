@@ -679,12 +679,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           ],
         ),
         const SizedBox(height: 25),
-        StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection('Points')
-              .where('scannedId', isEqualTo: _currentUserId)
-              .limit(6)
-              .snapshots(),
+        StreamBuilder<List<QueryDocumentSnapshot>>(
+          stream: _getCombinedActivityStream(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return const Center(child: Text('Error'));
@@ -693,8 +689,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               return const Center(child: CircularProgressIndicator());
             }
 
-            final data = snapshot.data!;
-            if (data.docs.isEmpty) {
+            final data = snapshot.data ?? [];
+            if (data.isEmpty) {
               return Container(
                 height: 200,
                 decoration: BoxDecoration(
@@ -730,20 +726,26 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                 mainAxisSpacing: 20,
                 childAspectRatio: 1.5,
               ),
-              itemCount: data.docs.length,
+              itemCount: data.length,
               itemBuilder: (context, index) {
-                final doc = data.docs[index];
+                final doc = data[index];
                 final docData = doc.data() as Map<String, dynamic>;
                 final dynamic rawPts = docData['pts'];
                 final double points = rawPts is num ? rawPts.toDouble() : 0.0;
                 final dynamic rawDateTime = docData['dateTime'];
                 final DateTime? dateTime =
                     rawDateTime is Timestamp ? rawDateTime.toDate() : null;
+                final String transactionType =
+                    docData['type']?.toString() ?? '';
+                final bool isWalletTransaction =
+                    transactionType.contains('Transfer') ||
+                        transactionType.contains('Reload') ||
+                        transactionType.contains('Purchase');
 
                 return StreamBuilder<DocumentSnapshot>(
                   stream: FirebaseFirestore.instance
                       .collection('Business')
-                      .doc(data.docs[index]['uid'])
+                      .doc(docData['uid'])
                       .snapshots(),
                   builder: (context, businessSnapshot) {
                     String sourceName = 'Juan Million';
@@ -783,21 +785,31 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 12, vertical: 6),
                                   decoration: BoxDecoration(
-                                    color: primary.withOpacity(0.1),
+                                    color: isWalletTransaction
+                                        ? Colors.blue.withOpacity(0.1)
+                                        : primary.withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: TextWidget(
                                     text: sourceName,
                                     fontSize: 12,
                                     fontFamily: 'Bold',
-                                    color: primary,
+                                    color: isWalletTransaction
+                                        ? Colors.blue
+                                        : primary,
                                     maxLines: 1,
                                   ),
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              const Icon(Icons.star_rounded,
-                                  color: Colors.amber, size: 20),
+                              Icon(
+                                  isWalletTransaction
+                                      ? Icons.account_balance_wallet_rounded
+                                      : Icons.star_rounded,
+                                  color: isWalletTransaction
+                                      ? Colors.blue
+                                      : Colors.amber,
+                                  size: 20),
                             ],
                           ),
                           Row(
@@ -840,6 +852,41 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         ),
       ],
     );
+  }
+
+  Stream<List<QueryDocumentSnapshot>> _getCombinedActivityStream() async* {
+    final pointsQuery = FirebaseFirestore.instance
+        .collection('Points')
+        .where('scannedId', isEqualTo: _currentUserId)
+        .limit(10);
+
+    final walletsQuery = FirebaseFirestore.instance
+        .collection('Wallets')
+        .where('uid', isEqualTo: _currentUserId)
+        .limit(10);
+
+    await for (final pointsSnap in pointsQuery.snapshots()) {
+      final walletsSnap = await walletsQuery.get();
+
+      final combined = <QueryDocumentSnapshot>[];
+      combined.addAll(pointsSnap.docs);
+      combined.addAll(walletsSnap.docs);
+
+      // Sort by dateTime descending
+      combined.sort((a, b) {
+        final aData = a.data() as Map<String, dynamic>;
+        final bData = b.data() as Map<String, dynamic>;
+        final aTime = aData['dateTime'] is Timestamp
+            ? (aData['dateTime'] as Timestamp).toDate()
+            : DateTime(2000);
+        final bTime = bData['dateTime'] is Timestamp
+            ? (bData['dateTime'] as Timestamp).toDate()
+            : DateTime(2000);
+        return bTime.compareTo(aTime);
+      });
+
+      yield combined.take(6).toList();
+    }
   }
 
   // Mobile Layout
@@ -1189,12 +1236,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   }
 
   Widget _buildMobileRecentActivity(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('Points')
-          .where('scannedId', isEqualTo: _currentUserId)
-          .limit(10)
-          .snapshots(),
+    return StreamBuilder<List<QueryDocumentSnapshot>>(
+      stream: _getCombinedActivityStream(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return const Center(child: Text('Error'));
@@ -1203,8 +1246,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        final data = snapshot.data!;
-        if (data.docs.isEmpty) {
+        final data = snapshot.data ?? [];
+        if (data.isEmpty) {
           return Container(
             height: 150,
             decoration: BoxDecoration(
@@ -1235,20 +1278,25 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           height: 200,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: data.docs.length,
+            itemCount: data.length,
             itemBuilder: (context, index) {
-              final doc = data.docs[index];
+              final doc = data[index];
               final docData = doc.data() as Map<String, dynamic>;
               final dynamic rawPts = docData['pts'];
               final double points = rawPts is num ? rawPts.toDouble() : 0.0;
               final dynamic rawDateTime = docData['dateTime'];
               final DateTime? dateTime =
                   rawDateTime is Timestamp ? rawDateTime.toDate() : null;
+              final String transactionType = docData['type']?.toString() ?? '';
+              final bool isWalletTransaction =
+                  transactionType.contains('Transfer') ||
+                      transactionType.contains('Reload') ||
+                      transactionType.contains('Purchase');
 
               return StreamBuilder<DocumentSnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('Business')
-                    .doc(data.docs[index]['uid'])
+                    .doc(docData['uid'])
                     .snapshots(),
                 builder: (context, businessSnapshot) {
                   String sourceName = 'Juan Million';
@@ -1290,21 +1338,31 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 10, vertical: 5),
                                 decoration: BoxDecoration(
-                                  color: primary.withOpacity(0.1),
+                                  color: isWalletTransaction
+                                      ? Colors.blue.withOpacity(0.1)
+                                      : primary.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(15),
                                 ),
                                 child: TextWidget(
                                   text: sourceName,
                                   fontSize: 11,
                                   fontFamily: 'Bold',
-                                  color: primary,
+                                  color: isWalletTransaction
+                                      ? Colors.blue
+                                      : primary,
                                   maxLines: 1,
                                 ),
                               ),
                             ),
                             const SizedBox(width: 6),
-                            const Icon(Icons.star_rounded,
-                                color: Colors.amber, size: 18),
+                            Icon(
+                                isWalletTransaction
+                                    ? Icons.account_balance_wallet_rounded
+                                    : Icons.star_rounded,
+                                color: isWalletTransaction
+                                    ? Colors.blue
+                                    : Colors.amber,
+                                size: 18),
                           ],
                         ),
                         Row(

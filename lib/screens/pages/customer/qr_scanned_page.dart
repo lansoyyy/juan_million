@@ -398,27 +398,30 @@ class _QRScannedPageState extends State<QRScannedPage> {
                                               const SizedBox(
                                                 width: 20,
                                               ),
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                children: [
-                                                  TextWidget(
-                                                    text: name,
-                                                    fontSize: 14,
-                                                    color: Colors.black,
-                                                    fontFamily: 'Bold',
-                                                  ),
-                                                  TextWidget(
-                                                    text: DateFormat.yMMMd()
-                                                        .add_jm()
-                                                        .format(DateTime.now()),
-                                                    fontSize: 12,
-                                                    color: Colors.grey,
-                                                    fontFamily: 'Regular',
-                                                  ),
-                                                ],
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    TextWidget(
+                                                      text: name,
+                                                      fontSize: 14,
+                                                      color: Colors.black,
+                                                      fontFamily: 'Bold',
+                                                    ),
+                                                    TextWidget(
+                                                      text: DateFormat.yMMMd()
+                                                          .add_jm()
+                                                          .format(
+                                                              DateTime.now()),
+                                                      fontSize: 12,
+                                                      color: Colors.grey,
+                                                      fontFamily: 'Regular',
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ],
                                           ),
