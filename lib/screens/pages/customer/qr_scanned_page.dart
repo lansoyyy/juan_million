@@ -360,7 +360,8 @@ class _QRScannedPageState extends State<QRScannedPage> {
                                         return const SizedBox();
                                       }
                                       final businessData = snap.data();
-                                      if (businessData is! Map) {
+                                      if (businessData == null ||
+                                          businessData is! Map) {
                                         return const SizedBox();
                                       }
                                       final String name =
@@ -451,7 +452,7 @@ class _QRScannedPageState extends State<QRScannedPage> {
                                     return const SizedBox();
                                   }
                                   final userData = snap.data();
-                                  if (userData is! Map) {
+                                  if (userData == null || userData is! Map) {
                                     return const SizedBox();
                                   }
                                   final String name =

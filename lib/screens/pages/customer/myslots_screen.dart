@@ -38,8 +38,10 @@ class MySlotsScreen extends StatelessWidget {
               height: 20,
             ),
             StreamBuilder<QuerySnapshot>(
-                stream:
-                    FirebaseFirestore.instance.collection('Slots').snapshots(),
+                stream: FirebaseFirestore.instance
+                    .collection('Slots')
+                    .orderBy('dateTime', descending: false)
+                    .snapshots(),
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.hasError) {
@@ -58,96 +60,114 @@ class MySlotsScreen extends StatelessWidget {
 
                   final data = snapshot.requireData;
 
-                  // if (data.docs.isNotEmpty) {
-                  //   uid = data.docs.first['uid'];
-                  //   id = data.docs.first.id;
-                  // }
+                  // Filter to only current user's slots to make calculating index easier
+                  final userDocs = data.docs
+                      .where((doc) =>
+                          doc['uid'] == FirebaseAuth.instance.currentUser!.uid)
+                      .toList();
 
-                  return SizedBox(
-                    height: 500,
+                  if (userDocs.isEmpty) {
+                    return const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(20.0),
+                        child: Text(
+                          'No slots purchased yet',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    );
+                  }
+
+                  return Expanded(
                     child: ListView.builder(
-                      itemCount: data.docs.length,
+                      itemCount: userDocs.length,
                       itemBuilder: (context, index) {
-                        // Calculate user's sequential slot number (1, 2, 3, etc.)
-                        int userSlotNumber = 0;
-                        for (int i = 0; i <= index; i++) {
-                          if (data.docs[i]['uid'] ==
-                              FirebaseAuth.instance.currentUser!.uid) {
-                            userSlotNumber++;
-                          }
-                        }
+                        // The userDocs are ordered chronologically, so index + 1 is the correct sequential slot number
+                        int userSlotNumber = index + 1;
+                        final slotDoc = userDocs[index];
 
-                        return data.docs[index]['uid'] !=
-                                FirebaseAuth.instance.currentUser!.uid
-                            ? const SizedBox()
-                            : StreamBuilder<DocumentSnapshot>(
-                                stream: FirebaseFirestore.instance
-                                    .collection('Users')
-                                    .doc(data.docs[index]['uid'])
-                                    .snapshots(),
-                                builder: (context,
-                                    AsyncSnapshot<DocumentSnapshot> snapshot) {
-                                  if (!snapshot.hasData) {
-                                    return const Center(child: Text('Loading'));
-                                  } else if (snapshot.hasError) {
-                                    return const Center(
-                                        child: Text('Something went wrong'));
-                                  } else if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return const Center(
-                                        child: CircularProgressIndicator());
-                                  }
-                                  dynamic mydata = snapshot.data;
-                                  return Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(15),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            CircleAvatar(
-                                              maxRadius: 20,
-                                              minRadius: 20,
-                                              backgroundImage:
-                                                  NetworkImage(mydata['pic']),
-                                            ),
-                                            const SizedBox(
-                                              width: 10,
-                                            ),
-                                            TextWidget(
-                                              text: mydata['name'],
-                                              fontSize: 16,
-                                              color: Colors.black,
-                                              fontFamily: 'Bold',
-                                            ),
-                                            const Expanded(
-                                              child: SizedBox(
-                                                width: 20,
-                                              ),
-                                            ),
-                                            TextWidget(
-                                              text: '#$userSlotNumber',
-                                              fontSize: 18,
-                                              color: Colors.black,
-                                              fontFamily: 'Bold',
-                                            ),
-                                            const SizedBox(
-                                              width: 20,
-                                            ),
-                                          ],
+                        return StreamBuilder<DocumentSnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('Users')
+                                .doc(slotDoc['uid'])
+                                .snapshots(),
+                            builder: (context,
+                                AsyncSnapshot<DocumentSnapshot> snapshot) {
+                              if (!snapshot.hasData) {
+                                return const SizedBox(
+                                    height: 60,
+                                    child: Center(
+                                        child: CircularProgressIndicator()));
+                              } else if (snapshot.hasError) {
+                                return const Center(
+                                    child: Text('Something went wrong'));
+                              } else if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const SizedBox(
+                                    height: 60,
+                                    child: Center(
+                                        child: CircularProgressIndicator()));
+                              }
+
+                              final mydata = snapshot.data!.data()
+                                  as Map<String, dynamic>?;
+                              if (mydata == null) return const SizedBox();
+
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 15.0, vertical: 5.0),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        CircleAvatar(
+                                          maxRadius: 20,
+                                          minRadius: 20,
+                                          backgroundImage:
+                                              mydata['pic'] != null &&
+                                                      mydata['pic'].isNotEmpty
+                                                  ? NetworkImage(mydata['pic'])
+                                                  : null,
+                                          child: mydata['pic'] == null ||
+                                                  mydata['pic'].isEmpty
+                                              ? const Icon(Icons.person)
+                                              : null,
                                         ),
-                                      ),
+                                        const SizedBox(
+                                          width: 15,
+                                        ),
+                                        Expanded(
+                                          child: TextWidget(
+                                            text: mydata['name'] ?? 'Unknown',
+                                            fontSize: 16,
+                                            color: Colors.black,
+                                            fontFamily: 'Bold',
+                                          ),
+                                        ),
+                                        TextWidget(
+                                          text: '#$userSlotNumber',
+                                          fontSize: 18,
+                                          color: Colors.black,
+                                          fontFamily: 'Bold',
+                                        ),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                      ],
                                     ),
-                                  );
-                                });
+                                  ),
+                                ),
+                              );
+                            });
                       },
                     ),
                   );

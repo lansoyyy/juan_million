@@ -1315,19 +1315,25 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                   showToast('Transaction was succesfull!',
                                       context: context);
 
-                                  Navigator.pop(context);
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => QRScannedPage(
-                                            inuser: false,
-                                            pts: (currentPts + ptsToReload)
-                                                .toString(),
-                                            store: FirebaseAuth
-                                                .instance.currentUser!.uid,
-                                          )));
+                                  if (context.mounted) {
+                                    Navigator.pop(context);
+                                    Navigator.of(context)
+                                        .push(MaterialPageRoute(
+                                            builder: (context) => QRScannedPage(
+                                                  inuser: false,
+                                                  pts:
+                                                      (currentPts + ptsToReload)
+                                                          .toString(),
+                                                  store: FirebaseAuth.instance
+                                                      .currentUser!.uid,
+                                                )));
+                                  }
                                 } else {
                                   showToast('Payment failed or canceled.',
                                       context: context, type: ToastType.error);
-                                  Navigator.pop(context);
+                                  if (context.mounted) {
+                                    Navigator.pop(context);
+                                  }
                                 }
                               } else {
                                 showToast(
