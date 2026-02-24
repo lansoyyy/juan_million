@@ -19,6 +19,7 @@ class LandingScreen extends StatelessWidget {
 
     return Scaffold(
       body: Container(
+        height: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -30,43 +31,41 @@ class LandingScreen extends StatelessWidget {
             ],
           ),
         ),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // Navigation Bar
-              if (isWeb) _buildNavigationBar(context),
+        child: Column(
+          children: [
+            // Navigation Bar
+            // if (isWeb) _buildNavigationBar(context),
 
-              // Hero Section
-              _buildHeroSection(context, isWeb),
+            // Hero Section
+            _buildHeroSection(context, isWeb),
 
-              // Statistics Section
-              _buildStatisticsSection(context, isWeb),
+            // Statistics Section
+            // _buildStatisticsSection(context, isWeb),
 
-              // Features Section
-              if (isWeb) _buildFeaturesSection(context),
+            // // Features Section
+            // if (isWeb) _buildFeaturesSection(context),
 
-              // How It Works Section
-              _buildHowItWorksSection(context, isWeb),
+            // // How It Works Section
+            // _buildHowItWorksSection(context, isWeb),
 
-              // Account Selection Section
-              _buildAccountSection(context, isWeb),
+            // // Account Selection Section
+            // _buildAccountSection(context, isWeb),
 
-              // Benefits Section
-              _buildBenefitsSection(context, isWeb),
+            // // Benefits Section
+            // _buildBenefitsSection(context, isWeb),
 
-              // Testimonials Section
-              if (isWeb) _buildTestimonialsSection(context),
+            // // Testimonials Section
+            // if (isWeb) _buildTestimonialsSection(context),
 
-              // FAQ Section
-              _buildFAQSection(context, isWeb),
+            // // FAQ Section
+            // _buildFAQSection(context, isWeb),
 
-              // Final CTA Section
-              _buildFinalCTASection(context, isWeb),
+            // // Final CTA Section
+            // _buildFinalCTASection(context, isWeb),
 
-              // Footer
-              _buildFooter(context, isWeb),
-            ],
-          ),
+            // // Footer
+            // _buildFooter(context, isWeb),
+          ],
         ),
       ),
     );
