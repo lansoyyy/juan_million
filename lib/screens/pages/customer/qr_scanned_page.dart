@@ -19,6 +19,7 @@ class QRScannedPage extends StatefulWidget {
   bool? inuser;
   bool? fromWallet;
   bool? fromScan;
+  String? refId;
 
   QRScannedPage({
     super.key,
@@ -27,6 +28,7 @@ class QRScannedPage extends StatefulWidget {
     this.inuser = true,
     required this.pts,
     required this.store,
+    this.refId,
   });
 
   @override
@@ -298,8 +300,9 @@ class _QRScannedPageState extends State<QRScannedPage> {
                                     ),
                                     const SizedBox(height: 4),
                                     TextWidget(
-                                      text:
-                                          'REF-${DateTime.now().millisecondsSinceEpoch.toString().substring(5, 15)}',
+                                      text: widget.refId != null && widget.refId!.isNotEmpty
+                                          ? widget.refId!
+                                          : 'REF-${DateTime.now().millisecondsSinceEpoch.toString().substring(5, 15)}',
                                       fontSize: 16,
                                       color: Colors.black,
                                       fontFamily: 'Bold',

@@ -746,6 +746,7 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
             inuser: true,
             pts: amountStr,
             store: FirebaseAuth.instance.currentUser!.uid,
+            refId: walletDoc.id,
           ),
         ),
       );
