@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 Future<String> addSlots() async {
   final docUser = FirebaseFirestore.instance
       .collection('Slots')
-      .doc(DateTime.now().toString());
+      .doc(); // auto-generated ID ensures uniqueness
 
   final json = {
     'uid': FirebaseAuth.instance.currentUser!.uid,
