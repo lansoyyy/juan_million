@@ -450,11 +450,15 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
         'wallet': FieldValue.increment(-totalCost),
       });
 
+      // Use per-slot ms offset so all slots in this purchase have strictly
+      // increasing timestamps — prevents tie-breaking by doc ID which is
+      // non-sequential and causes wrong slot numbers in the community wallet.
+      final DateTime slotBaseTime = DateTime.now();
       for (int i = 0; i < purchasedSlots; i++) {
         final slotRef = FirebaseFirestore.instance.collection('Slots').doc();
         batch.set(slotRef, {
           'uid': userId,
-          'dateTime': DateTime.now(),
+          'dateTime': slotBaseTime.add(Duration(milliseconds: i * 10)),
         });
       }
     }

@@ -194,8 +194,11 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                 .update({
               'pts': FieldValue.increment(-slotsLeft * limit),
             });
+            final DateTime slotsBaseTime1 = DateTime.now();
             for (int i = 0; i < slotsLeft; i++) {
-              addSlots();
+              addSlots(
+                  dateTime:
+                      slotsBaseTime1.add(Duration(milliseconds: i * 10)));
             }
           } else {
             FirebaseFirestore.instance
@@ -204,8 +207,11 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                 .update({
               'pts': FieldValue.increment(-slotsFromPoints * limit),
             });
+            final DateTime slotsBaseTime2 = DateTime.now();
             for (int i = 0; i < slotsFromPoints; i++) {
-              addSlots();
+              addSlots(
+                  dateTime:
+                      slotsBaseTime2.add(Duration(milliseconds: i * 10)));
             }
           }
         });
