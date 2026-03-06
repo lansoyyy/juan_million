@@ -194,6 +194,30 @@ class LandingScreen extends StatelessWidget {
                   },
                 ),
               ],
+            )
+          else
+            Column(
+              children: [
+                _buildCTAButton(
+                  context,
+                  'Get Started',
+                  primary,
+                  () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => LoginScreen(inCustomer: true)));
+                  },
+                ),
+                const SizedBox(height: 15),
+                _buildCTAButton(
+                  context,
+                  'For Business',
+                  secondary,
+                  () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => LoginScreen(inCustomer: false)));
+                  },
+                ),
+              ],
             ),
         ],
       ),
