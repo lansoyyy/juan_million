@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:juan_million/screens/pages/customer/qr_scanned_page.dart';
 import 'package:juan_million/screens/pages/customer/qr_scanner_screen.dart';
@@ -721,6 +720,7 @@ class _WalletPageState extends State<WalletPage> {
                                 .where('from',
                                     isEqualTo:
                                         FirebaseAuth.instance.currentUser!.uid)
+                            .orderBy('dateTime', descending: true)
                                 .snapshots(),
                             builder: (BuildContext context,
                                 AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -790,6 +790,13 @@ class _WalletPageState extends State<WalletPage> {
                                               text: '${doc['type']}',
                                               fontSize: 12,
                                               color: Colors.black,
+                                              fontFamily: 'Medium',
+                                            ),
+                                            TextWidget(
+                                              text:
+                                                  'Ref: ${doc['id'] ?? doc.id}',
+                                              fontSize: 11,
+                                              color: Colors.grey,
                                               fontFamily: 'Medium',
                                             ),
                                             TextWidget(

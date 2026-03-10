@@ -34,13 +34,14 @@ class _SettingsPageState extends State<SettingsPage> {
 
     try {
       await user.reauthenticateWithCredential(credential);
+      final double parsedPtsConversion =
+          double.tryParse(pts.text.trim()) ?? 0.0;
       await FirebaseFirestore.instance
           .collection('Business')
           .doc(data.id)
           .update({
         'name': name.text,
-        'ptsconversion': int.parse(pts.text)
-        // 'ptsconversion': double.parse(pts.text),
+        'ptsconversion': parsedPtsConversion,
       });
       showToast('Business information updated!', context: context);
     } on FirebaseAuthException catch (e) {
@@ -77,7 +78,9 @@ class _SettingsPageState extends State<SettingsPage> {
             final dynamic rawPtsConversion = data['ptsconversion'];
             final double ptsConversion =
                 rawPtsConversion is num ? rawPtsConversion.toDouble() : 0;
-            pts.text = ptsConversion.toStringAsFixed(0);
+            pts.text = ptsConversion % 1 == 0
+              ? ptsConversion.toStringAsFixed(0)
+              : ptsConversion.toString();
 
             password.text = '*******';
 

@@ -343,6 +343,7 @@ class _PointsPageState extends State<PointsPage> {
                                   .where('uid',
                                       isEqualTo: FirebaseAuth
                                           .instance.currentUser!.uid)
+                                .orderBy('dateTime', descending: true)
                                   .snapshots(),
                               builder: (BuildContext context,
                                   AsyncSnapshot<QuerySnapshot> snapshot) {

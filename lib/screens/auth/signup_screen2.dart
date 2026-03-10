@@ -1,15 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:juan_million/models/municipality_model.dart';
 import 'package:juan_million/models/province_model.dart';
 import 'package:juan_million/models/region_model.dart';
 import 'package:juan_million/screens/auth/login_screen.dart';
-import 'package:juan_million/screens/auth/package_screen.dart';
-import 'package:juan_million/screens/business_home_screen.dart';
 import 'package:juan_million/screens/pages/business/packages_page.dart';
-import 'package:juan_million/screens/pages/store_page.dart';
-import 'package:juan_million/services/add_business.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/address_widget.dart';
 import 'package:juan_million/widgets/button_widget.dart';
@@ -23,7 +18,7 @@ import 'package:flutter/foundation.dart';
 import 'dart:io';
 
 class SignupScreen2 extends StatefulWidget {
-  String id;
+  final String id;
 
   SignupScreen2({super.key, required this.id});
 
@@ -427,6 +422,18 @@ class _SignupScreen2State extends State<SignupScreen2> {
                         ),
                       ),
                     const SizedBox(height: 20),
+                    TextFieldWidget(
+                      fontStyle: FontStyle.normal,
+                      hint: 'Business Representative',
+                      borderColor: Colors.grey.shade300,
+                      radius: 12,
+                      width: double.infinity,
+                      isRequred: false,
+                      controller: rep,
+                      prefixIcon: Icons.person_outline,
+                      label: 'Business Representative',
+                    ),
+                    const SizedBox(height: 20),
                     // Points conversion
                     TextFieldWidget(
                       inputType: TextInputType.number,
@@ -448,28 +455,39 @@ class _SignupScreen2State extends State<SignupScreen2> {
                         width: double.infinity,
                         label: 'Next',
                         onPressed: () async {
-                          if (desc.text != '' || rep.text != '') {
-                            await FirebaseFirestore.instance
-                                .collection('Business')
-                                .doc(widget.id)
-                                .update({
-                              'logo': imageURL,
-                              'address':
-                                  '${municipality!.name}, ${province!.name}',
-                              'desc': desc.text,
-                              'clarification': _selectedSubCategory,
-                              'representative': rep.text,
-                              'ptsconversion': double.parse(pts.text),
-                            }).whenComplete(() {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => PackagePage(
-                                        id: widget.id,
-                                      )));
-                            });
-                          } else {
-                            showToast('All fields are required!',
-                                context: context);
+                          if (municipality == null ||
+                              province == null ||
+                              _selectedSubCategory == null ||
+                              desc.text.trim().isEmpty ||
+                              rep.text.trim().isEmpty) {
+                            showToast(
+                              'Please complete all required fields, including representative.',
+                              context: context,
+                              type: ToastType.error,
+                            );
+                            return;
                           }
+
+                          final double parsedPts =
+                              double.tryParse(pts.text.trim()) ?? 0;
+
+                          await FirebaseFirestore.instance
+                              .collection('Business')
+                              .doc(widget.id)
+                              .update({
+                            'logo': imageURL,
+                            'address':
+                                '${municipality!.name}, ${province!.name}',
+                            'desc': desc.text.trim(),
+                            'clarification': _selectedSubCategory,
+                            'representative': rep.text.trim(),
+                            'ptsconversion': parsedPts,
+                          }).whenComplete(() {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => PackagePage(
+                                      id: widget.id,
+                                    )));
+                          });
                         },
                         color: primary,
                         radius: 12,
@@ -757,6 +775,18 @@ class _SignupScreen2State extends State<SignupScreen2> {
                         ),
                       ),
                     const SizedBox(height: 20),
+                    TextFieldWidget(
+                      fontStyle: FontStyle.normal,
+                      hint: 'Business Representative',
+                      borderColor: Colors.grey.shade200,
+                      radius: 15,
+                      width: double.infinity,
+                      isRequred: false,
+                      controller: rep,
+                      prefixIcon: Icons.person_outline,
+                      label: 'Business Representative',
+                    ),
+                    const SizedBox(height: 20),
                     // Points conversion
                     TextFieldWidget(
                       inputType: TextInputType.number,
@@ -795,28 +825,39 @@ class _SignupScreen2State extends State<SignupScreen2> {
                         child: InkWell(
                           borderRadius: BorderRadius.circular(16),
                           onTap: () async {
-                            if (desc.text != '' || rep.text != '') {
-                              await FirebaseFirestore.instance
-                                  .collection('Business')
-                                  .doc(widget.id)
-                                  .update({
-                                'logo': imageURL,
-                                'address':
-                                    '${municipality!.name}, ${province!.name}',
-                                'desc': desc.text,
-                                'clarification': _selectedSubCategory,
-                                'representative': rep.text,
-                                'ptsconversion': double.parse(pts.text),
-                              }).whenComplete(() {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => PackagePage(
-                                          id: widget.id,
-                                        )));
-                              });
-                            } else {
-                              showToast('All fields are required!',
-                                  context: context);
+                            if (municipality == null ||
+                                province == null ||
+                                _selectedSubCategory == null ||
+                                desc.text.trim().isEmpty ||
+                                rep.text.trim().isEmpty) {
+                              showToast(
+                                'Please complete all required fields, including representative.',
+                                context: context,
+                                type: ToastType.error,
+                              );
+                              return;
                             }
+
+                            final double parsedPts =
+                                double.tryParse(pts.text.trim()) ?? 0;
+
+                            await FirebaseFirestore.instance
+                                .collection('Business')
+                                .doc(widget.id)
+                                .update({
+                              'logo': imageURL,
+                              'address':
+                                  '${municipality!.name}, ${province!.name}',
+                              'desc': desc.text.trim(),
+                              'clarification': _selectedSubCategory,
+                              'representative': rep.text.trim(),
+                              'ptsconversion': parsedPts,
+                            }).whenComplete(() {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => PackagePage(
+                                        id: widget.id,
+                                      )));
+                            });
                           },
                           child: Center(
                             child: TextWidget(

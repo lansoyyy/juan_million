@@ -7,7 +7,6 @@ import 'package:juan_million/screens/pages/customer/qr_scanned_page.dart';
 import 'package:juan_million/screens/pages/customer/qr_scanner_screen.dart';
 import 'package:juan_million/screens/pages/store_page.dart';
 import 'package:juan_million/utlis/app_constants.dart';
-import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:juan_million/widgets/textfield_widget.dart';
 import 'package:juan_million/widgets/toast_widget.dart';
@@ -350,6 +349,18 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
                                             FirebaseAuth
                                                 .instance.currentUser!.uid)
                                     .toList();
+
+                                userTransactions.sort((a, b) {
+                                  final dynamic aRaw = a['dateTime'];
+                                  final dynamic bRaw = b['dateTime'];
+                                  final DateTime aTime = aRaw is Timestamp
+                                    ? aRaw.toDate()
+                                    : DateTime(2000);
+                                  final DateTime bTime = bRaw is Timestamp
+                                    ? bRaw.toDate()
+                                    : DateTime(2000);
+                                  return bTime.compareTo(aTime);
+                                });
 
                                 if (userTransactions.isEmpty) {
                                   return Center(

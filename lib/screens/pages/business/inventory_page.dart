@@ -144,6 +144,7 @@ class _InventoryPageState extends State<InventoryPage> {
             .collection('Points')
             .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
             .where('scanned', isEqualTo: true)
+        .orderBy('dateTime', descending: true)
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
@@ -392,12 +393,72 @@ class _InventoryPageState extends State<InventoryPage> {
                                       color: Colors.grey.shade200,
                                     ),
                                     itemBuilder: (context, index) {
-                                      return data.docs[index]['scannedId'] == ''
-                                          ? const SizedBox()
-                                          : StreamBuilder<DocumentSnapshot>(
+                                      final String scannedId =
+                                          (data.docs[index]['scannedId'] ?? '')
+                                              .toString();
+                                      if (scannedId.isEmpty) {
+                                        return Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20, vertical: 16),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                flex: 3,
+                                                child: TextWidget(
+                                                  text:
+                                                      data.docs[index]['type']
+                                                              ?.toString() ??
+                                                          'System Transaction',
+                                                  fontSize: 14,
+                                                  color: Colors.black87,
+                                                  fontFamily: 'Medium',
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 2,
+                                                child: Center(
+                                                  child: TextWidget(
+                                                    text: '-',
+                                                    fontSize: 13,
+                                                    color: Colors.grey,
+                                                    fontFamily: 'Bold',
+                                                  ),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 2,
+                                                child: Center(
+                                                  child: Container(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 12,
+                                                        vertical: 6),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.orange
+                                                          .withOpacity(0.1),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8),
+                                                    ),
+                                                    child: TextWidget(
+                                                      text: data.docs[index]
+                                                              ['pts']
+                                                          .toString(),
+                                                      fontSize: 13,
+                                                      color: Colors.orange,
+                                                      fontFamily: 'Bold',
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      }
+                                      return StreamBuilder<DocumentSnapshot>(
                                               stream: FirebaseFirestore.instance
                                                   .collection('Users')
-                                                  .doc(data.docs[index]['scannedId'])
+                                                  .doc(scannedId)
                                                   .snapshots(),
                                               builder: (context,
                                                   AsyncSnapshot<DocumentSnapshot>
@@ -531,12 +592,66 @@ class _InventoryPageState extends State<InventoryPage> {
                               physics: const NeverScrollableScrollPhysics(),
                               itemCount: data.docs.length,
                               itemBuilder: (context, index) {
-                                return data.docs[index]['scannedId'] == ''
-                                    ? const SizedBox()
-                                    : StreamBuilder<DocumentSnapshot>(
+                                final String scannedId =
+                                    (data.docs[index]['scannedId'] ?? '')
+                                        .toString();
+                                if (scannedId.isEmpty) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 12),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(16),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(15),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color:
+                                                Colors.black.withOpacity(0.05),
+                                            blurRadius: 10,
+                                            offset: const Offset(0, 5),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: TextWidget(
+                                              text: data.docs[index]['type']
+                                                      ?.toString() ??
+                                                  'System Transaction',
+                                              fontSize: 14,
+                                              color: Colors.black87,
+                                              fontFamily: 'Bold',
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 12, vertical: 6),
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  Colors.orange.withOpacity(0.1),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: TextWidget(
+                                              text: data.docs[index]['pts']
+                                                  .toString(),
+                                              fontSize: 14,
+                                              color: Colors.orange,
+                                              fontFamily: 'Bold',
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                }
+                                return StreamBuilder<DocumentSnapshot>(
                                         stream: FirebaseFirestore.instance
                                             .collection('Users')
-                                            .doc(data.docs[index]['scannedId'])
+                                            .doc(scannedId)
                                             .snapshots(),
                                         builder: (context,
                                             AsyncSnapshot<DocumentSnapshot>

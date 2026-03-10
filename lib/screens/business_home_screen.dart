@@ -10,6 +10,7 @@ import 'package:juan_million/screens/pages/business/points_page.dart';
 import 'package:juan_million/screens/pages/business/settings_page.dart';
 import 'package:juan_million/screens/pages/business/wallet_page.dart';
 import 'package:juan_million/screens/pages/business/payments_page.dart';
+import 'package:juan_million/screens/pages/business/notif_page.dart';
 import 'package:juan_million/screens/pages/customer/qr_scanned_page.dart';
 import 'package:juan_million/screens/pages/customer/qr_scanner_screen.dart';
 import 'package:juan_million/utlis/app_constants.dart';
@@ -520,11 +521,11 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                       },
                     ),
                     _buildQuickAction(
-                      Icons.history_rounded,
-                      'Inventory',
+                      Icons.notifications_rounded,
+                      'Notifications',
                       () {
                         Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const InventoryPage()));
+                            builder: (context) => const BusinessNotifPage()));
                       },
                     ),
                   ],
@@ -567,6 +568,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                   .collection('Points')
                   .where('uid', isEqualTo: mydata.id)
                   .where('scanned', isEqualTo: true)
+                .orderBy('dateTime', descending: true)
                   .snapshots(),
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -898,7 +900,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                       .collection('Points')
                       .where('uid',
                           isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-                      // .where('scanned', isEqualTo: true)
+                    .orderBy('dateTime', descending: true)
                       .snapshots(),
                   builder: (BuildContext context,
                       AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -1446,6 +1448,14 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                         onTap: () {
                           Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) => const PaymentsPage()));
+                        },
+                      ),
+                      _buildSidebarItem(
+                        icon: Icons.notifications_rounded,
+                        label: 'Notifications',
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => const BusinessNotifPage()));
                         },
                       ),
                       const SizedBox(height: 16),

@@ -2,11 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:juan_million/utlis/colors.dart';
+import 'package:juan_million/widgets/qr_download_helper.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class MyQRPage extends StatefulWidget {
-  bool? isPoints;
+  final bool? isPoints;
 
   MyQRPage({
     super.key,
@@ -332,6 +333,34 @@ class _MyQRPageState extends State<MyQRPage> {
                                               ),
                                             ),
                                           ],
+                                        ),
+                                      ),
+
+                                      const SizedBox(height: 16),
+
+                                      SizedBox(
+                                        width: double.infinity,
+                                        child: ElevatedButton.icon(
+                                          onPressed: () async {
+                                            await downloadQrAsPng(
+                                              context,
+                                              data: mydata.id,
+                                              fileName:
+                                                  'my_qr_${mydata.id.toString().substring(0, 6)}',
+                                            );
+                                          },
+                                          icon: const Icon(Icons.download),
+                                          label: const Text('Download QR'),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: primary,
+                                            foregroundColor: Colors.white,
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 14),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ],

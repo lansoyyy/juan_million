@@ -415,11 +415,13 @@ class _CustomerNotifPageState extends State<CustomerNotifPage> {
     final pointsQuery = FirebaseFirestore.instance
         .collection('Points')
         .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+      .orderBy('dateTime', descending: true)
         .limit(20);
 
     final walletsQuery = FirebaseFirestore.instance
         .collection('Wallets')
         .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+      .orderBy('dateTime', descending: true)
         .limit(20);
 
     await for (final pointsSnap in pointsQuery.snapshots()) {
