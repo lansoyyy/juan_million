@@ -564,12 +564,8 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
             ),
             const SizedBox(height: 20),
             StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('Points')
-                  .where('uid', isEqualTo: mydata.id)
-                  .where('scanned', isEqualTo: true)
-                .orderBy('dateTime', descending: true)
-                  .snapshots(),
+              stream:
+                  FirebaseFirestore.instance.collection('Points').snapshots(),
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.hasError) {
@@ -580,7 +576,9 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                       child: CircularProgressIndicator(color: Colors.white));
                 }
 
-                final transactionCount = snapshot.data!.docs.length;
+                final transactionCount = snapshot.data!.docs.where((doc) {
+                  return doc['uid'] == mydata.id && doc['scanned'] == true;
+                }).length;
                 return _buildMobileWalletCard(
                   'Transactions',
                   transactionCount.toString(),
@@ -898,9 +896,6 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
               StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
                       .collection('Points')
-                      .where('uid',
-                          isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-                    .orderBy('dateTime', descending: true)
                       .snapshots(),
                   builder: (BuildContext context,
                       AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -919,7 +914,22 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                     }
 
                     final data = snapshot.requireData;
-                    return data.docs.isEmpty
+                    final recentDocs = data.docs.where((doc) {
+                      return doc['uid'] ==
+                          FirebaseAuth.instance.currentUser!.uid;
+                    }).toList();
+
+                    recentDocs.sort((a, b) {
+                      final dynamic aRaw = a['dateTime'];
+                      final dynamic bRaw = b['dateTime'];
+                      final DateTime aTime =
+                          aRaw is Timestamp ? aRaw.toDate() : DateTime(2000);
+                      final DateTime bTime =
+                          bRaw is Timestamp ? bRaw.toDate() : DateTime(2000);
+                      return bTime.compareTo(aTime);
+                    });
+
+                    return recentDocs.isEmpty
                         ? Center(
                             child: Container(
                               padding: const EdgeInsets.all(20),
@@ -948,9 +958,10 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                         : SizedBox(
                             height: 180,
                             child: ListView.builder(
-                              itemCount: data.docs.length,
+                              itemCount: recentDocs.length,
                               scrollDirection: Axis.horizontal,
                               itemBuilder: (context, index) {
+                                final doc = recentDocs[index];
                                 return AnimatedContainer(
                                   duration: const Duration(milliseconds: 300),
                                   curve: Curves.easeInOut,
@@ -1005,8 +1016,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                             .center,
                                                     children: [
                                                       TextWidget(
-                                                        text: data.docs[index]
-                                                                ['pts']
+                                                        text: doc['pts']
                                                             .toString(),
                                                         fontSize: 38,
                                                         fontFamily: 'Bold',
@@ -1031,8 +1041,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                   TextWidget(
                                                     text: DateFormat.yMMMd()
                                                         .add_jm()
-                                                        .format(data.docs[index]
-                                                                ['dateTime']
+                                                        .format(doc['dateTime']
                                                             .toDate()),
                                                     fontSize: 14,
                                                     fontFamily: 'Medium',

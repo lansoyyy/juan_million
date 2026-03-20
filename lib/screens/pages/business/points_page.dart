@@ -340,10 +340,6 @@ class _PointsPageState extends State<PointsPage> {
                           StreamBuilder<QuerySnapshot>(
                               stream: FirebaseFirestore.instance
                                   .collection('Points')
-                                  .where('uid',
-                                      isEqualTo: FirebaseAuth
-                                          .instance.currentUser!.uid)
-                                .orderBy('dateTime', descending: true)
                                   .snapshots(),
                               builder: (BuildContext context,
                                   AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -363,12 +359,29 @@ class _PointsPageState extends State<PointsPage> {
                                 }
 
                                 final data = snapshot.requireData;
+                                final docs = data.docs.where((doc) {
+                                  return doc['uid'] ==
+                                      FirebaseAuth.instance.currentUser!.uid;
+                                }).toList();
+
+                                docs.sort((a, b) {
+                                  final dynamic aRaw = a['dateTime'];
+                                  final dynamic bRaw = b['dateTime'];
+                                  final DateTime aTime = aRaw is Timestamp
+                                      ? aRaw.toDate()
+                                      : DateTime(2000);
+                                  final DateTime bTime = bRaw is Timestamp
+                                      ? bRaw.toDate()
+                                      : DateTime(2000);
+                                  return bTime.compareTo(aTime);
+                                });
+
                                 return ListView.builder(
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: data.docs.length,
+                                  itemCount: docs.length,
                                   itemBuilder: (context, index) {
-                                    final doc = data.docs[index];
+                                    final doc = docs[index];
                                     final isAdded = doc['type'] == 'Added';
                                     return GestureDetector(
                                       onTap: () {

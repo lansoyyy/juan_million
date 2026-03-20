@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
+import 'package:juan_million/widgets/transaction_receipt_dialog.dart';
 
 class ProfikePage extends StatelessWidget {
-  dynamic data;
+  final dynamic data;
 
   ProfikePage({super.key, required this.data});
 
@@ -150,16 +151,35 @@ class ProfikePage extends StatelessWidget {
                         }
 
                         final data = snapshot.requireData;
+                        final docs = data.docs.toList();
+                        docs.sort((a, b) {
+                          final dynamic aRaw = a['dateTime'];
+                          final dynamic bRaw = b['dateTime'];
+                          final DateTime aTime = aRaw is Timestamp
+                              ? aRaw.toDate()
+                              : DateTime(2000);
+                          final DateTime bTime = bRaw is Timestamp
+                              ? bRaw.toDate()
+                              : DateTime(2000);
+                          return bTime.compareTo(aTime);
+                        });
+
                         return SizedBox(
                           height: 250,
                           child: ListView.builder(
-                            itemCount: data.docs.length,
+                            itemCount: docs.length,
                             itemBuilder: (context, index) {
-                              double points =
-                                  data.docs[index]['pts'].toDouble();
+                              final doc = docs[index];
+                              final dynamic rawPts = doc['pts'];
+                              final double points =
+                                  rawPts is num ? rawPts.toDouble() : 0;
                               return Padding(
                                 padding: const EdgeInsets.all(5.0),
                                 child: ListTile(
+                                  onTap: () {
+                                    TransactionReceiptDialog.showPointsReceipt(
+                                        context, doc);
+                                  },
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(
                                       15,
@@ -179,8 +199,7 @@ class ProfikePage extends StatelessWidget {
                                       TextWidget(
                                         text: DateFormat.yMMMd()
                                             .add_jm()
-                                            .format(data.docs[index]['dateTime']
-                                                .toDate()),
+                                            .format(doc['dateTime'].toDate()),
                                         fontSize: 11,
                                         color: Colors.grey,
                                         fontFamily: 'Medium',
@@ -193,7 +212,7 @@ class ProfikePage extends StatelessWidget {
                                         fontFamily: 'Medium',
                                       ),
                                       TextWidget(
-                                        text: '${data.docs[index]['type']}',
+                                        text: '${doc['type']}',
                                         fontSize: 12,
                                         color: Colors.black,
                                         fontFamily: 'Medium',

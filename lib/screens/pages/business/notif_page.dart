@@ -15,51 +15,6 @@ class BusinessNotifPage extends StatefulWidget {
 class _BusinessNotifPageState extends State<BusinessNotifPage> {
   String _filter = 'all';
 
-  Stream<List<QueryDocumentSnapshot>> _getNotifications() async* {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
-
-    final pointsQuery = FirebaseFirestore.instance
-        .collection('Points')
-        .where('uid', isEqualTo: uid)
-        .orderBy('dateTime', descending: true)
-        .limit(30);
-
-    await for (final pointsSnap in pointsQuery.snapshots()) {
-      final sentWalletsSnap = await FirebaseFirestore.instance
-          .collection('Wallets')
-          .where('from', isEqualTo: uid)
-          .orderBy('dateTime', descending: true)
-          .limit(30)
-          .get();
-
-      final receivedWalletsSnap = await FirebaseFirestore.instance
-          .collection('Wallets')
-          .where('uid', isEqualTo: uid)
-          .orderBy('dateTime', descending: true)
-          .limit(30)
-          .get();
-
-      final combined = <QueryDocumentSnapshot>[];
-      combined.addAll(pointsSnap.docs);
-      combined.addAll(sentWalletsSnap.docs);
-      combined.addAll(receivedWalletsSnap.docs);
-
-      combined.sort((a, b) {
-        final aData = a.data() as Map<String, dynamic>;
-        final bData = b.data() as Map<String, dynamic>;
-        final DateTime aTime = aData['dateTime'] is Timestamp
-            ? (aData['dateTime'] as Timestamp).toDate()
-            : DateTime(2000);
-        final DateTime bTime = bData['dateTime'] is Timestamp
-            ? (bData['dateTime'] as Timestamp).toDate()
-            : DateTime(2000);
-        return bTime.compareTo(aTime);
-      });
-
-      yield combined.take(40).toList();
-    }
-  }
-
   bool _passesFilter(DateTime time) {
     final now = DateTime.now();
     if (_filter == 'today') {
@@ -102,69 +57,108 @@ class _BusinessNotifPageState extends State<BusinessNotifPage> {
           ),
           const SizedBox(height: 12),
           Expanded(
-            child: StreamBuilder<List<QueryDocumentSnapshot>>(
-              stream: _getNotifications(),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return const Center(child: Text('Error loading notifications'));
+            child: StreamBuilder<QuerySnapshot>(
+              stream:
+                  FirebaseFirestore.instance.collection('Points').snapshots(),
+              builder: (context, pointsSnapshot) {
+                if (pointsSnapshot.hasError) {
+                  return const Center(
+                      child: Text('Error loading notifications'));
                 }
-                if (!snapshot.hasData) {
+                if (!pointsSnapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                final docs = snapshot.data!;
-                final filtered = docs.where((doc) {
-                  final map = doc.data() as Map<String, dynamic>;
-                  final dynamic rawTime = map['dateTime'];
-                  final DateTime time = rawTime is Timestamp
-                      ? rawTime.toDate()
-                      : DateTime(2000);
-                  return _passesFilter(time);
-                }).toList();
+                return StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('Wallets')
+                      .snapshots(),
+                  builder: (context, walletsSnapshot) {
+                    if (walletsSnapshot.hasError) {
+                      return const Center(
+                          child: Text('Error loading notifications'));
+                    }
+                    if (!walletsSnapshot.hasData) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
 
-                if (filtered.isEmpty) {
-                  return Center(
-                    child: TextWidget(
-                      text: 'No notifications found',
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
-                  );
-                }
+                    final uid = FirebaseAuth.instance.currentUser!.uid;
+                    final docs = <QueryDocumentSnapshot>[];
+                    docs.addAll(pointsSnapshot.data!.docs
+                        .where((doc) => doc['uid'] == uid));
+                    docs.addAll(walletsSnapshot.data!.docs.where(
+                      (doc) => doc['uid'] == uid || doc['from'] == uid,
+                    ));
 
-                return ListView.builder(
-                  padding: const EdgeInsets.all(12),
-                  itemCount: filtered.length,
-                  itemBuilder: (context, index) {
-                    final map = filtered[index].data() as Map<String, dynamic>;
-                    final dynamic rawPts = map['pts'];
-                    final int pts = rawPts is num ? rawPts.toInt() : 0;
-                    final String type = map['type']?.toString() ?? 'Transaction';
-                    final dynamic rawTime = map['dateTime'];
-                    final DateTime time = rawTime is Timestamp
-                        ? rawTime.toDate()
-                        : DateTime(2000);
+                    docs.sort((a, b) {
+                      final dynamic aRaw = a['dateTime'];
+                      final dynamic bRaw = b['dateTime'];
+                      final DateTime aTime =
+                          aRaw is Timestamp ? aRaw.toDate() : DateTime(2000);
+                      final DateTime bTime =
+                          bRaw is Timestamp ? bRaw.toDate() : DateTime(2000);
+                      return bTime.compareTo(aTime);
+                    });
 
-                    return Card(
-                      color: Colors.white,
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: blue.withOpacity(0.15),
-                          child: Icon(Icons.notifications, color: blue),
-                        ),
-                        title: TextWidget(
-                          text: type,
+                    final filtered = docs
+                        .where((doc) {
+                          final dynamic rawTime = doc['dateTime'];
+                          final DateTime time = rawTime is Timestamp
+                              ? rawTime.toDate()
+                              : DateTime(2000);
+                          return _passesFilter(time);
+                        })
+                        .take(40)
+                        .toList();
+
+                    if (filtered.isEmpty) {
+                      return Center(
+                        child: TextWidget(
+                          text: 'No notifications found',
                           fontSize: 14,
-                          fontFamily: 'Bold',
-                          color: Colors.black87,
+                          color: Colors.grey,
                         ),
-                        subtitle: TextWidget(
-                          text: '${DateFormat.yMMMd().add_jm().format(time)}\n$pts pts',
-                          fontSize: 12,
-                          color: Colors.grey.shade700,
-                          maxLines: 2,
-                        ),
-                      ),
+                      );
+                    }
+
+                    return ListView.builder(
+                      padding: const EdgeInsets.all(12),
+                      itemCount: filtered.length,
+                      itemBuilder: (context, index) {
+                        final map =
+                            filtered[index].data() as Map<String, dynamic>;
+                        final dynamic rawPts = map['pts'];
+                        final int pts = rawPts is num ? rawPts.toInt() : 0;
+                        final String type =
+                            map['type']?.toString() ?? 'Transaction';
+                        final dynamic rawTime = map['dateTime'];
+                        final DateTime time = rawTime is Timestamp
+                            ? rawTime.toDate()
+                            : DateTime(2000);
+
+                        return Card(
+                          color: Colors.white,
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: blue.withOpacity(0.15),
+                              child: Icon(Icons.notifications, color: blue),
+                            ),
+                            title: TextWidget(
+                              text: type,
+                              fontSize: 14,
+                              fontFamily: 'Bold',
+                              color: Colors.black87,
+                            ),
+                            subtitle: TextWidget(
+                              text:
+                                  '${DateFormat.yMMMd().add_jm().format(time)}\n$pts pts',
+                              fontSize: 12,
+                              color: Colors.grey.shade700,
+                              maxLines: 2,
+                            ),
+                          ),
+                        );
+                      },
                     );
                   },
                 );

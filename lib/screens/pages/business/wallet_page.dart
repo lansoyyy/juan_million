@@ -717,10 +717,6 @@ class _WalletPageState extends State<WalletPage> {
                         StreamBuilder<QuerySnapshot>(
                             stream: FirebaseFirestore.instance
                                 .collection('Wallets')
-                                .where('from',
-                                    isEqualTo:
-                                        FirebaseAuth.instance.currentUser!.uid)
-                            .orderBy('dateTime', descending: true)
                                 .snapshots(),
                             builder: (BuildContext context,
                                 AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -740,13 +736,36 @@ class _WalletPageState extends State<WalletPage> {
                               }
 
                               final data = snapshot.requireData;
+                              final transactions = data.docs.where((doc) {
+                                final map = doc.data() as Map<String, dynamic>;
+                                return map['uid'] ==
+                                        FirebaseAuth
+                                            .instance.currentUser!.uid ||
+                                    map['from'] ==
+                                        FirebaseAuth.instance.currentUser!.uid;
+                              }).toList();
+
+                              transactions.sort((a, b) {
+                                final dynamic aRaw = a['dateTime'];
+                                final dynamic bRaw = b['dateTime'];
+                                final DateTime aTime = aRaw is Timestamp
+                                    ? aRaw.toDate()
+                                    : DateTime(2000);
+                                final DateTime bTime = bRaw is Timestamp
+                                    ? bRaw.toDate()
+                                    : DateTime(2000);
+                                return bTime.compareTo(aTime);
+                              });
+
                               return SizedBox(
                                 height: 1000,
                                 child: ListView.builder(
                                   physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: data.docs.length,
+                                  itemCount: transactions.length,
                                   itemBuilder: (context, index) {
-                                    final doc = data.docs[index];
+                                    final doc = transactions[index];
+                                    final bool isIncoming = doc['uid'] ==
+                                        FirebaseAuth.instance.currentUser!.uid;
                                     return Padding(
                                       padding: const EdgeInsets.all(5.0),
                                       child: ListTile(
@@ -761,8 +780,11 @@ class _WalletPageState extends State<WalletPage> {
                                         ),
                                         tileColor: Colors.white,
                                         leading: Icon(
-                                          Icons.volunteer_activism_outlined,
-                                          color: secondary,
+                                          isIncoming
+                                              ? Icons.call_received_rounded
+                                              : Icons.call_made_rounded,
+                                          color:
+                                              isIncoming ? primary : secondary,
                                           size: 32,
                                         ),
                                         title: Column(
@@ -793,10 +815,24 @@ class _WalletPageState extends State<WalletPage> {
                                               fontFamily: 'Medium',
                                             ),
                                             TextWidget(
+                                              text: isIncoming
+                                                  ? 'From: ${doc['from'] ?? 'N/A'}'
+                                                  : 'To: ${doc['uid'] ?? 'N/A'}',
+                                              fontSize: 11,
+                                              color: Colors.grey,
+                                              fontFamily: 'Medium',
+                                            ),
+                                            TextWidget(
                                               text:
                                                   'Ref: ${doc['id'] ?? doc.id}',
                                               fontSize: 11,
                                               color: Colors.grey,
+                                              fontFamily: 'Medium',
+                                            ),
+                                            TextWidget(
+                                              text: 'Status: Completed',
+                                              fontSize: 11,
+                                              color: Colors.green,
                                               fontFamily: 'Medium',
                                             ),
                                             TextWidget(
