@@ -14,6 +14,13 @@ class CustomerNotifPage extends StatefulWidget {
 
 class _CustomerNotifPageState extends State<CustomerNotifPage> {
   String _filterType = 'all'; // all, today, week, month
+  late final String _currentUserId;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentUserId = FirebaseAuth.instance.currentUser!.uid;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,264 +95,295 @@ class _CustomerNotifPageState extends State<CustomerNotifPage> {
           ),
           // Content
           Expanded(
-            child: StreamBuilder<List<QueryDocumentSnapshot>>(
-                stream: _getCombinedNotificationStream(),
+            child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                stream: FirebaseFirestore.instance
+                    .collection('Points')
+                    .snapshots(),
                 builder: (BuildContext context,
-                    AsyncSnapshot<List<QueryDocumentSnapshot>> snapshot) {
-                  if (snapshot.hasError) {
-                    print('error');
+                    AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                        pointsSnapshot) {
+                  if (pointsSnapshot.hasError) {
                     return const Center(child: Text('Error'));
                   }
-                  if (snapshot.connectionState == ConnectionState.waiting) {
+                  if (pointsSnapshot.connectionState ==
+                      ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  final allData = snapshot.data ?? [];
+                  return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                      stream: FirebaseFirestore.instance
+                          .collection('Wallets')
+                          .snapshots(),
+                      builder: (context,
+                          AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                              walletsSnapshot) {
+                        if (walletsSnapshot.hasError) {
+                          return const Center(child: Text('Error'));
+                        }
+                        if (walletsSnapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
 
-                  // Filter notifications based on selected filter
-                  List<QueryDocumentSnapshot> filteredDocs = [];
-                  DateTime now = DateTime.now();
+                        final pointDocs = (pointsSnapshot.data?.docs ?? [])
+                            .where(_isRelevantPointsNotification)
+                            .toList();
+                        final walletDocs = (walletsSnapshot.data?.docs ?? [])
+                            .where(_isRelevantWalletNotification)
+                            .toList();
 
-                  if (_filterType == 'all') {
-                    filteredDocs = allData.toList();
-                  } else if (_filterType == 'today') {
-                    filteredDocs = allData.where((doc) {
-                      final dynamic rawDateTime = doc['dateTime'];
-                      if (rawDateTime is! Timestamp) return false;
-                      DateTime docDate = rawDateTime.toDate();
-                      return docDate.day == now.day &&
-                          docDate.month == now.month &&
-                          docDate.year == now.year;
-                    }).toList();
-                  } else if (_filterType == 'week') {
-                    filteredDocs = allData.where((doc) {
-                      final dynamic rawDateTime = doc['dateTime'];
-                      if (rawDateTime is! Timestamp) return false;
-                      DateTime docDate = rawDateTime.toDate();
-                      return now.difference(docDate).inDays <= 7;
-                    }).toList();
-                  } else if (_filterType == 'month') {
-                    filteredDocs = allData.where((doc) {
-                      final dynamic rawDateTime = doc['dateTime'];
-                      if (rawDateTime is! Timestamp) return false;
-                      DateTime docDate = rawDateTime.toDate();
-                      return docDate.month == now.month &&
-                          docDate.year == now.year;
-                    }).toList();
-                  }
+                        final allData =
+                            <QueryDocumentSnapshot<Map<String, dynamic>>>[];
+                        allData.addAll(pointDocs);
+                        allData.addAll(walletDocs);
 
-                  // Sort by dateTime descending
-                  filteredDocs.sort((a, b) {
-                    final dynamic aDateTime = a['dateTime'];
-                    final dynamic bDateTime = b['dateTime'];
-                    final int aMs = aDateTime is Timestamp
-                        ? aDateTime.millisecondsSinceEpoch
-                        : 0;
-                    final int bMs = bDateTime is Timestamp
-                        ? bDateTime.millisecondsSinceEpoch
-                        : 0;
-                    return bMs.compareTo(aMs);
-                  });
+                        final filteredDocs = allData
+                            .where((doc) => _matchesFilter(_parseTimestamp(doc)))
+                            .toList()
+                          ..sort((a, b) =>
+                              _parseTimestamp(b).compareTo(_parseTimestamp(a)));
 
-                  if (filteredDocs.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.notifications_off_outlined,
-                            size: 80,
-                            color: Colors.grey.shade400,
-                          ),
-                          const SizedBox(height: 20),
-                          TextWidget(
-                            text: 'No notifications',
-                            fontSize: 18,
-                            fontFamily: 'Medium',
-                            color: Colors.grey.shade600,
-                          ),
-                          const SizedBox(height: 10),
-                          TextWidget(
-                            text: _filterType == 'all'
-                                ? 'You have no notifications yet'
-                                : 'No notifications for this period',
-                            fontSize: 14,
-                            fontFamily: 'Regular',
-                            color: Colors.grey.shade500,
-                          ),
-                        ],
-                      ),
-                    );
-                  }
+                        if (filteredDocs.isEmpty) {
+                          return Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.notifications_off_outlined,
+                                  size: 80,
+                                  color: Colors.grey.shade400,
+                                ),
+                                const SizedBox(height: 20),
+                                TextWidget(
+                                  text: 'No notifications',
+                                  fontSize: 18,
+                                  fontFamily: 'Medium',
+                                  color: Colors.grey.shade600,
+                                ),
+                                const SizedBox(height: 10),
+                                TextWidget(
+                                  text: _filterType == 'all'
+                                      ? 'You have no notifications yet'
+                                      : 'No notifications for this period',
+                                  fontSize: 14,
+                                  fontFamily: 'Regular',
+                                  color: Colors.grey.shade500,
+                                ),
+                              ],
+                            ),
+                          );
+                        }
 
-                  return Padding(
-                    padding: EdgeInsets.all(isDesktop ? 30 : 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Modern Filter Chips
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
+                        return Padding(
+                          padding: EdgeInsets.all(isDesktop ? 30 : 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildFilterChip(
-                                  'All', 'all', Icons.notifications_rounded),
-                              const SizedBox(width: 12),
-                              _buildFilterChip(
-                                  'Today', 'today', Icons.today_rounded),
-                              const SizedBox(width: 12),
-                              _buildFilterChip('This Week', 'week',
-                                  Icons.date_range_rounded),
-                              const SizedBox(width: 12),
-                              _buildFilterChip('This Month', 'month',
-                                  Icons.calendar_month_rounded),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 25),
+                              // Modern Filter Chips
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: [
+                                    _buildFilterChip('All', 'all',
+                                        Icons.notifications_rounded),
+                                    const SizedBox(width: 12),
+                                    _buildFilterChip(
+                                        'Today', 'today', Icons.today_rounded),
+                                    const SizedBox(width: 12),
+                                    _buildFilterChip('This Week', 'week',
+                                        Icons.date_range_rounded),
+                                    const SizedBox(width: 12),
+                                    _buildFilterChip('This Month', 'month',
+                                        Icons.calendar_month_rounded),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 25),
 
-                        // Notifications list
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: filteredDocs.length,
-                            itemBuilder: (context, index) {
-                              final doc = filteredDocs[index];
-                              final dynamic rawPts = doc['pts'];
-                              final double points =
-                                  rawPts is num ? rawPts.toDouble() : 0.0;
-                              final dynamic rawDateTime = doc['dateTime'];
-                              final DateTime? dateTime =
-                                  rawDateTime is Timestamp
-                                      ? rawDateTime.toDate()
-                                      : null;
+                              // Notifications list
+                              Expanded(
+                                child: ListView.builder(
+                                  itemCount: filteredDocs.length,
+                                  itemBuilder: (context, index) {
+                                    final doc = filteredDocs[index];
+                                    final Map<String, dynamic> data =
+                                        doc.data();
+                                    final bool isWallet =
+                                        doc.reference.parent.id == 'Wallets';
+                                    final double points =
+                                        _parseAmount(data['pts']);
+                                    final DateTime dateTime =
+                                        _parseTimestamp(doc);
 
-                              return AnimatedContainer(
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeInOut,
-                                margin: const EdgeInsets.only(bottom: 15),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                        color: primary.withOpacity(0.1),
-                                        width: 1),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.08),
-                                        spreadRadius: 0,
-                                        blurRadius: 15,
-                                        offset: const Offset(0, 5),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(20.0),
-                                    child: Row(
-                                      children: [
-                                        // Notification icon with gradient
-                                        Container(
-                                          padding: const EdgeInsets.all(14),
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                primary.withOpacity(0.2),
-                                                secondary.withOpacity(0.2),
-                                              ],
+                                    return AnimatedContainer(
+                                      duration:
+                                          const Duration(milliseconds: 300),
+                                      curve: Curves.easeInOut,
+                                      margin:
+                                          const EdgeInsets.only(bottom: 15),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          border: Border.all(
+                                              color: primary.withOpacity(0.1),
+                                              width: 1),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black
+                                                  .withOpacity(0.08),
+                                              spreadRadius: 0,
+                                              blurRadius: 15,
+                                              offset: const Offset(0, 5),
                                             ),
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: Icon(
-                                            Icons.stars_rounded,
-                                            color: primary,
-                                            size: 28,
-                                          ),
+                                          ],
                                         ),
-                                        const SizedBox(width: 18),
-
-                                        // Notification content
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsets.all(20.0),
+                                          child: Row(
                                             children: [
-                                              TextWidget(
-                                                text: 'Points Earned! 🎉',
-                                                fontSize: 17,
-                                                fontFamily: 'Bold',
-                                                color: Colors.black87,
-                                              ),
-                                              const SizedBox(height: 6),
-                                              Row(
-                                                children: [
-                                                  TextWidget(
-                                                    text: 'You earned ',
-                                                    fontSize: 14,
-                                                    color: Colors.grey.shade700,
+                                              // Notification icon with gradient
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.all(14),
+                                                decoration: BoxDecoration(
+                                                  gradient: LinearGradient(
+                                                    colors: [
+                                                      primary
+                                                          .withOpacity(0.2),
+                                                      secondary
+                                                          .withOpacity(0.2),
+                                                    ],
                                                   ),
-                                                  Container(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 8,
-                                                        vertical: 3),
-                                                    decoration: BoxDecoration(
-                                                      gradient: LinearGradient(
-                                                        colors: [
-                                                          primary
-                                                              .withOpacity(0.1),
-                                                          secondary
-                                                              .withOpacity(0.1),
-                                                        ],
-                                                      ),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                    ),
-                                                    child: TextWidget(
-                                                      text:
-                                                          '${points.round().toStringAsFixed(0)} pts',
-                                                      fontSize: 13,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: Icon(
+                                                  isWallet
+                                                      ? Icons
+                                                          .account_balance_wallet_rounded
+                                                      : Icons.stars_rounded,
+                                                  color: primary,
+                                                  size: 28,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 18),
+
+                                              // Notification content
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    TextWidget(
+                                                      text: isWallet
+                                                          ? 'Wallet Update'
+                                                          : 'Points Earned! 🎉',
+                                                      fontSize: 17,
                                                       fontFamily: 'Bold',
-                                                      color: primary,
+                                                      color: Colors.black87,
                                                     ),
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 8),
-                                              Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.access_time_rounded,
-                                                    size: 14,
-                                                    color: Colors.grey.shade500,
-                                                  ),
-                                                  const SizedBox(width: 5),
-                                                  TextWidget(
-                                                    text: DateFormat.yMMMd()
-                                                        .add_jm()
-                                                        .format(dateTime ??
-                                                            DateTime
-                                                                .fromMillisecondsSinceEpoch(
-                                                                    0)),
-                                                    fontSize: 12,
-                                                    color: Colors.grey.shade500,
-                                                  ),
-                                                ],
+                                                    const SizedBox(height: 6),
+                                                    Row(
+                                                      children: [
+                                                        TextWidget(
+                                                          text: isWallet
+                                                              ? 'Amount '
+                                                              : 'You earned ',
+                                                          fontSize: 14,
+                                                          color: Colors.grey
+                                                              .shade700,
+                                                        ),
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal: 8,
+                                                                  vertical: 3),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            gradient:
+                                                                LinearGradient(
+                                                              colors: [
+                                                                primary
+                                                                    .withOpacity(
+                                                                        0.1),
+                                                                secondary
+                                                                    .withOpacity(
+                                                                        0.1),
+                                                              ],
+                                                            ),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                          ),
+                                                          child: TextWidget(
+                                                            text: isWallet
+                                                                ? '${points.toStringAsFixed(0)} cash'
+                                                                : '${points.toStringAsFixed(0)} pts',
+                                                            fontSize: 13,
+                                                            fontFamily: 'Bold',
+                                                            color: primary,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    const SizedBox(height: 4),
+                                                    TextWidget(
+                                                      text: isWallet
+                                                          ? (data['type']
+                                                                  ?.toString() ??
+                                                              'Wallet transaction')
+                                                          : (data['type']
+                                                                  ?.toString() ??
+                                                              'Points added'),
+                                                      fontSize: 13,
+                                                      color:
+                                                          Colors.grey.shade600,
+                                                      fontFamily: 'Medium',
+                                                    ),
+                                                    const SizedBox(height: 8),
+                                                    Row(
+                                                      children: [
+                                                        Icon(
+                                                          Icons
+                                                              .access_time_rounded,
+                                                          size: 14,
+                                                          color: Colors.grey
+                                                              .shade500,
+                                                        ),
+                                                        const SizedBox(
+                                                            width: 5),
+                                                        TextWidget(
+                                                          text: DateFormat
+                                                                  .yMMMd()
+                                                              .add_jm()
+                                                              .format(
+                                                                  dateTime),
+                                                          fontSize: 12,
+                                                          color: Colors.grey
+                                                              .shade500,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ],
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                  ),
+                                      ),
+                                    );
+                                  },
                                 ),
-                              );
-                            },
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                  );
+                        );
+                      });
                 }),
           ),
         ],
@@ -411,40 +449,43 @@ class _CustomerNotifPageState extends State<CustomerNotifPage> {
     );
   }
 
-  Stream<List<QueryDocumentSnapshot>> _getCombinedNotificationStream() async* {
-    final pointsQuery = FirebaseFirestore.instance
-        .collection('Points')
-        .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-      .orderBy('dateTime', descending: true)
-        .limit(20);
+  bool _isRelevantPointsNotification(
+      QueryDocumentSnapshot<Map<String, dynamic>> doc) {
+    final data = doc.data();
+    return data['scannedId'] == _currentUserId || data['uid'] == _currentUserId;
+  }
 
-    final walletsQuery = FirebaseFirestore.instance
-        .collection('Wallets')
-        .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-      .orderBy('dateTime', descending: true)
-        .limit(20);
+  bool _isRelevantWalletNotification(
+      QueryDocumentSnapshot<Map<String, dynamic>> doc) {
+    final data = doc.data();
+    return data['uid'] == _currentUserId || data['from'] == _currentUserId;
+  }
 
-    await for (final pointsSnap in pointsQuery.snapshots()) {
-      final walletsSnap = await walletsQuery.get();
-
-      final combined = <QueryDocumentSnapshot>[];
-      combined.addAll(pointsSnap.docs);
-      combined.addAll(walletsSnap.docs);
-
-      // Sort by dateTime descending
-      combined.sort((a, b) {
-        final aData = a.data() as Map<String, dynamic>;
-        final bData = b.data() as Map<String, dynamic>;
-        final aTime = aData['dateTime'] is Timestamp
-            ? (aData['dateTime'] as Timestamp).toDate()
-            : DateTime(2000);
-        final bTime = bData['dateTime'] is Timestamp
-            ? (bData['dateTime'] as Timestamp).toDate()
-            : DateTime(2000);
-        return bTime.compareTo(aTime);
-      });
-
-      yield combined.take(20).toList();
+  DateTime _parseTimestamp(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
+    final dynamic rawDateTime = doc.data()['dateTime'];
+    if (rawDateTime is Timestamp) {
+      return rawDateTime.toDate();
     }
+    return DateTime.fromMillisecondsSinceEpoch(0);
+  }
+
+  double _parseAmount(dynamic rawAmount) {
+    return rawAmount is num ? rawAmount.toDouble() : 0.0;
+  }
+
+  bool _matchesFilter(DateTime docDate) {
+    final now = DateTime.now();
+    if (_filterType == 'today') {
+      return docDate.day == now.day &&
+          docDate.month == now.month &&
+          docDate.year == now.year;
+    }
+    if (_filterType == 'week') {
+      return now.difference(docDate).inDays <= 7;
+    }
+    if (_filterType == 'month') {
+      return docDate.month == now.month && docDate.year == now.year;
+    }
+    return true;
   }
 }

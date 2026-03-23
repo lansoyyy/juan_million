@@ -329,10 +329,6 @@ class _CustomerPointsPageState extends State<CustomerPointsPage> {
                           child: StreamBuilder<QuerySnapshot>(
                               stream: FirebaseFirestore.instance
                                   .collection('Points')
-                                  .where('uid',
-                                      isEqualTo: FirebaseAuth
-                                          .instance.currentUser!.uid)
-                                .orderBy('dateTime', descending: true)
                                   .snapshots(),
                               builder: (BuildContext context,
                                   AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -352,8 +348,27 @@ class _CustomerPointsPageState extends State<CustomerPointsPage> {
                                 }
 
                                 final data = snapshot.requireData;
+                                final userTransactions = data.docs.where((doc) {
+                                  final dynamic scannedId = doc['scannedId'];
+                                  final dynamic uid = doc['uid'];
+                                  final String currentUserId =
+                                      FirebaseAuth.instance.currentUser!.uid;
+                                  return scannedId == currentUserId ||
+                                      uid == currentUserId;
+                                }).toList()
+                                  ..sort((a, b) {
+                                    final dynamic aRaw = a['dateTime'];
+                                    final dynamic bRaw = b['dateTime'];
+                                    final DateTime aTime = aRaw is Timestamp
+                                        ? aRaw.toDate()
+                                        : DateTime(2000);
+                                    final DateTime bTime = bRaw is Timestamp
+                                        ? bRaw.toDate()
+                                        : DateTime(2000);
+                                    return bTime.compareTo(aTime);
+                                  });
 
-                                if (data.docs.isEmpty) {
+                                if (userTransactions.isEmpty) {
                                   return Center(
                                     child: Column(
                                       mainAxisAlignment:
@@ -384,23 +399,33 @@ class _CustomerPointsPageState extends State<CustomerPointsPage> {
                                           mainAxisSpacing: 20,
                                           childAspectRatio: 3,
                                         ),
-                                        itemCount: data.docs.length,
+                                        itemCount: userTransactions.length,
                                         itemBuilder: (context, index) {
-                                          double points = data.docs[index]
-                                                  ['pts']
-                                              .toDouble();
+                                          final transaction =
+                                            userTransactions[index];
+                                          final dynamic rawPoints =
+                                            transaction['pts'];
+                                          final double points =
+                                            rawPoints is num
+                                              ? rawPoints.toDouble()
+                                              : 0.0;
                                           return _buildTransactionCard(
-                                              data.docs[index], points, true);
+                                            transaction, points, true);
                                         },
                                       )
                                     : ListView.builder(
-                                        itemCount: data.docs.length,
+                                        itemCount: userTransactions.length,
                                         itemBuilder: (context, index) {
-                                          double points = data.docs[index]
-                                                  ['pts']
-                                              .toDouble();
+                                          final transaction =
+                                            userTransactions[index];
+                                          final dynamic rawPoints =
+                                            transaction['pts'];
+                                          final double points =
+                                            rawPoints is num
+                                              ? rawPoints.toDouble()
+                                              : 0.0;
                                           return _buildTransactionCard(
-                                              data.docs[index], points, false);
+                                            transaction, points, false);
                                         },
                                       );
                               }),
@@ -752,9 +777,11 @@ class _CustomerPointsPageState extends State<CustomerPointsPage> {
       Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => QRScannedPage(
                 fromWallet: true,
+                fromScan: true,
                 inuser: true,
                 pts: amountValue.toString(),
                 store: FirebaseAuth.instance.currentUser!.uid,
+                refId: walletDoc.id,
               )));
     } on PlatformException {
       qrCode = 'Failed to get platform version.';

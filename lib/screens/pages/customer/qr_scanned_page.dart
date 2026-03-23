@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:juan_million/screens/business_home_screen.dart';
 import 'package:juan_million/screens/customer_home_screen.dart';
@@ -13,13 +12,13 @@ import 'package:juan_million/widgets/text_widget.dart';
 import 'package:juan_million/widgets/toast_widget.dart';
 
 class QRScannedPage extends StatefulWidget {
-  String store;
-  String pts;
+  final String store;
+  final String pts;
 
-  bool? inuser;
-  bool? fromWallet;
-  bool? fromScan;
-  String? refId;
+  final bool? inuser;
+  final bool? fromWallet;
+  final bool? fromScan;
+  final String? refId;
 
   QRScannedPage({
     super.key,
@@ -37,6 +36,15 @@ class QRScannedPage extends StatefulWidget {
 
 class _QRScannedPageState extends State<QRScannedPage> {
   String qrCode = 'Unknown';
+  late String _store;
+  late String _pts;
+
+  @override
+  void initState() {
+    super.initState();
+    _store = widget.store;
+    _pts = widget.pts;
+  }
 
   Future<void> scanQRCode() async {
     try {
@@ -141,8 +149,8 @@ class _QRScannedPageState extends State<QRScannedPage> {
 
       if (!mounted) return;
       setState(() {
-        widget.pts = ptsValue.toString();
-        widget.store = businessId;
+        _pts = ptsValue.toString();
+        _store = businessId;
       });
 
       if (Navigator.of(context).canPop()) {
@@ -166,10 +174,13 @@ class _QRScannedPageState extends State<QRScannedPage> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final double cardWidth = (size.width - 40).clamp(280.0, 350.0).toDouble();
-    final Stream<DocumentSnapshot> userData = FirebaseFirestore.instance
+    final bool showsBusinessDetails = !widget.fromWallet! && widget.inuser!;
+    final Stream<DocumentSnapshot>? userData = showsBusinessDetails
+      ? FirebaseFirestore.instance
         .collection('Business')
-        .doc(widget.store)
-        .snapshots();
+        .doc(_store)
+        .snapshots()
+      : null;
     return Scaffold(
       backgroundColor: blue,
       body: SafeArea(
@@ -250,7 +261,9 @@ class _QRScannedPageState extends State<QRScannedPage> {
                           child: TextWidget(
                             maxLines: 2,
                             text: widget.fromWallet!
-                                ? 'You transfer Points'
+                                ? widget.fromScan!
+                                    ? 'You transferred points successfully'
+                                    : 'You transferred wallet funds successfully'
                                 : 'Your purchase from Juan Store is converted as points',
                             fontSize: 14,
                             color: Colors.grey,
@@ -271,7 +284,7 @@ class _QRScannedPageState extends State<QRScannedPage> {
                         ),
                         Center(
                           child: TextWidget(
-                            text: widget.pts,
+                            text: _pts,
                             fontSize: 48,
                             color: Colors.black,
                             fontFamily: 'Bold',
@@ -342,7 +355,7 @@ class _QRScannedPageState extends State<QRScannedPage> {
                             : !widget.inuser!
                                 ? const SizedBox()
                                 : StreamBuilder<DocumentSnapshot>(
-                                    stream: userData,
+                              stream: userData,
                                     builder: (context,
                                         AsyncSnapshot<DocumentSnapshot>
                                             snapshot) {
@@ -436,7 +449,7 @@ class _QRScannedPageState extends State<QRScannedPage> {
                             ? StreamBuilder<DocumentSnapshot>(
                                 stream: FirebaseFirestore.instance
                                     .collection('Users')
-                                    .doc(widget.store)
+                                    .doc(_store)
                                     .snapshots(),
                                 builder: (context,
                                     AsyncSnapshot<DocumentSnapshot> snapshot) {

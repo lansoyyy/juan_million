@@ -40,7 +40,6 @@ class MySlotsScreen extends StatelessWidget {
             StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('Slots')
-                    .orderBy('dateTime', descending: false)
                     .snapshots(),
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -59,14 +58,28 @@ class MySlotsScreen extends StatelessWidget {
                   }
 
                   final data = snapshot.requireData;
+                  final sortedSlots = data.docs.toList()
+                    ..sort((a, b) {
+                      final dynamic aRaw = a['dateTime'];
+                      final dynamic bRaw = b['dateTime'];
+                      final DateTime aTime = aRaw is Timestamp
+                          ? aRaw.toDate()
+                          : DateTime(2000);
+                      final DateTime bTime = bRaw is Timestamp
+                          ? bRaw.toDate()
+                          : DateTime(2000);
+                      return aTime.compareTo(bTime);
+                    });
 
-                  // Filter to only current user's slots to make calculating index easier
-                  final userDocs = data.docs
-                      .where((doc) =>
-                          doc['uid'] == FirebaseAuth.instance.currentUser!.uid)
-                      .toList();
+                  final userSlots = <MapEntry<int, QueryDocumentSnapshot>>[];
+                  for (int index = 0; index < sortedSlots.length; index++) {
+                    final slotDoc = sortedSlots[index];
+                    if (slotDoc['uid'] == FirebaseAuth.instance.currentUser!.uid) {
+                      userSlots.add(MapEntry(index + 1, slotDoc));
+                    }
+                  }
 
-                  if (userDocs.isEmpty) {
+                  if (userSlots.isEmpty) {
                     return const Center(
                       child: Padding(
                         padding: EdgeInsets.all(20.0),
@@ -80,11 +93,11 @@ class MySlotsScreen extends StatelessWidget {
 
                   return Expanded(
                     child: ListView.builder(
-                      itemCount: userDocs.length,
+                      itemCount: userSlots.length,
                       itemBuilder: (context, index) {
-                        // The userDocs are ordered chronologically, so index + 1 is the correct sequential slot number
-                        int userSlotNumber = index + 1;
-                        final slotDoc = userDocs[index];
+                        final slotEntry = userSlots[index];
+                        final int userSlotNumber = slotEntry.key;
+                        final slotDoc = slotEntry.value;
 
                         return StreamBuilder<DocumentSnapshot>(
                             stream: FirebaseFirestore.instance

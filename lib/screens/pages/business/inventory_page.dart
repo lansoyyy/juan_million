@@ -142,9 +142,6 @@ class _InventoryPageState extends State<InventoryPage> {
     return StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('Points')
-            .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-            .where('scanned', isEqualTo: true)
-        .orderBy('dateTime', descending: true)
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
@@ -162,6 +159,19 @@ class _InventoryPageState extends State<InventoryPage> {
           }
 
           final data = snapshot.requireData;
+          final docs = data.docs.where((doc) {
+            return doc['uid'] == FirebaseAuth.instance.currentUser!.uid &&
+                doc['scanned'] == true;
+          }).toList()
+            ..sort((a, b) {
+              final dynamic aRaw = a['dateTime'];
+              final dynamic bRaw = b['dateTime'];
+              final DateTime aTime =
+                  aRaw is Timestamp ? aRaw.toDate() : DateTime(2000);
+              final DateTime bTime =
+                  bRaw is Timestamp ? bRaw.toDate() : DateTime(2000);
+              return bTime.compareTo(aTime);
+            });
           return Container(
             decoration: isDesktop
                 ? null
@@ -236,7 +246,7 @@ class _InventoryPageState extends State<InventoryPage> {
                             ),
                             const SizedBox(height: 10),
                             TextWidget(
-                              text: data.docs.length.toString(),
+                              text: docs.length.toString(),
                               fontFamily: 'Bold',
                               fontSize: 64,
                               color: blue,
@@ -309,7 +319,7 @@ class _InventoryPageState extends State<InventoryPage> {
                                     ),
                                     const SizedBox(width: 6),
                                     TextWidget(
-                                      text: '${data.docs.length}',
+                                      text: '${docs.length}',
                                       fontSize: 12,
                                       color: isDesktop ? blue : Colors.white,
                                       fontFamily: 'Bold',
@@ -387,14 +397,14 @@ class _InventoryPageState extends State<InventoryPage> {
                                   ListView.separated(
                                     shrinkWrap: true,
                                     physics: const NeverScrollableScrollPhysics(),
-                                    itemCount: data.docs.length,
+                                    itemCount: docs.length,
                                     separatorBuilder: (context, index) => Divider(
                                       height: 1,
                                       color: Colors.grey.shade200,
                                     ),
                                     itemBuilder: (context, index) {
                                       final String scannedId =
-                                          (data.docs[index]['scannedId'] ?? '')
+                                          (docs[index]['scannedId'] ?? '')
                                               .toString();
                                       if (scannedId.isEmpty) {
                                         return Container(
@@ -406,7 +416,7 @@ class _InventoryPageState extends State<InventoryPage> {
                                                 flex: 3,
                                                 child: TextWidget(
                                                   text:
-                                                      data.docs[index]['type']
+                                                      docs[index]['type']
                                                               ?.toString() ??
                                                           'System Transaction',
                                                   fontSize: 14,
@@ -441,7 +451,7 @@ class _InventoryPageState extends State<InventoryPage> {
                                                               8),
                                                     ),
                                                     child: TextWidget(
-                                                      text: data.docs[index]
+                                                      text: docs[index]
                                                               ['pts']
                                                           .toString(),
                                                       fontSize: 13,
@@ -565,7 +575,7 @@ class _InventoryPageState extends State<InventoryPage> {
                                                                           8),
                                                             ),
                                                             child: TextWidget(
-                                                              text: data.docs[
+                                                              text: docs[
                                                                       index]['pts']
                                                                   .toString(),
                                                               fontSize: 13,
@@ -590,10 +600,10 @@ class _InventoryPageState extends State<InventoryPage> {
                             ListView.builder(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
-                              itemCount: data.docs.length,
+                              itemCount: docs.length,
                               itemBuilder: (context, index) {
                                 final String scannedId =
-                                    (data.docs[index]['scannedId'] ?? '')
+                                    (docs[index]['scannedId'] ?? '')
                                         .toString();
                                 if (scannedId.isEmpty) {
                                   return Padding(
@@ -618,7 +628,7 @@ class _InventoryPageState extends State<InventoryPage> {
                                         children: [
                                           Expanded(
                                             child: TextWidget(
-                                              text: data.docs[index]['type']
+                                              text: docs[index]['type']
                                                       ?.toString() ??
                                                   'System Transaction',
                                               fontSize: 14,
@@ -636,7 +646,7 @@ class _InventoryPageState extends State<InventoryPage> {
                                                   BorderRadius.circular(8),
                                             ),
                                             child: TextWidget(
-                                              text: data.docs[index]['pts']
+                                              text: docs[index]['pts']
                                                   .toString(),
                                               fontSize: 14,
                                               color: Colors.orange,
@@ -796,7 +806,7 @@ class _InventoryPageState extends State<InventoryPage> {
                                                                           8),
                                                             ),
                                                             child: TextWidget(
-                                                              text: data.docs[
+                                                              text: docs[
                                                                       index]['pts']
                                                                   .toString(),
                                                               fontSize: 14,

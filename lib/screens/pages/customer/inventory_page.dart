@@ -292,6 +292,18 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                           }
 
                           final data = snapshot.requireData;
+                          final sortedSlots = data.docs.toList()
+                            ..sort((a, b) {
+                              final dynamic aRaw = a['dateTime'];
+                              final dynamic bRaw = b['dateTime'];
+                              final DateTime aTime = aRaw is Timestamp
+                                  ? aRaw.toDate()
+                                  : DateTime(2000);
+                              final DateTime bTime = bRaw is Timestamp
+                                  ? bRaw.toDate()
+                                  : DateTime(2000);
+                              return aTime.compareTo(bTime);
+                            });
 
                           if (data.docs.isEmpty) {
                             return const Center(child: Text('No slots found'));
@@ -299,8 +311,8 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
 
                           int myIndex = 0;
 
-                          for (int i = 0; i < data.docs.length; i++) {
-                            if (data.docs[i]['uid'] ==
+                          for (int i = 0; i < sortedSlots.length; i++) {
+                            if (sortedSlots[i]['uid'] ==
                                 FirebaseAuth.instance.currentUser!.uid) {
                               myIndex = i + 1;
                               break;
@@ -376,7 +388,6 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                               );
                             }
 
-                            final data = snapshot.requireData;
                             return Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -577,8 +588,20 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                             }
 
                             final data = snapshot.requireData;
+                            final sortedSlots = data.docs.toList()
+                              ..sort((a, b) {
+                                final dynamic aRaw = a['dateTime'];
+                                final dynamic bRaw = b['dateTime'];
+                                final DateTime aTime = aRaw is Timestamp
+                                    ? aRaw.toDate()
+                                    : DateTime(2000);
+                                final DateTime bTime = bRaw is Timestamp
+                                    ? bRaw.toDate()
+                                    : DateTime(2000);
+                                return aTime.compareTo(bTime);
+                              });
 
-                            if (data.docs.isEmpty) {
+                            if (sortedSlots.isEmpty) {
                               return SizedBox(
                                 height: isDesktop ? 400 : 300,
                                 child: Center(
@@ -601,13 +624,13 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                               );
                             }
 
-                            if (data.docs.isNotEmpty) {
-                              uid = data.docs.first['uid'];
-                              id = data.docs.first.id;
+                            if (sortedSlots.isNotEmpty) {
+                              uid = sortedSlots.first['uid'];
+                              id = sortedSlots.first.id;
                             }
 
                             final itemCount =
-                                data.docs.length > 9 ? 9 : data.docs.length;
+                                sortedSlots.length > 9 ? 9 : sortedSlots.length;
 
                             // Desktop: 2-column grid, Mobile: list
                             return SizedBox(
@@ -626,7 +649,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                                         return StreamBuilder<DocumentSnapshot>(
                                             stream: FirebaseFirestore.instance
                                                 .collection('Users')
-                                                .doc(data.docs[index]['uid'])
+                                              .doc(sortedSlots[index]['uid'])
                                                 .snapshots(),
                                             builder: (context,
                                                 AsyncSnapshot<DocumentSnapshot>
@@ -654,7 +677,7 @@ class _CustomerInventoryPageState extends State<CustomerInventoryPage> {
                                         return StreamBuilder<DocumentSnapshot>(
                                             stream: FirebaseFirestore.instance
                                                 .collection('Users')
-                                                .doc(data.docs[index]['uid'])
+                                              .doc(sortedSlots[index]['uid'])
                                                 .snapshots(),
                                             builder: (context,
                                                 AsyncSnapshot<DocumentSnapshot>

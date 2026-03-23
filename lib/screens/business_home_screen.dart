@@ -165,6 +165,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                 fromWallet: true,
                 pts: transferredPts.toString(),
                 store: result,
+                refId: pointsDoc.id,
               )));
     } on PlatformException {
       qrCode = 'Failed to get platform version.';
@@ -1097,8 +1098,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                                     CrossAxisAlignment.end,
                                                 children: [
                                                   TextWidget(
-                                                    text: data.docs[index]
-                                                            ['pts']
+                                                    text: doc['pts']
                                                         .toString(),
                                                     fontSize: 32,
                                                     fontFamily: 'Bold',
@@ -1121,8 +1121,7 @@ class _BusinessHomeScreenState extends State<BusinessHomeScreen> {
                                               const SizedBox(height: 10),
                                               TextWidget(
                                                 text: DateFormat.MMMd().format(
-                                                    data.docs[index]['dateTime']
-                                                        .toDate()),
+                                                    doc['dateTime'].toDate()),
                                                 fontSize: 12,
                                                 fontFamily: 'Medium',
                                                 color: Colors.grey,

@@ -459,7 +459,7 @@ class _WalletPageState extends State<WalletPage> {
                                             ListTile(
                                               onTap: () {
                                                 setState(() {
-                                                  selected = 'Business';
+                                                  selected = 'Coordinator';
                                                 });
                                                 Navigator.pop(context);
                                                 if (!hasCashier) {
@@ -550,10 +550,10 @@ class _WalletPageState extends State<WalletPage> {
                                                 );
                                               },
                                               leading: const Icon(
-                                                Icons.business,
+                                                Icons.account_balance,
                                               ),
                                               title: TextWidget(
-                                                text: 'To affiliate',
+                                                text: 'To coordinator',
                                                 fontSize: 14,
                                                 fontFamily: 'Bold',
                                               ),
@@ -757,96 +757,112 @@ class _WalletPageState extends State<WalletPage> {
                                 return bTime.compareTo(aTime);
                               });
 
-                              return SizedBox(
-                                height: 1000,
-                                child: ListView.builder(
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: transactions.length,
-                                  itemBuilder: (context, index) {
-                                    final doc = transactions[index];
-                                    final bool isIncoming = doc['uid'] ==
-                                        FirebaseAuth.instance.currentUser!.uid;
-                                    return Padding(
-                                      padding: const EdgeInsets.all(5.0),
-                                      child: ListTile(
-                                        onTap: () {
-                                          TransactionReceiptDialog
-                                              .showWalletReceipt(context, doc);
-                                        },
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            15,
-                                          ),
-                                        ),
-                                        tileColor: Colors.white,
-                                        leading: Icon(
-                                          isIncoming
-                                              ? Icons.call_received_rounded
-                                              : Icons.call_made_rounded,
-                                          color:
-                                              isIncoming ? primary : secondary,
-                                          size: 32,
-                                        ),
-                                        title: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            TextWidget(
-                                              text: DateFormat.yMMMd()
-                                                  .add_jm()
-                                                  .format(
-                                                      doc['dateTime'].toDate()),
-                                              fontSize: 11,
-                                              color: Colors.grey,
-                                              fontFamily: 'Medium',
-                                            ),
-                                            TextWidget(
-                                              text: '${doc['pts']}',
-                                              fontSize: 16,
-                                              color: Colors.black,
-                                              fontFamily: 'Medium',
-                                            ),
-                                            TextWidget(
-                                              text: '${doc['type']}',
-                                              fontSize: 12,
-                                              color: Colors.black,
-                                              fontFamily: 'Medium',
-                                            ),
-                                            TextWidget(
-                                              text: isIncoming
-                                                  ? 'From: ${doc['from'] ?? 'N/A'}'
-                                                  : 'To: ${doc['uid'] ?? 'N/A'}',
-                                              fontSize: 11,
-                                              color: Colors.grey,
-                                              fontFamily: 'Medium',
-                                            ),
-                                            TextWidget(
-                                              text:
-                                                  'Ref: ${doc['id'] ?? doc.id}',
-                                              fontSize: 11,
-                                              color: Colors.grey,
-                                              fontFamily: 'Medium',
-                                            ),
-                                            TextWidget(
-                                              text: 'Status: Completed',
-                                              fontSize: 11,
-                                              color: Colors.green,
-                                              fontFamily: 'Medium',
-                                            ),
-                                            TextWidget(
-                                              text: 'By: ${doc['cashier']}',
-                                              fontSize: 11,
-                                              color: Colors.grey,
-                                              fontFamily: 'Medium',
-                                            ),
-                                          ],
+                              if (transactions.isEmpty) {
+                                return Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(24),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Center(
+                                    child: TextWidget(
+                                      text: 'No transactions yet',
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                      fontFamily: 'Medium',
+                                    ),
+                                  ),
+                                );
+                              }
+
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: transactions.length,
+                                itemBuilder: (context, index) {
+                                  final doc = transactions[index];
+                                  final bool isIncoming = doc['uid'] ==
+                                      FirebaseAuth.instance.currentUser!.uid;
+                                  return Padding(
+                                    padding: const EdgeInsets.all(5.0),
+                                    child: ListTile(
+                                      onTap: () {
+                                        TransactionReceiptDialog
+                                            .showWalletReceipt(context, doc);
+                                      },
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          15,
                                         ),
                                       ),
-                                    );
-                                  },
-                                ),
+                                      tileColor: Colors.white,
+                                      leading: Icon(
+                                        isIncoming
+                                            ? Icons.call_received_rounded
+                                            : Icons.call_made_rounded,
+                                        color:
+                                            isIncoming ? primary : secondary,
+                                        size: 32,
+                                      ),
+                                      title: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          TextWidget(
+                                            text: DateFormat.yMMMd()
+                                                .add_jm()
+                                                .format(doc['dateTime'].toDate()),
+                                            fontSize: 11,
+                                            color: Colors.grey,
+                                            fontFamily: 'Medium',
+                                          ),
+                                          TextWidget(
+                                            text: '${doc['pts']}',
+                                            fontSize: 16,
+                                            color: Colors.black,
+                                            fontFamily: 'Medium',
+                                          ),
+                                          TextWidget(
+                                            text: '${doc['type']}',
+                                            fontSize: 12,
+                                            color: Colors.black,
+                                            fontFamily: 'Medium',
+                                          ),
+                                          TextWidget(
+                                            text: isIncoming
+                                                ? 'From: ${doc['from'] ?? 'N/A'}'
+                                                : 'To: ${doc['uid'] ?? 'N/A'}',
+                                            fontSize: 11,
+                                            color: Colors.grey,
+                                            fontFamily: 'Medium',
+                                          ),
+                                          TextWidget(
+                                            text:
+                                                'Ref: ${doc['id'] ?? doc.id}',
+                                            fontSize: 11,
+                                            color: Colors.grey,
+                                            fontFamily: 'Medium',
+                                          ),
+                                          TextWidget(
+                                            text: 'Status: Completed',
+                                            fontSize: 11,
+                                            color: Colors.green,
+                                            fontFamily: 'Medium',
+                                          ),
+                                          TextWidget(
+                                            text: 'By: ${doc['cashier']}',
+                                            fontSize: 11,
+                                            color: Colors.grey,
+                                            fontFamily: 'Medium',
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
                               );
                             }),
                       ],
@@ -1233,6 +1249,18 @@ class _WalletPageState extends State<WalletPage> {
       if (Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
       }
+
+      TransactionReceiptDialog.showWalletReceipt(context, {
+        'pts': amountValue,
+        'from': FirebaseAuth.instance.currentUser!.uid,
+        'uid': result,
+        'id': walletDoc.id,
+        'dateTime': DateTime.now(),
+        'type': selected == 'Coordinator'
+            ? 'Cash out to coordinator'
+            : 'Receive & Transfers',
+        'cashier': cashier,
+      });
 
       showToast('Transaction was successful!', context: context);
       pts.clear();
