@@ -1,12 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:juan_million/screens/pages/customer/qr_scanned_page.dart';
-import 'package:juan_million/screens/pages/customer/qr_scanner_screen.dart';
 import 'package:juan_million/screens/pages/store_page.dart';
 import 'package:juan_million/utlis/app_constants.dart';
+import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
 import 'package:juan_million/widgets/textfield_widget.dart';
 import 'package:juan_million/widgets/toast_widget.dart';
@@ -63,8 +62,6 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
   }
 
   final pts = TextEditingController();
-
-  String selected = '';
 
   // Wallet-specific gradient colors
   final Color walletPrimary = const Color(0xFF6a11cb);
@@ -216,9 +213,6 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
                                               const SizedBox(height: 20),
                                               ListTile(
                                                 onTap: () {
-                                                  setState(() {
-                                                    selected = 'Business';
-                                                  });
                                                   Navigator.pop(context);
                                                   showAmountDialog();
                                                 },
@@ -629,7 +623,7 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
                 MaterialButton(
                   onPressed: () async {
                     Navigator.of(context).pop();
-                    scanQRCode();
+                    _showAffiliateCodeDialog();
                   },
                   child: const Text(
                     'Confirm',
@@ -641,137 +635,215 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
             ));
   }
 
-  String qrCode = 'Unknown';
+  final TextEditingController _affiliateCodeController = TextEditingController();
 
-  Future<void> scanQRCode() async {
-    try {
-      // Navigate to a new screen for QR scanning
-      final result = await Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => const QRScannerScreen(),
+  void _showAffiliateCodeDialog() {
+    _affiliateCodeController.clear();
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
         ),
-      );
-
-      if (result == null) {
-        // User cancelled the scan
-        return;
-      }
-
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return const AlertDialog(
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CircularProgressIndicator(),
-              ],
-            ),
-          );
-        },
-      );
-
-      if (!mounted) return;
-
-      setState(() {
-        qrCode = result;
-      });
-
-      final int amountValue = int.tryParse(pts.text) ?? 0;
-      final int serviceCharge = (amountValue * 0.05).round();
-      final int totalDebit = amountValue + serviceCharge;
-
-      if (amountValue <= 0) {
-        if (Navigator.of(context).canPop()) {
-          Navigator.of(context).pop();
-        }
-        showToast('Please enter a valid amount', context: context);
-        return;
-      }
-
-      final recipientDoc = await FirebaseFirestore.instance
-          .collection(selected)
-          .doc(result)
-          .get();
-
-      if (!recipientDoc.exists) {
-        if (Navigator.of(context).canPop()) {
-          Navigator.of(context).pop();
-        }
-        showToast('Invalid recipient QR code', context: context);
-        return;
-      }
-
-      final userDocRef = FirebaseFirestore.instance
-          .collection('Users')
-          .doc(FirebaseAuth.instance.currentUser!.uid);
-      final userSnap = await userDocRef.get();
-      final userMap = userSnap.data();
-      final int currentWallet = (userMap != null && userMap['wallet'] is num)
-          ? (userMap['wallet'] as num).toInt()
-          : 0;
-
-      if (currentWallet < totalDebit) {
-        if (Navigator.of(context).canPop()) {
-          Navigator.of(context).pop();
-        }
-        showToast('Your E wallet is not enough to proceed!', context: context);
-        return;
-      }
-
-      final batch = FirebaseFirestore.instance.batch();
-      final walletDoc = FirebaseFirestore.instance.collection('Wallets').doc();
-      batch.update(userDocRef, {
-        'wallet': FieldValue.increment(-totalDebit),
-      });
-      batch.update(
-        FirebaseFirestore.instance.collection(selected).doc(result),
-        {
-          'wallet': FieldValue.increment(amountValue),
-        },
-      );
-
-      batch.set(walletDoc, {
-        'pts': amountValue,
-        'from': FirebaseAuth.instance.currentUser!.uid,
-        'uid': result,
-        'id': walletDoc.id,
-        'dateTime': DateTime.now(),
-        'type': 'Receive & Transfers',
-        'cashier': '',
-      });
-
-      await batch.commit();
-
-      if (Navigator.of(context).canPop()) {
-        Navigator.of(context).pop();
-      }
-
-      final amountStr = amountValue.toString();
-      pts.clear();
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => QRScannedPage(
-            fromWallet: true,
-            inuser: true,
-            pts: amountStr,
-            store: FirebaseAuth.instance.currentUser!.uid,
-            refId: walletDoc.id,
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextWidget(
+                text: 'Enter Affiliate Code',
+                fontSize: 20,
+                fontFamily: 'Bold',
+                color: primary,
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: _affiliateCodeController,
+                decoration: InputDecoration(
+                  hintText: 'Enter referral code',
+                  hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 15),
+                  filled: true,
+                  fillColor: Colors.grey.shade100,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: primary, width: 2),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                ),
+                autofocus: true,
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: TextWidget(
+                      text: 'Cancel',
+                      fontSize: 15,
+                      fontFamily: 'Medium',
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final code = _affiliateCodeController.text.trim();
+                      if (code.isEmpty) {
+                        showToast('Please enter a referral code', context: context);
+                        return;
+                      }
+                      Navigator.of(context).pop();
+                      await _processTransferWithReferralCode(code);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                    ),
+                    child: TextWidget(
+                      text: 'Proceed',
+                      fontSize: 15,
+                      fontFamily: 'Bold',
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
-      );
-    } on PlatformException {
-      qrCode = 'Failed to get platform version.';
-      if (Navigator.of(context).canPop()) {
-        Navigator.of(context).pop();
-      }
-      showToast('Failed to scan QR code', context: context);
-    } catch (_) {
-      if (Navigator.of(context).canPop()) {
-        Navigator.of(context).pop();
-      }
-      showToast('Transfer failed. Please try again.', context: context);
+      ),
+    );
+  }
+
+  Future<void> _processTransferWithReferralCode(String referralCode) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return const AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (!mounted) return;
+
+    final int amountValue = int.tryParse(pts.text) ?? 0;
+    final int serviceCharge = (amountValue * 0.05).round();
+    final int totalDebit = amountValue + serviceCharge;
+
+    if (amountValue <= 0) {
+      if (Navigator.of(context).canPop()) Navigator.of(context).pop();
+      showToast('Please enter a valid amount', context: context);
+      return;
     }
+
+    final refSnapshot = await FirebaseFirestore.instance
+        .collection('Referals')
+        .where('ref', isEqualTo: referralCode)
+        .limit(1)
+        .get();
+
+    if (refSnapshot.docs.isEmpty) {
+      if (Navigator.of(context).canPop()) Navigator.of(context).pop();
+      showToast('Invalid referral code. Please check and try again.', context: context);
+      return;
+    }
+
+    final refDoc = refSnapshot.docs.first;
+    final refData = refDoc.data();
+    final String businessUid = refData['uid'] as String;
+    final String refType = refData['type'] as String;
+
+    if (refType != 'Business') {
+      if (Navigator.of(context).canPop()) Navigator.of(context).pop();
+      showToast('This referral code does not belong to a business.', context: context);
+      return;
+    }
+
+    final businessDoc = await FirebaseFirestore.instance
+        .collection('Business')
+        .doc(businessUid)
+        .get();
+
+    if (!businessDoc.exists) {
+      if (Navigator.of(context).canPop()) Navigator.of(context).pop();
+      showToast('Business not found for this referral code.', context: context);
+      return;
+    }
+
+    final userDocRef = FirebaseFirestore.instance
+        .collection('Users')
+        .doc(FirebaseAuth.instance.currentUser!.uid);
+    final userSnap = await userDocRef.get();
+    final userMap = userSnap.data();
+    final int currentWallet = (userMap != null && userMap['wallet'] is num)
+        ? (userMap['wallet'] as num).toInt()
+        : 0;
+
+    if (currentWallet < totalDebit) {
+      if (Navigator.of(context).canPop()) Navigator.of(context).pop();
+      showToast('Your E wallet is not enough to proceed!', context: context);
+      return;
+    }
+
+    final batch = FirebaseFirestore.instance.batch();
+    final walletDoc = FirebaseFirestore.instance.collection('Wallets').doc();
+    batch.update(userDocRef, {
+      'wallet': FieldValue.increment(-totalDebit),
+    });
+    batch.update(
+      FirebaseFirestore.instance.collection('Business').doc(businessUid),
+      {
+        'wallet': FieldValue.increment(amountValue),
+      },
+    );
+
+    batch.set(walletDoc, {
+      'pts': amountValue,
+      'from': FirebaseAuth.instance.currentUser!.uid,
+      'uid': businessUid,
+      'id': walletDoc.id,
+      'dateTime': DateTime.now(),
+      'type': 'Receive & Transfers',
+      'cashier': '',
+    });
+
+    await batch.commit();
+
+    if (Navigator.of(context).canPop()) Navigator.of(context).pop();
+
+    final amountStr = amountValue.toString();
+    pts.clear();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => QRScannedPage(
+          fromWallet: true,
+          inuser: true,
+          pts: amountStr,
+          store: FirebaseAuth.instance.currentUser!.uid,
+          refId: walletDoc.id,
+        ),
+      ),
+    );
   }
 }
