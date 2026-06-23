@@ -1,0 +1,54 @@
+rules_version = '2';
+
+// Template — review and merge with your existing Firestore rules before deploying.
+//
+// Customer E-Wallet "To Affiliate" transfer requires authenticated users to:
+//   1. READ  Business/{id}           — resolve referral code / QR (Affiliate Locator)
+//   2. READ  Referals (optional)     — legacy referral lookup fallbacks
+//   3. UPDATE Users/{auth.uid}       — debit customer wallet (FieldValue.increment)
+//   4. UPDATE Business/{businessId}    — credit affiliate wallet (FieldValue.increment)
+//   5. CREATE Wallets/{id}           — append transfer ledger entry
+//
+// Deploy: Firebase Console > Firestore > Rules, or `firebase deploy --only firestore:rules`
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    match /Business/{businessId} {
+      allow read: if isSignedIn();
+      // Allow wallet credit during customer-to-business transfers.
+      // Merge this with your existing Business write rules.
+      allow update: if isSignedIn();
+    }
+
+    match /Users/{userId} {
+      allow read: if isSignedIn();
+      allow update: if isOwner(userId);
+    }
+
+    match /Referals/{referalId} {
+      allow read: if isSignedIn();
+      allow write: if isOwner(referalId);
+    }
+
+    match /Wallets/{walletId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn()
+        && request.resource.data.from == request.auth.uid;
+    }
+
+    // Add rules for your other collections (Points, Payments, etc.) here.
+    // The catch-all below is for documentation only — remove or replace in production.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

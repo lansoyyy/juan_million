@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:juan_million/screens/pages/customer/qr_scanned_page.dart';
 import 'package:juan_million/screens/pages/store_page.dart';
+import 'package:juan_million/services/affiliate_resolver.dart';
 import 'package:juan_million/utlis/app_constants.dart';
 import 'package:juan_million/utlis/colors.dart';
 import 'package:juan_million/widgets/text_widget.dart';
@@ -661,7 +662,8 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
               TextField(
                 controller: _affiliateCodeController,
                 decoration: InputDecoration(
-                  hintText: 'Enter referral code',
+                  hintText:
+                      'Paste affiliate account ID, QR value, or referral code',
                   hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 15),
                   filled: true,
                   fillColor: Colors.grey.shade100,
@@ -697,9 +699,11 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
                   const SizedBox(width: 10),
                   ElevatedButton(
                     onPressed: () async {
-                      final code = _affiliateCodeController.text.trim();
+                      final code =
+                          normalizeAffiliateInput(_affiliateCodeController.text);
                       if (code.isEmpty) {
-                        showToast('Please enter a referral code', context: context);
+                        showToast('Please enter a referral code',
+                            context: context);
                         return;
                       }
                       Navigator.of(context).pop();
@@ -729,6 +733,12 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
     );
   }
 
+  void _dismissTransferLoadingDialog() {
+    if (mounted && Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    }
+  }
+
   Future<void> _processTransferWithReferralCode(String referralCode) async {
     showDialog(
       context: context,
@@ -747,103 +757,109 @@ class _CustomerWalletPageState extends State<CustomerWalletPage> {
 
     if (!mounted) return;
 
-    final int amountValue = int.tryParse(pts.text) ?? 0;
-    final int serviceCharge = (amountValue * 0.05).round();
-    final int totalDebit = amountValue + serviceCharge;
+    try {
+      final int amountValue = int.tryParse(pts.text) ?? 0;
+      final int serviceCharge = (amountValue * 0.05).round();
+      final int totalDebit = amountValue + serviceCharge;
 
-    if (amountValue <= 0) {
-      if (Navigator.of(context).canPop()) Navigator.of(context).pop();
-      showToast('Please enter a valid amount', context: context);
-      return;
-    }
+      if (amountValue <= 0) {
+        showToast('Please enter a valid amount', context: context);
+        return;
+      }
 
-    final refSnapshot = await FirebaseFirestore.instance
-        .collection('Referals')
-        .where('ref', isEqualTo: referralCode)
-        .limit(1)
-        .get();
+      final affiliate = await resolveAffiliateBusiness(referralCode);
+      if (!mounted) return;
+      if (affiliate == null) {
+        showToast('Invalid referral code. Please check and try again.',
+            context: context, type: ToastType.error);
+        return;
+      }
 
-    if (refSnapshot.docs.isEmpty) {
-      if (Navigator.of(context).canPop()) Navigator.of(context).pop();
-      showToast('Invalid referral code. Please check and try again.', context: context);
-      return;
-    }
+      final String businessUid = affiliate.businessUid;
+      final String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
 
-    final refDoc = refSnapshot.docs.first;
-    final refData = refDoc.data();
-    final String businessUid = refData['uid'] as String;
-    final String refType = refData['type'] as String;
+      if (businessUid == currentUserUid) {
+        if (!mounted) return;
+        showToast('Cannot transfer to your own account!',
+            context: context, type: ToastType.error);
+        return;
+      }
 
-    if (refType != 'Business') {
-      if (Navigator.of(context).canPop()) Navigator.of(context).pop();
-      showToast('This referral code does not belong to a business.', context: context);
-      return;
-    }
+      final userDocRef =
+          FirebaseFirestore.instance.collection('Users').doc(currentUserUid);
+      final businessDocRef =
+          FirebaseFirestore.instance.collection('Business').doc(businessUid);
+      final walletDoc = FirebaseFirestore.instance.collection('Wallets').doc();
 
-    final businessDoc = await FirebaseFirestore.instance
-        .collection('Business')
-        .doc(businessUid)
-        .get();
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        final userSnap = await transaction.get(userDocRef);
+        final userMap = userSnap.data();
+        final int currentWallet =
+            (userMap != null && userMap['wallet'] is num)
+                ? (userMap['wallet'] as num).toInt()
+                : 0;
 
-    if (!businessDoc.exists) {
-      if (Navigator.of(context).canPop()) Navigator.of(context).pop();
-      showToast('Business not found for this referral code.', context: context);
-      return;
-    }
+        if (currentWallet < totalDebit) {
+          throw Exception('insufficient_funds');
+        }
 
-    final userDocRef = FirebaseFirestore.instance
-        .collection('Users')
-        .doc(FirebaseAuth.instance.currentUser!.uid);
-    final userSnap = await userDocRef.get();
-    final userMap = userSnap.data();
-    final int currentWallet = (userMap != null && userMap['wallet'] is num)
-        ? (userMap['wallet'] as num).toInt()
-        : 0;
+        transaction.update(userDocRef, {
+          'wallet': FieldValue.increment(-totalDebit),
+        });
+        transaction.update(businessDocRef, {
+          'wallet': FieldValue.increment(amountValue),
+        });
+        transaction.set(walletDoc, {
+          'pts': amountValue,
+          'from': currentUserUid,
+          'uid': businessUid,
+          'id': walletDoc.id,
+          'dateTime': DateTime.now(),
+          'type': 'Receive & Transfers',
+          'cashier': '',
+        });
+      });
 
-    if (currentWallet < totalDebit) {
-      if (Navigator.of(context).canPop()) Navigator.of(context).pop();
-      showToast('Your E wallet is not enough to proceed!', context: context);
-      return;
-    }
+      if (!mounted) return;
 
-    final batch = FirebaseFirestore.instance.batch();
-    final walletDoc = FirebaseFirestore.instance.collection('Wallets').doc();
-    batch.update(userDocRef, {
-      'wallet': FieldValue.increment(-totalDebit),
-    });
-    batch.update(
-      FirebaseFirestore.instance.collection('Business').doc(businessUid),
-      {
-        'wallet': FieldValue.increment(amountValue),
-      },
-    );
-
-    batch.set(walletDoc, {
-      'pts': amountValue,
-      'from': FirebaseAuth.instance.currentUser!.uid,
-      'uid': businessUid,
-      'id': walletDoc.id,
-      'dateTime': DateTime.now(),
-      'type': 'Receive & Transfers',
-      'cashier': '',
-    });
-
-    await batch.commit();
-
-    if (Navigator.of(context).canPop()) Navigator.of(context).pop();
-
-    final amountStr = amountValue.toString();
-    pts.clear();
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => QRScannedPage(
-          fromWallet: true,
-          inuser: true,
-          pts: amountStr,
-          store: FirebaseAuth.instance.currentUser!.uid,
-          refId: walletDoc.id,
+      final amountStr = amountValue.toString();
+      pts.clear();
+      showToast('Transaction was successful!', context: context);
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => QRScannedPage(
+            fromWallet: true,
+            inuser: true,
+            pts: amountStr,
+            store: businessUid,
+            refId: walletDoc.id,
+          ),
         ),
-      ),
-    );
+      );
+    } on FirebaseException catch (e) {
+      if (!mounted) return;
+      if (e.code == 'permission-denied') {
+        showToast('Transfer not permitted. Contact support.',
+            context: context, type: ToastType.error);
+      } else {
+        showToast('Transfer failed. Please try again.',
+            context: context, type: ToastType.error);
+      }
+    } on Exception catch (e) {
+      if (!mounted) return;
+      if (e.toString().contains('insufficient_funds')) {
+        showToast('Your E wallet is not enough to proceed!',
+            context: context, type: ToastType.error);
+      } else {
+        showToast('Transfer failed. Please try again.',
+            context: context, type: ToastType.error);
+      }
+    } catch (_) {
+      if (!mounted) return;
+      showToast('Transfer failed. Please try again.',
+          context: context, type: ToastType.error);
+    } finally {
+      _dismissTransferLoadingDialog();
+    }
   }
 }
